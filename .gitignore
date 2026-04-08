@@ -1,0 +1,5 @@
+.worktrees/
+.baseline-toplevel
+.new-toplevel
+result
+result-*

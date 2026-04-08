@@ -1,0 +1,3 @@
+{...}: {
+  programs.shpool.enable = true;
+}
