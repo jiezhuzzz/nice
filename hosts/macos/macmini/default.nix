@@ -46,6 +46,7 @@ in {
       ../../../modules/home-manager/common
       ../../../modules/home-manager/darwin/aerospace.nix
       ../../../modules/home-manager/darwin/karabiner.nix
+      ../../../modules/home-manager/darwin/packages.nix
     ];
     home.username = user.me.username;
     home.homeDirectory = "/Users/${user.me.username}";
