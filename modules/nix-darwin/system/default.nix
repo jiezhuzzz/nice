@@ -6,6 +6,13 @@
       show-recents = false;
       mru-spaces = false; # don't auto-rearrange spaces by most-recent use
       tilesize = 48;
+
+      persistent-apps = [
+        "/Applications/WeChat.app"
+        "/Applications/Ghostty.app"
+        "/Applications/Zen.app"
+        "/Applications/Zed.app"
+      ];
     };
 
     finder = {
@@ -19,6 +26,7 @@
     };
 
     NSGlobalDomain = {
+      AppleICUForce24HourTime = true;
       AppleShowAllExtensions = true;
       ApplePressAndHoldEnabled = false; # enable key repeat instead of accent popup
       InitialKeyRepeat = 15;
@@ -34,10 +42,7 @@
       PMPrintingExpandedStateForPrint2 = true;
     };
 
-    trackpad = {
-      Clicking = true; # tap to click
-      TrackpadThreeFingerDrag = true;
-    };
+    trackpad.Clicking = true;
 
     loginwindow.GuestEnabled = false;
   };

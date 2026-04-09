@@ -30,6 +30,7 @@
   home.preferXdgDirectories = true;
   xdg.enable = true;
 
+  programs.man.generateCaches = false;
   programs.home-manager.enable = true;
   home.stateVersion = "26.05";
 }

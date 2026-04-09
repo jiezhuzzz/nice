@@ -42,16 +42,22 @@ in {
     brews = [];
     casks = [
       "raycast"
+      "betterdisplay"
       "balenaetcher"
       "iina"
       "zen"
       "zoom"
-      "orbstack"
+      "squirrel-app"
       "cleanshot"
+      "ghostty"
+      "karabiner-elements"
+      "zed"
     ];
     masApps = {
+      Bitwarden = 1352778147;
+      Portal = 1436994560;
       WeChat = 836500024;
-      "Pixelmator Pro" = 1289583905;
+      "Pixelmator Pro" = 6746662575;
     };
   };
 }

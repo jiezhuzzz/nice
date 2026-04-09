@@ -9,14 +9,10 @@
 let
   # Host keys (from /etc/ssh/ssh_host_ed25519_key.pub on each machine).
   naptop = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIApiDrorjoUu3XSvuzSEwDyMauOtmcqeRKW9SJWN1PT7";
+  nacbook = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILd3vgPew3ZkrxUrPxWieOlctLjqw9r0MH48HsAbNfcb";
 
-  # User keys (add your personal SSH/age pubkey here so you can re-encrypt
-  # secrets without being logged in on the host).
-  # jie = "ssh-ed25519 AAAA... jie@somewhere";
-
-  allHosts = [naptop];
-  # allUsers = [jie];
-  allRecipients = allHosts; # ++ allUsers;
+  allHosts = [naptop nacbook];
+  allRecipients = allHosts;
 in {
   "github-ssh-key.age".publicKeys = allRecipients;
   "git-signing-key.age".publicKeys = allRecipients;

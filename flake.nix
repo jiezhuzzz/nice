@@ -55,6 +55,9 @@
       imports = [./lib/mk-hosts.nix];
       perSystem = {pkgs, ...}: {
         formatter = pkgs.alejandra;
+        devShells.default = pkgs.mkShellNoCC {
+          packages = with pkgs; [nil alejandra];
+        };
       };
     };
 }

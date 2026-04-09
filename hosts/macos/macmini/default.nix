@@ -6,6 +6,7 @@
   user = import ../../../users/jie.nix;
 in {
   imports = [
+    ../../../modules/nix-darwin/fonts
     ../../../modules/nix-darwin/homebrew
     ../../../modules/nix-darwin/system
   ];
@@ -29,17 +30,22 @@ in {
 
   system.primaryUser = user.me.username;
 
+  users.knownUsers = [user.me.username];
   users.users.${user.me.username} = {
+    uid = 501;
     home = "/Users/${user.me.username}";
     shell = pkgs.fish;
   };
 
+  home-manager.backupFileExtension = "backup";
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.extraSpecialArgs = {inherit inputs user;};
   home-manager.users.${user.me.username} = {...}: {
     imports = [
       ../../../modules/home-manager/common
+      ../../../modules/home-manager/darwin/aerospace.nix
+      ../../../modules/home-manager/darwin/karabiner.nix
     ];
     home.username = user.me.username;
     home.homeDirectory = "/Users/${user.me.username}";
