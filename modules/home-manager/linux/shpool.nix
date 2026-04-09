@@ -1,3 +1,3 @@
 {...}: {
-  programs.shpool.enable = true;
+  services.shpool.enable = true;
 }

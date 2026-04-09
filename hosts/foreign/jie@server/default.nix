@@ -10,4 +10,8 @@ in {
 
   home.username = user.me.username;
   home.homeDirectory = "/home/${user.me.username}";
+
+  # catppuccin/nix's bottom module uses IFD on a x86_64-linux-only derivation,
+  # which breaks `nix flake check` from aarch64-darwin. Server doesn't need it.
+  catppuccin.bottom.enable = false;
 }
