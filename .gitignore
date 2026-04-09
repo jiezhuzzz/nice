@@ -1,3 +1,4 @@
+.direnv/
 .worktrees/
 .baseline-toplevel
 .new-toplevel
