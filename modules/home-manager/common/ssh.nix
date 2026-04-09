@@ -1,6 +1,11 @@
 # SSH client config. The github.com identity file is decrypted by agenix
-# at boot to /run/agenix/github-ssh-key (owned by this user).
-{...}: {
+# to /run/agenix/github-ssh-key; we expose it at the conventional
+# ~/.ssh/github_ed25519 path via an out-of-store symlink so ssh config
+# and tooling see a normal $HOME path.
+{config, ...}: {
+  home.file.".ssh/github_ed25519".source =
+    config.lib.file.mkOutOfStoreSymlink "/run/agenix/github-ssh-key";
+
   programs.ssh = {
     enable = true;
     # Opt out of the legacy implicit defaults; set our own "*" block below.
@@ -20,7 +25,7 @@
     matchBlocks."github.com" = {
       hostname = "github.com";
       user = "git";
-      identityFile = "/run/agenix/github-ssh-key";
+      identityFile = "~/.ssh/github_ed25519";
       identitiesOnly = true;
     };
   };
