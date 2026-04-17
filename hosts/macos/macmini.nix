@@ -3,17 +3,16 @@
   pkgs,
   ...
 }: let
-  user = import ../../../users/jie.nix;
+  user = import ../../users/jie.nix;
 in {
   imports = [
-    ../../../modules/nix-darwin/fonts
-    ../../../modules/nix-darwin/homebrew
-    ../../../modules/nix-darwin/secrets
-    ../../../modules/nix-darwin/system
+    ../../modules/nix-darwin/fonts
+    ../../modules/nix-darwin/homebrew
+    ../../modules/nix-darwin/system
   ];
 
   nixpkgs.config.allowUnfree = true;
-  nix.enable = false;
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   programs.fish.enable = true;
 
@@ -22,8 +21,8 @@ in {
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
-  networking.hostName = "nacbook";
-  networking.computerName = "nacbook";
+  networking.hostName = "macmini";
+  networking.computerName = "macmini";
 
   nixpkgs.hostPlatform = "aarch64-darwin";
 
@@ -38,15 +37,16 @@ in {
     shell = pkgs.fish;
   };
 
+  home-manager.backupFileExtension = "backup";
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.extraSpecialArgs = {inherit inputs user;};
   home-manager.users.${user.me.username} = {...}: {
     imports = [
-      ../../../modules/home-manager/common
-      ../../../modules/home-manager/darwin/aerospace.nix
-      ../../../modules/home-manager/darwin/karabiner.nix
-      ../../../modules/home-manager/darwin/packages.nix
+      ../../modules/home-manager/common
+      ../../modules/home-manager/darwin/aerospace.nix
+      ../../modules/home-manager/darwin/karabiner.nix
+      ../../modules/home-manager/darwin/packages.nix
     ];
     home.username = user.me.username;
     home.homeDirectory = "/Users/${user.me.username}";

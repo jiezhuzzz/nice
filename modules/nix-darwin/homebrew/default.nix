@@ -45,6 +45,7 @@ in {
       "raycast"
       "betterdisplay"
       "balenaetcher"
+      "claude"
       "iina"
       "zen"
       "zoom"
@@ -53,6 +54,7 @@ in {
       "ghostty"
       "karabiner-elements"
       "zed"
+      "zotero"
     ];
     masApps = {
       Bitwarden = 1352778147;

@@ -18,13 +18,14 @@
     ./fd.nix
     ./fastfetch.nix
     ./bat.nix
+    ./bun.nix
     ./gitui.nix
     ./bottom.nix
     ./ripgrep.nix
     ./agent.nix
     ./delta.nix
     ./gh.nix
-    ./ghostty.nix
+    ./ghostty
   ];
 
   home.preferXdgDirectories = true;
