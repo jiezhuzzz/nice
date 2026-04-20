@@ -47,6 +47,7 @@ in {
       "balenaetcher"
       "claude"
       "iina"
+      "keka"
       "zen"
       "zoom"
       "squirrel-app"
