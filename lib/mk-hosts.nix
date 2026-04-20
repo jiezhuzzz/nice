@@ -53,6 +53,7 @@ in {
 
   flake.darwinConfigurations = {
     nixmini = mkDarwin [../hosts/macos/nixmini.nix];
-    nixbook = mkDarwin [../hosts/macos/nixbook.nix];
+    nixair = mkDarwin [../hosts/macos/nixair.nix];
+    nixneo = mkDarwin [../hosts/macos/nixneo.nix];
   };
 }

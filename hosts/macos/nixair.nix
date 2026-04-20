@@ -22,8 +22,8 @@ in {
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
-  networking.hostName = "nixbook";
-  networking.computerName = "nixbook";
+  networking.hostName = "nixair";
+  networking.computerName = "nixair";
 
   nixpkgs.hostPlatform = "aarch64-darwin";
 
