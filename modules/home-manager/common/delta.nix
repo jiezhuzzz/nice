@@ -1,4 +1,7 @@
-{...}: {
-  programs.delta.enable = true;
-  programs.delta.enableGitIntegration = true;
+{ ... }:
+{
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+  };
 }
