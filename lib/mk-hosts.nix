@@ -43,7 +43,7 @@
     };
 in {
   flake.nixosConfigurations = {
-    naptop = mkNixos [../hosts/nixos/naptop];
+    nixps = mkNixos [../hosts/nixos/nixps];
     nas = mkNixos [../hosts/nixos/nas];
   };
 

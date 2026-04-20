@@ -26,7 +26,7 @@ in {
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
-  networking.hostName = "naptop";
+  networking.hostName = "nixps";
 
   time.timeZone = "America/Chicago";
 
