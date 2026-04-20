@@ -52,7 +52,7 @@ in {
   };
 
   flake.darwinConfigurations = {
-    macmini = mkDarwin [../hosts/macos/macmini.nix];
-    nacbook = mkDarwin [../hosts/macos/nacbook.nix];
+    nixmini = mkDarwin [../hosts/macos/nixmini.nix];
+    nixbook = mkDarwin [../hosts/macos/nixbook.nix];
   };
 }

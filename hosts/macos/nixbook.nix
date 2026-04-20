@@ -8,11 +8,12 @@ in {
   imports = [
     ../../modules/nix-darwin/fonts
     ../../modules/nix-darwin/homebrew
+    ../../modules/nix-darwin/secrets
     ../../modules/nix-darwin/system
   ];
 
   nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  nix.enable = false;
 
   programs.fish.enable = true;
 
@@ -21,12 +22,10 @@ in {
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
-  networking.hostName = "macmini";
-  networking.computerName = "macmini";
+  networking.hostName = "nixbook";
+  networking.computerName = "nixbook";
 
   nixpkgs.hostPlatform = "aarch64-darwin";
-
-  time.timeZone = "America/Chicago";
 
   system.primaryUser = user.me.username;
 
@@ -37,7 +36,6 @@ in {
     shell = pkgs.fish;
   };
 
-  home-manager.backupFileExtension = "backup";
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.extraSpecialArgs = {inherit inputs user;};

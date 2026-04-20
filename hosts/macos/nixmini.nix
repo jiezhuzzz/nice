@@ -22,8 +22,8 @@ in {
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
-  networking.hostName = "nacbook";
-  networking.computerName = "nacbook";
+  networking.hostName = "nixmini";
+  networking.computerName = "nixmini";
 
   nixpkgs.hostPlatform = "aarch64-darwin";
 
@@ -36,6 +36,7 @@ in {
     shell = pkgs.fish;
   };
 
+  home-manager.backupFileExtension = "backup";
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.extraSpecialArgs = {inherit inputs user;};

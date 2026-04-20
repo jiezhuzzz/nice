@@ -9,12 +9,12 @@
 let
   # Host keys (from /etc/ssh/ssh_host_ed25519_key.pub on each machine).
   naptop = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIApiDrorjoUu3XSvuzSEwDyMauOtmcqeRKW9SJWN1PT7";
-  nacbook = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILd3vgPew3ZkrxUrPxWieOlctLjqw9r0MH48HsAbNfcb";
+  nixbook = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILd3vgPew3ZkrxUrPxWieOlctLjqw9r0MH48HsAbNfcb";
 
   # User keys (for editing secrets and as a recovery path).
   password-manager = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIkFCNadE6kTViKssYg8SBEHf9H0BEa92p3l0UfMELOF";
 
-  allHosts = [naptop nacbook];
+  allHosts = [naptop nixbook];
   allUsers = [password-manager];
   allRecipients = allHosts ++ allUsers;
 in {

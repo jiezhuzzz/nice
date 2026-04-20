@@ -21,7 +21,7 @@
         background-opacity = 0.9;
         background-blur-radius = 20;
       }
-      // lib.optionalAttrs ((osConfig.networking.hostName or "") == "macmini") {
+      // lib.optionalAttrs ((osConfig.networking.hostName or "") == "nixmini") {
         custom-shader = [
           "${./shaders/inside-the-matrix.glsl}"
           "${./shaders/cursor_blaze.glsl}"
