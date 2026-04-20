@@ -12,8 +12,6 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
-    nixos-hardware.url = "github:NixOS/nixos-hardware";
-
     zen-browser.url = "github:youwen5/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -51,12 +49,18 @@
 
   outputs = inputs @ {flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin"];
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
       imports = [./lib/mk-hosts.nix];
       perSystem = {pkgs, ...}: {
         formatter = pkgs.alejandra;
         devShells.default = pkgs.mkShellNoCC {
-          packages = with pkgs; [nil alejandra];
+          packages = with pkgs; [
+            nil
+            alejandra
+          ];
         };
       };
     };
