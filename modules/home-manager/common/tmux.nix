@@ -27,6 +27,10 @@
       # Only show session name if it's not a bare number (i.e. user-named)
       set -g status-left "#{?#{m:*[!0-9]*,#{session_name}},[#{session_name}] ,}"
 
+      # Right status: catppuccin host module only (no default date/time)
+      set -g status-right-length 100
+      set -g status-right "#{E:@catppuccin_status_host}"
+
       # Clipboard — vi copy mode yanks to system clipboard
       set -g set-clipboard on
       bind -T copy-mode-vi v send -X begin-selection
@@ -54,11 +58,14 @@
   };
 
   catppuccin.tmux.extraConfig = ''
-    # Window text: space before text to separate from number
+    # Rounded window indicators
+    set -g @catppuccin_window_status_style "rounded"
+
+    # Window text
     set -g @catppuccin_window_default_text " #{b:pane_current_path}:#{pane_current_command}"
     set -g @catppuccin_window_current_text " #{b:pane_current_path}:#{pane_current_command}"
 
-    # Hostname on the right
+    # Right status: hostname only, no date/time
     set -g @catppuccin_status_modules_right "host"
   '';
 }
