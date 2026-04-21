@@ -1,8 +1,11 @@
 {pkgs, ...}: {
   programs.bash = {
     enable = true;
+    bashrcExtra = ''
+      source ${pkgs.blesh}/share/blesh/ble.sh --attach=none
+    '';
     initExtra = ''
-      source ${pkgs.blesh}/share/blesh/ble.sh
+      [[ ! ''${BLE_VERSION-} ]] || ble-attach
     '';
   };
 }
