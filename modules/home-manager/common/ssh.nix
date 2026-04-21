@@ -2,8 +2,7 @@
 # to /run/agenix/github-ssh-key; we expose it at the conventional
 # ~/.ssh/github_ed25519 path via an out-of-store symlink so ssh config
 # and tooling see a normal $HOME path.
-{ config, ... }:
-{
+{config, ...}: {
   home.file.".ssh/github_ed25519".source =
     config.lib.file.mkOutOfStoreSymlink "/run/agenix/github-ssh-key";
   home.file.".ssh/chameleon_ed25519".source =
@@ -15,7 +14,7 @@
     enableDefaultConfig = false;
     matchBlocks."*" = {
       forwardAgent = false;
-      addKeysToAgent = "no";
+      addKeysToAgent = "yes";
       compression = false;
       serverAliveInterval = 0;
       serverAliveCountMax = 3;
@@ -37,12 +36,12 @@
       identityFile = "~/.ssh/chameleon_ed25519";
       identitiesOnly = true;
     };
-    matchBlocks."tacc-internal" = {
-      hostname = "10.52.*.*";
+    matchBlocks."10.52.*.*" = {
       user = "cc";
       identityFile = "~/.ssh/chameleon_ed25519";
       identitiesOnly = true;
       proxyJump = "tacc";
+      forwardAgent = true;
     };
   };
 }

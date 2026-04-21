@@ -48,7 +48,7 @@ in {
   };
 
   flake.homeConfigurations = {
-    "jie@server" = mkHome "x86_64-linux" [(../hosts/foreign + "/jie@server")];
+    chameleon = mkHome "x86_64-linux" [../hosts/foreign/chameleon];
   };
 
   flake.darwinConfigurations = {
