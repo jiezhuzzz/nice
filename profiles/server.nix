@@ -26,6 +26,7 @@
     ../modules/home-manager/common/oh-my-posh.nix
     ../modules/home-manager/common/tmux.nix
     ../modules/home-manager/linux/shpool.nix
+    ../modules/home-manager/common/packages.nix
   ];
 
   home.preferXdgDirectories = true;
