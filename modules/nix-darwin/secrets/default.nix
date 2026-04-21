@@ -16,4 +16,10 @@ in {
     owner = user.me.username;
     mode = "0400";
   };
+
+  age.secrets.chameleon-ssh-key = {
+    file = ../../../secrets/chameleon-ssh-key.age;
+    owner = user.me.username;
+    mode = "0400";
+  };
 }

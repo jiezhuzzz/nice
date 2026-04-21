@@ -12,12 +12,55 @@
           complex_modifications = {
             rules = [
               {
-                description = "Caps Lock → Escape (alone) / Control (held)";
+                description = "Caps Lock → Escape (alone) / Control (held) [Apple keyboard]";
                 manipulators = [
                   {
                     type = "basic";
+                    conditions = [
+                      {
+                        type = "device_if";
+                        identifiers = [
+                          {
+                            is_built_in_keyboard = true;
+                          }
+                        ];
+                      }
+                    ];
                     from = {
                       key_code = "caps_lock";
+                      modifiers.optional = ["any"];
+                    };
+                    to = [
+                      {
+                        key_code = "left_control";
+                        lazy = true;
+                      }
+                    ];
+                    to_if_alone = [
+                      {
+                        key_code = "escape";
+                      }
+                    ];
+                  }
+                ];
+              }
+              {
+                description = "Control → Escape (alone) / Control (held) [HHKB]";
+                manipulators = [
+                  {
+                    type = "basic";
+                    conditions = [
+                      {
+                        type = "device_if";
+                        identifiers = [
+                          {
+                            vendor_id = 1278;
+                          }
+                        ];
+                      }
+                    ];
+                    from = {
+                      key_code = "left_control";
                       modifiers.optional = ["any"];
                     };
                     to = [

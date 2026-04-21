@@ -16,6 +16,9 @@ in {
 
   programs.git = {
     enable = true;
+    attributes = [
+      "*.age diff=age binary"
+    ];
     settings = {
       user.name = user.me.fullname;
       user.email = user.me.email;
@@ -29,6 +32,13 @@ in {
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
+      merge.conflictstyle = "zdiff3";
+      diff.algorithm = "histogram";
+      transfer.fsckobjects = true;
+      fetch.fsckobjects = true;
+      receive.fsckobjects = true;
+      rebase.autosquash = true;
+      rerere.enabled = true;
     };
   };
 }

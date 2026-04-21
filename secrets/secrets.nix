@@ -21,4 +21,5 @@ let
 in {
   "github-ssh-key.age".publicKeys = allRecipients;
   "git-signing-key.age".publicKeys = allRecipients;
+  "chameleon-ssh-key.age".publicKeys = allRecipients;
 }

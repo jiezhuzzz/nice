@@ -19,4 +19,11 @@ in {
     group = "users";
     mode = "0400";
   };
+
+  age.secrets.chameleon-ssh-key = {
+    file = ../../../secrets/chameleon-ssh-key.age;
+    owner = user.me.username;
+    group = "users";
+    mode = "0400";
+  };
 }
