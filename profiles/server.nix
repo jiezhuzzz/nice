@@ -2,6 +2,7 @@
 # Shared home-manager profile for standalone HM on non-NixOS servers.
 {...}: {
   imports = [
+    ../modules/home-manager/common/theme.nix
     ../modules/home-manager/common/bash.nix
     ../modules/home-manager/common/atuin.nix
     ../modules/home-manager/common/direnv.nix
