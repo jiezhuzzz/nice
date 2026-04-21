@@ -22,6 +22,7 @@
     ../modules/home-manager/common/zoxide.nix
     ../modules/home-manager/common/bottom.nix
     ../modules/home-manager/common/fastfetch.nix
+    ../modules/home-manager/common/agent.nix
     ../modules/home-manager/linux/shpool.nix
   ];
 
