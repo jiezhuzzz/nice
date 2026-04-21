@@ -88,18 +88,28 @@ in {
       gtk.enable = true;
     };
 
-    # Agenix-managed SSH key symlinks and identity pinning
-    home.file.".ssh/github_ed25519".source =
-      config.lib.file.mkOutOfStoreSymlink "/run/agenix/github-ssh-key";
-    home.file.".ssh/chameleon_ed25519".source =
-      config.lib.file.mkOutOfStoreSymlink "/run/agenix/chameleon-ssh-key";
+    # SSH identity pinning (keys decrypted by agenix to /run/agenix/)
     programs.ssh.matchBlocks."github.com" = {
-      identityFile = "~/.ssh/github_ed25519";
+      identityFile = "/run/agenix/github-ssh-key";
       identitiesOnly = true;
     };
-    programs.ssh.matchBlocks."tacc".identityFile = "~/.ssh/chameleon_ed25519";
-    programs.ssh.matchBlocks."tacc".identitiesOnly = true;
-    programs.ssh.matchBlocks."10.52.*.*".identityFile = "~/.ssh/chameleon_ed25519";
-    programs.ssh.matchBlocks."10.52.*.*".identitiesOnly = true;
+    programs.ssh.matchBlocks."tacc" = {
+      identityFile = "/run/agenix/chameleon-ssh-key";
+      identitiesOnly = true;
+    };
+    programs.ssh.matchBlocks."10.52.*.*" = {
+      identityFile = "/run/agenix/chameleon-ssh-key";
+      identitiesOnly = true;
+    };
+
+    # Auto-load SSH keys into agent at login
+    systemd.user.services.ssh-add-keys = {
+      Unit.Description = "Load SSH keys into agent";
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.openssh}/bin/ssh-add /run/agenix/github-ssh-key /run/agenix/git-signing-key /run/agenix/chameleon-ssh-key";
+      };
+      Install.WantedBy = ["default.target"];
+    };
   };
 }
