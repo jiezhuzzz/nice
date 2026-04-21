@@ -38,7 +38,7 @@ in {
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.extraSpecialArgs = {inherit inputs user;};
-  home-manager.users.${user.me.username} = {pkgs, ...}: {
+  home-manager.users.${user.me.username} = {config, pkgs, ...}: {
     imports = [
       # common
       ../modules/home-manager/common/packages.nix
@@ -87,5 +87,19 @@ in {
       size = 32;
       gtk.enable = true;
     };
+
+    # Agenix-managed SSH key symlinks and identity pinning
+    home.file.".ssh/github_ed25519".source =
+      config.lib.file.mkOutOfStoreSymlink "/run/agenix/github-ssh-key";
+    home.file.".ssh/chameleon_ed25519".source =
+      config.lib.file.mkOutOfStoreSymlink "/run/agenix/chameleon-ssh-key";
+    programs.ssh.matchBlocks."github.com" = {
+      identityFile = "~/.ssh/github_ed25519";
+      identitiesOnly = true;
+    };
+    programs.ssh.matchBlocks."tacc".identityFile = "~/.ssh/chameleon_ed25519";
+    programs.ssh.matchBlocks."tacc".identitiesOnly = true;
+    programs.ssh.matchBlocks."10.52.*.*".identityFile = "~/.ssh/chameleon_ed25519";
+    programs.ssh.matchBlocks."10.52.*.*".identitiesOnly = true;
   };
 }

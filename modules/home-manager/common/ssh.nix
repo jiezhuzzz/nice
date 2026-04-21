@@ -1,16 +1,8 @@
-# SSH client config. The github.com identity file is decrypted by agenix
-# to /run/agenix/github-ssh-key; we expose it at the conventional
-# ~/.ssh/github_ed25519 path via an out-of-store symlink so ssh config
-# and tooling see a normal $HOME path.
-{config, ...}: {
-  home.file.".ssh/github_ed25519".source =
-    config.lib.file.mkOutOfStoreSymlink "/run/agenix/github-ssh-key";
-  home.file.".ssh/chameleon_ed25519".source =
-    config.lib.file.mkOutOfStoreSymlink "/run/agenix/chameleon-ssh-key";
-
+# SSH client config — base settings shared by all hosts.
+# Desktop machines additionally import ssh-keys.nix for local key paths.
+{...}: {
   programs.ssh = {
     enable = true;
-    # Opt out of the legacy implicit defaults; set our own "*" block below.
     enableDefaultConfig = false;
     matchBlocks."*" = {
       forwardAgent = false;
@@ -27,19 +19,13 @@
     matchBlocks."github.com" = {
       hostname = "github.com";
       user = "git";
-      identityFile = "~/.ssh/github_ed25519";
-      identitiesOnly = true;
     };
     matchBlocks."tacc" = {
       hostname = "129.114.108.248";
       user = "cc";
-      identityFile = "~/.ssh/chameleon_ed25519";
-      identitiesOnly = true;
     };
     matchBlocks."10.52.*.*" = {
       user = "cc";
-      identityFile = "~/.ssh/chameleon_ed25519";
-      identitiesOnly = true;
       proxyJump = "tacc";
       forwardAgent = true;
     };
