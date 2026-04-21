@@ -18,6 +18,7 @@
         window-padding-y = 8;
         cursor-style = "block";
         copy-on-select = true;
+        shell-integration-features = "ssh-terminfo";
         background-opacity = 0.9;
         background-blur-radius = 20;
       }
