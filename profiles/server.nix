@@ -23,6 +23,7 @@
     ../modules/home-manager/common/bottom.nix
     ../modules/home-manager/common/fastfetch.nix
     ../modules/home-manager/common/agent.nix
+    ../modules/home-manager/common/oh-my-posh.nix
     ../modules/home-manager/common/tmux.nix
     ../modules/home-manager/linux/shpool.nix
   ];
