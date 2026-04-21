@@ -38,7 +38,7 @@ in {
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.extraSpecialArgs = {inherit inputs user;};
-  home-manager.users.${user.me.username} = {config, ...}: {
+  home-manager.users.${user.me.username} = {...}: {
     imports = [
       # common
       ../modules/home-manager/common/packages.nix
