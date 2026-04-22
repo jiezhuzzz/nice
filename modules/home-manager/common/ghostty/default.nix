@@ -25,7 +25,7 @@
       // lib.optionalAttrs ((osConfig.networking.hostName or "") == "nixmini") {
         custom-shader = [
           "${./shaders/inside-the-matrix.glsl}"
-          # "${./shaders/cursor_blaze.glsl}"
+          "${./shaders/cursor_blaze.glsl}"
         ];
       };
   };
