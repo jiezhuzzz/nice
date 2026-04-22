@@ -192,7 +192,7 @@ vec3 rain(vec3 ro3, vec3 rd3, float time) {
                                 float a1 = result.a;
                                 result.a = a1 + (1. - a1) * a;
                                 result.xyz = (result.xyz * a1 + col * (1. - a1) * a) / result.a;
-                                if (result.a > 0.98)
+                                if (result.a > 0.90)
                                     return result.xyz;
                             }
                         }
@@ -246,6 +246,14 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     }
 
     vec2 uv = fragCoord.xy / iResolution.xy;
+
+    // Early out: skip rain computation for pixels occupied by terminal text
+    vec4 terminalColor = texture(iChannel0, uv);
+    float textBrightness = dot(terminalColor.rgb, vec3(0.299, 0.587, 0.114));
+    if (textBrightness > 0.4) {
+        fragColor = terminalColor;
+        return;
+    }
 
     float time = mod(iTime, 300) * SPEED; //reset time every 5 minutes, as large values lead to the same (and eventually no) rune(s)
 
@@ -393,16 +401,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     rd = normalize(rd);
     ro += rd * 0.2;
 
-    // vec3 col = rain(ro, rd, time);
     vec3 col = rain(ro, rd, time) * 0.25;
 
-    // Sample the terminal screen texture including alpha channel
-    vec4 terminalColor = texture(iChannel0, uv);
-
     // Combine the matrix effect with the terminal color
-    // vec3 blendedColor = terminalColor.rgb + col;
-
-    // Make a mask that is 1.0 where the terminal content is not black
     float mask = 1.2 - step(0.5, dot(terminalColor.rgb, vec3(1.0)));
     vec3 blendedColor = mix(terminalColor.rgb * 1.2, col, mask);
 
