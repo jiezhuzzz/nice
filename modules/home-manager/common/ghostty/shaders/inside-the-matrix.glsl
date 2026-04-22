@@ -24,7 +24,7 @@ const float WALK_SPEED = 0.5 * XYCELL_SIZE;
 const float BLOCKS_BEFORE_TURN = 3.;
 
 const float PI = 3.14159265359;
-const vec4 RUNE_SNAPS = vec4(2, 3, 2, 3);
+const vec4 RUNE_SNAPS = vec4(2, 3, 2, 3);  // snap grid: 2 cols x 3 rows for rune stroke endpoints
 
 //        ----  random  ----
 
