@@ -1,7 +1,7 @@
 {...}: {
   programs.tmux = {
     enable = true;
-    prefix = "C-q";
+    prefix = "C-`";
     mouse = true;
     terminal = "tmux-256color";
     baseIndex = 1;

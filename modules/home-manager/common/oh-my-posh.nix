@@ -1,9 +1,7 @@
-{...}:
-let
+{...}: let
   # Nix doesn't support \uXXXX escapes; use fromJSON to get Unicode glyphs
   icon = char: builtins.fromJSON ''"${char}"'';
-in
-{
+in {
   programs.oh-my-posh = {
     enable = true;
     enableBashIntegration = true;

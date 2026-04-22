@@ -63,7 +63,8 @@ in {
       ../modules/home-manager/common/gitui.nix
       ../modules/home-manager/common/bottom.nix
       ../modules/home-manager/common/ripgrep.nix
-      ../modules/home-manager/common/agent.nix
+      ../modules/home-manager/common/claude-code.nix
+      ../modules/home-manager/common/codex.nix
       ../modules/home-manager/common/delta.nix
       ../modules/home-manager/common/gh.nix
       ../modules/home-manager/common/ghostty
