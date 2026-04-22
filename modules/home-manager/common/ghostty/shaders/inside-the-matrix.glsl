@@ -152,8 +152,7 @@ vec3 rain(vec3 ro3, vec3 rd3, float time) {
         float char_z_shift = floor(z_shift / STRIP_CHAR_HEIGHT);
         z_shift = char_z_shift * STRIP_CHAR_HEIGHT;
         int zcell = int(floor((pos_z - z_shift)/ZCELL_SIZE));  //z-cell index
-        {  // single z-cell check (camera angle is mostly horizontal)
-            int j = 0;
+        {  // single z-cell check: safe because camera ray is nearly horizontal
             //  calcaulate coordinates of the target (raindrop)
             vec4 cell_hash = hash4(vec3(ivec3(cell, zcell)));
             vec4 cell_hash2 = fract(cell_hash * vec4(127.1, 311.7, 271.9, 124.6));
