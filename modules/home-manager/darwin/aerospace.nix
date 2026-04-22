@@ -60,7 +60,7 @@
         outer = {
           left = 10;
           bottom = 10;
-          top = 5;
+          top = 10;
           right = 10;
         };
       };

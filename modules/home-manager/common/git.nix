@@ -8,7 +8,7 @@ in {
   programs.git = {
     enable = true;
     attributes = [
-      "*.age diff=age binary"
+      "*.age binary"
     ];
     settings = {
       user.name = user.me.fullname;
