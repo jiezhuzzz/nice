@@ -24,11 +24,12 @@ const float WALK_SPEED = 0.5 * XYCELL_SIZE;
 const float BLOCKS_BEFORE_TURN = 3.;
 
 const float PI = 3.14159265359;
+const vec4 RUNE_SNAPS = vec4(2, 3, 2, 3);
 
 //        ----  random  ----
 
 float hash(float v) {
-    return fract(sin(v)*43758.5453123);
+    return fract(v * 0.7548776662 + v * v * 0.4237987837);
 }
 
 float hash(vec2 v) {
@@ -37,26 +38,30 @@ float hash(vec2 v) {
 
 vec2 hash2(vec2 v)
 {
-    v = vec2(v * mat2(127.1, 311.7,  269.5, 183.3));
-    return fract(sin(v)*43758.5453123);
+    return fract(vec2(
+        dot(v, vec2(127.1, 311.7)),
+        dot(v, vec2(269.5, 183.3))
+    ) * 0.7548776662 + dot(v, v) * vec2(0.4237987837, 0.3914756201));
 }
 
 vec4 hash4(vec2 v)
 {
-    vec4 p = vec4(v * mat4x2( 127.1, 311.7,
-                              269.5, 183.3,
-                              113.5, 271.9,
-                              246.1, 124.6 ));
-    return fract(sin(p)*43758.5453123);
+    return fract(vec4(
+        dot(v, vec2(127.1, 311.7)),
+        dot(v, vec2(269.5, 183.3)),
+        dot(v, vec2(113.5, 271.9)),
+        dot(v, vec2(246.1, 124.6))
+    ) * 0.7548776662 + dot(v, v) * vec4(0.4237987837, 0.3914756201, 0.4831942539, 0.3683495187));
 }
 
 vec4 hash4(vec3 v)
 {
-    vec4 p = vec4(v * mat4x3( 127.1, 311.7, 74.7,
-                              269.5, 183.3, 246.1,
-                              113.5, 271.9, 124.6,
-                              271.9, 269.5, 311.7 ) );
-    return fract(sin(p)*43758.5453123);
+    return fract(vec4(
+        dot(v, vec3(127.1, 311.7, 74.7)),
+        dot(v, vec3(269.5, 183.3, 246.1)),
+        dot(v, vec3(113.5, 271.9, 124.6)),
+        dot(v, vec3(271.9, 269.5, 311.7))
+    ) * 0.7548776662 + dot(v, v) * vec4(0.4237987837, 0.3914756201, 0.4831942539, 0.3683495187));
 }
 
 //        ----  symbols  ----
@@ -82,8 +87,7 @@ float rune(vec2 U, vec2 seed, float highlight)
             if (i == 1) pos.x = .999;
             if (i == 2) pos.x = .0;
             // snap the random line endpoints to a grid 2x3
-            vec4 snaps = vec4(2, 3, 2, 3);
-            pos = ( floor(pos * snaps) + .5) / snaps;
+            pos = ( floor(pos * RUNE_SNAPS) + .5) / RUNE_SNAPS;
 
             if (pos.xy != pos.zw)  //filter out single points (when start and end are the same)
                 d = min(d, rune_line(U, pos.xy, pos.zw + .001) ); // closest line
