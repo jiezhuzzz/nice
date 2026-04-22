@@ -7,7 +7,7 @@
   @pkazmier modified this shader to work in Ghostty.
 */
 
-const int ITERATIONS = 40;   //use less value if you need more performance
+const int ITERATIONS = 22;   //use less value if you need more performance
 const float SPEED = .5;
 
 const float STRIP_CHARS_MIN =  7.;
@@ -72,16 +72,15 @@ float rune_line(vec2 p, vec2 a, vec2 b) {   // from https://www.shadertoy.com/vi
 float rune(vec2 U, vec2 seed, float highlight)
 {
 	float d = 1e5;
-	for (int i = 0; i < 4; i++)	// number of strokes
+	for (int i = 0; i < 3; i++)	// number of strokes (reduced from 4)
 	{
             vec4 pos = hash4(seed);
             seed += 1.;
 
-            // each rune touches the edge of its box on all 4 sides
+            // each rune touches the edge of its box on 3 sides
             if (i == 0) pos.y = .0;
             if (i == 1) pos.x = .999;
             if (i == 2) pos.x = .0;
-            if (i == 3) pos.y = .999;
             // snap the random line endpoints to a grid 2x3
             vec4 snaps = vec4(2, 3, 2, 3);
             pos = ( floor(pos * snaps) + .5) / snaps;
@@ -153,7 +152,8 @@ vec3 rain(vec3 ro3, vec3 rd3, float time) {
         float char_z_shift = floor(z_shift / STRIP_CHAR_HEIGHT);
         z_shift = char_z_shift * STRIP_CHAR_HEIGHT;
         int zcell = int(floor((pos_z - z_shift)/ZCELL_SIZE));  //z-cell index
-        for (int j=0; j<2; j++) {  //2 iterations is enough if camera doesn't look much up or down
+        {  // single z-cell check (camera angle is mostly horizontal)
+            int j = 0;
             //  calcaulate coordinates of the target (raindrop)
             vec4 cell_hash = hash4(vec3(ivec3(cell, zcell)));
             vec4 cell_hash2 = fract(cell_hash * vec4(127.1, 311.7, 271.9, 124.6));
@@ -196,8 +196,6 @@ vec3 rain(vec3 ro3, vec3 rd3, float time) {
                     }
                 }
             }
-            // not found in this cell - go to next vertical cell
-            zcell += cell_shift.z;
         }
         // go to next horizontal cell
     }
