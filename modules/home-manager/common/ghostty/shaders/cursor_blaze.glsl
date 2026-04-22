@@ -1,12 +1,10 @@
 // Based on https://gist.github.com/chardskarth/95874c54e29da6b5a36ab7b50ae2d088
 float ease(float x) {
-    return pow(1.0 - x, 10.0);
-}
-
-float sdBox(in vec2 p, in vec2 xy, in vec2 b)
-{
-    vec2 d = abs(p - xy) - b;
-    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+    float t = 1.0 - x;
+    float t2 = t * t;
+    float t4 = t2 * t2;
+    float t8 = t4 * t4;
+    return t8 * t2;  // t^10
 }
 
 float getSdfRectangle(in vec2 p, in vec2 xy, in vec2 b)
@@ -55,8 +53,8 @@ float blend(float t)
     return sqr / (2.0 * (sqr - t) + 1.0);
 }
 
-float antialising(float distance) {
-    return 1. - smoothstep(0., normalize(vec2(2., 2.), 0.).x, distance);
+float antialising(float distance, float aaWidth) {
+    return 1. - smoothstep(0., aaWidth, distance);
 }
 
 float determineStartVertexFactor(vec2 a, vec2 b) {
@@ -89,6 +87,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     #if !defined(WEB)
     fragColor = texture(iChannel0, fragCoord.xy / iResolution.xy);
     #endif
+    // Early exit: trail has fully faded, skip all computation
+    if (iTime - iTimeCursorChange > DURATION) return;
     //Normalization for fragCoord to a space of -1 to 1;
     vec2 vu = normalize(fragCoord, 1.);
     vec2 offsetFactor = vec2(-.5, 0.5);
@@ -108,6 +108,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 v1 = vec2(currentCursor.x + currentCursor.z * invertedVertexFactor, currentCursor.y);
     vec2 v2 = vec2(previousCursor.x + currentCursor.z * invertedVertexFactor, previousCursor.y);
     vec2 v3 = vec2(previousCursor.x + currentCursor.z * vertexFactor, previousCursor.y - previousCursor.w);
+
+    float aaWidth = 4.0 / iResolution.y;
 
     vec4 newColor = vec4(fragColor);
 
@@ -135,7 +137,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
         float sdfTrail = getSdfParallelogram(vu, v0, v1, v2, v3);
 
         newColor = mix(newColor, TRAIL_COLOR_ACCENT, 1.0 - smoothstep(sdfTrail, -0.01, 0.001));
-        newColor = mix(newColor, TRAIL_COLOR, antialising(sdfTrail));
+        newColor = mix(newColor, TRAIL_COLOR, antialising(sdfTrail, aaWidth));
         newColor = mix(fragColor, newColor, 1.0 - alphaModifier);
         fragColor = mix(newColor, fragColor, step(sdfCursor, 0));
     }
