@@ -54,6 +54,7 @@ in {
       "cleanshot"
       "ghostty"
       "karabiner-elements"
+      "stats"
       "zed"
       "zotero"
     ];
