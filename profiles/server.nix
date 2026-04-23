@@ -24,6 +24,8 @@
     ../modules/home-manager/common/fastfetch.nix
     ../modules/home-manager/common/claude-code.nix
     ../modules/home-manager/common/codex.nix
+    ../modules/home-manager/common/uv.nix
+    ../modules/home-manager/common/npm.nix
     ../modules/home-manager/common/oh-my-posh.nix
     ../modules/home-manager/common/tmux.nix
     ../modules/home-manager/linux/shpool.nix

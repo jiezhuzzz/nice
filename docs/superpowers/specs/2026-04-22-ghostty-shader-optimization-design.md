@@ -51,12 +51,14 @@ Current pattern:
 return fract(sin(v) * 43758.5453123);
 ```
 
-Replace with cheaper `fract`-based approach:
+Replace with cheaper algebraic approach. For scalar:
 ```glsl
-return fract(v * 0.7548776662 + v * v * 0.4237987837);
+float hash(float v) {
+    return fract(v * 0.7548776662 + v * v * 0.4237987837);
+}
 ```
 
-Applies to all 5 hash functions: `hash(float)`, `hash(vec2)`, `hash2(vec2)`, `hash4(vec2)`, `hash4(vec3)`.
+For vector variants (`hash(vec2)`, `hash2`, `hash4`), replace `sin()` with `fract()` of dot-product combinations using different constant vectors per component, preserving each function's input/output signature. The key change is eliminating `sin()` — the specific constants don't matter as long as they produce well-distributed pseudo-random output.
 
 **Visual impact**: Rain patterns will be "differently random" but equally random-looking.
 
@@ -119,9 +121,12 @@ float ease(float x) {
 
 ### 4d. Time-based early exit
 
-When cursor hasn't moved recently (`iTime - iTimeCursorChange > DURATION`), skip all trail computation. Cursor blaze costs zero GPU when cursor is idle.
+When cursor hasn't moved recently (`iTime - iTimeCursorChange > DURATION`), skip all trail computation. Cursor blaze costs zero GPU when cursor is idle. This check must be placed **after** the texture read (so `fragColor` retains the terminal content) but **before** any trail math:
 
 ```glsl
+#if !defined(WEB)
+fragColor = texture(iChannel0, fragCoord.xy / iResolution.xy);
+#endif
 float elapsed = iTime - iTimeCursorChange;
 if (elapsed > DURATION) return;
 ```
