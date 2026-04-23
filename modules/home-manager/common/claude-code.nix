@@ -1,13 +1,11 @@
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   claude-plugins-official = pkgs.fetchFromGitHub {
     owner = "anthropics";
     repo = "claude-plugins-official";
     rev = "cf62a6c02dc03db88da8eb7c61bdb9fd88da6326";
     sha256 = "d28cc99927aa4b2d09ee077d3043e2ecfcc6d09971677b53b6f1f2816b72889b";
   };
-in
-{
+in {
   programs.claude-code = {
     enable = true;
     settings = {
