@@ -40,6 +40,9 @@
 
     # Declarative Homebrew install (complements nix-darwin's `homebrew` state mgmt).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    # Override brew-src to track Homebrew/brew HEAD; nix-homebrew's pin lags
+    # behind the homebrew-cask/core taps, causing DSL incompatibilities.
+    nix-homebrew.inputs.brew-src.url = "github:Homebrew/brew";
 
     # Brew taps pinned via flake.lock (mutableTaps = false).
     homebrew-core = {
