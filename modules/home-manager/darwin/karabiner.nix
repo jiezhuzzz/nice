@@ -79,6 +79,17 @@ _: {
               }
             ];
           };
+          devices = [
+            {
+              identifiers = {
+                is_keyboard = true;
+                is_pointing_device = true;
+                vendor_id = 1278;
+                product_id = 22;
+              };
+              ignore = false;
+            }
+          ];
           virtual_hid_keyboard = {
             country_code = 0;
             keyboard_type_v2 = "ansi";
