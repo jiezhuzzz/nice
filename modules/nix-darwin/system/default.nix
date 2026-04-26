@@ -1,5 +1,5 @@
 # macOS system defaults (the `defaults write` equivalents).
-{...}: {
+_: {
   system.defaults = {
     dock = {
       autohide = true;

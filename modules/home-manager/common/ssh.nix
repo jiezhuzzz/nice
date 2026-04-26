@@ -1,6 +1,6 @@
 # SSH client config — base settings shared by all hosts.
 # Desktop machines additionally import ssh-keys.nix for local key paths.
-{...}: {
+_: {
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;

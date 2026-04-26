@@ -1,4 +1,4 @@
-{...}: {
+_: {
   programs.ghostty.settings = {
     # macOS-like Alt-as-Command keybindings (Linux)
     keybind = [

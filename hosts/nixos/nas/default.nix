@@ -1,4 +1,4 @@
-{...}: let
+_: let
   user = import ../../../users/jie.nix;
 in {
   nixpkgs.config.allowUnfree = true;

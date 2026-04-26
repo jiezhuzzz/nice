@@ -42,6 +42,7 @@ in {
     brews = [];
     casks = [
       "1password"
+      "affinity"
       "raycast"
       "betterdisplay"
       "balenaetcher"

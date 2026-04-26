@@ -1,7 +1,7 @@
 # age-encrypted secrets decrypted at activation time using the host's
 # SSH host key (see age.identityPaths). Each secret lands at
 # /run/agenix/<name> with the owner/mode specified here.
-{...}: let
+_: let
   user = import ../../../users/jie.nix;
 in {
   age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];

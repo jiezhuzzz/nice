@@ -1,16 +1,25 @@
 {
-  description = "jie's nix configuration (laptop, mac, server, nas)";
+  description = "A nice configuration (laptop, mac, server, nas)";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
-    nix-darwin.url = "github:LnL7/nix-darwin";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     zen-browser.url = "github:youwen5/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
@@ -53,15 +62,25 @@
         "x86_64-linux"
         "aarch64-darwin"
       ];
-      imports = [./lib/mk-hosts.nix];
+      imports = [
+        ./lib/mk-hosts.nix
+        inputs.treefmt-nix.flakeModule
+      ];
       perSystem = {pkgs, ...}: {
-        formatter = pkgs.alejandra;
-        devShells.default = pkgs.mkShellNoCC {
-          packages = with pkgs; [
-            nil
-            alejandra
-          ];
+        treefmt = {
+          projectRootFile = "flake.nix";
+          programs.alejandra.enable = true;
+          programs.statix.enable = true;
+          programs.mdsh.enable = true;
+          programs.shellcheck.enable = true;
+          programs.shfmt.enable = true;
         };
+        # devShells.default = pkgs.mkShellNoCC {
+        #   packages = with pkgs; [
+        #     nil
+        #     alejandra
+        #   ];
+        # };
       };
     };
 }

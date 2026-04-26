@@ -1,4 +1,4 @@
-{...}: {
+_: {
   # CapsLock → Esc (tap) / Ctrl (hold)
   # Alt ↔ Super swap (macOS-style): physical Alt keys act as Super (Cmd),
   # physical Super keys act as Alt. Applies to both left and right.

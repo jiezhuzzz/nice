@@ -1,4 +1,4 @@
-{...}: {
+_: {
   xdg.configFile."karabiner/karabiner.json" = {
     force = true;
     text = builtins.toJSON {

@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  isDarwin = pkgs.stdenv.isDarwin;
+  inherit (pkgs.stdenv) isDarwin;
   rimeDir =
     if isDarwin
     then "Library/Rime"

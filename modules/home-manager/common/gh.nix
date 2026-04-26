@@ -2,6 +2,7 @@
   programs.gh = {
     enable = true;
     settings = {
+      prompt = "enabled";
       git_protocol = "ssh";
     };
     extensions = with pkgs; [

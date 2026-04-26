@@ -1,4 +1,4 @@
-{...}: {
+_: {
   services.displayManager.gdm.enable = true;
   # GNOME desktop disabled — niri is the window manager on this host.
   # services.desktopManager.gnome.enable = true;
