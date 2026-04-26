@@ -77,6 +77,7 @@
           programs.mdsh.enable = true;
           programs.shellcheck.enable = true;
           programs.shfmt.enable = true;
+          programs.actionlint.enable = true;
         };
         # devShells.default = pkgs.mkShellNoCC {
         #   packages = with pkgs; [
