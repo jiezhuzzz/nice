@@ -4,6 +4,13 @@
     settings = {
       model_reasoning_effort = "high";
       approval_policy = "on-request";
+      sandbox_mode = "workspace-write";
+      # Activate with `codex --profile server` on hosts that need the
+      # US-region OpenAI endpoint (e.g. chameleon).
+      profiles.server = {
+        openai_base_url = "https://us.api.openai.com/v1";
+        model = "gpt-5.4";
+      };
     };
     context = ''
       # Python
