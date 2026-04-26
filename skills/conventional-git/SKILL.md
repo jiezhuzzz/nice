@@ -19,12 +19,14 @@ Conventional commits aren't bureaucracy — they make `git log`, `git blame`, `g
 ## Commit message format
 
 ```
-<type>[optional scope][!]: <description>
+<type>(<scope>)[!]: <description>
 
 [optional body]
 
 [optional footer(s)]
 ```
+
+The scope is **required** in this repo — every commit must name the area it touches.
 
 ### Types
 
@@ -57,7 +59,9 @@ The Conventional Commits convention uses `ci:` for changes to CI configuration. 
 
 ### Scope
 
-Optional. A short noun in parentheses naming the area touched: `fix(parser):`, `feat(auth):`, `docs(readme):`. Use the same scope name consistently across commits in this repo (look at `git log` for prior scopes before inventing a new one).
+**Required.** A short noun in parentheses naming the area touched: `fix(parser):`, `feat(auth):`, `docs(readme):`. Use the same scope name consistently across commits in this repo (look at `git log` for prior scopes before inventing a new one — reuse beats invention).
+
+Pick the narrowest accurate area. Module/package names, host names, top-level directory names, and config domains are all good scopes (e.g. `darwin`, `nixos`, `home-manager`, `parser`, `auth`, `deps`). When a change genuinely spans the whole repo (rare), `repo` or `flake` is acceptable. If you can't name a scope, the change is probably actually two changes — split it.
 
 ### Description
 
@@ -124,7 +128,7 @@ chore(deps): bump flake.lock
 ```
 
 ```
-ci: bump version to 0.4.2 [skip ci]
+ci(release): bump version to 0.4.2 [skip ci]
 ```
 
 ## Branch model
@@ -178,7 +182,7 @@ git tag -a v0.4.2 -m "Release 0.4.2"
 git push origin v0.4.2
 ```
 
-If a release commit is needed (changelog, version bump), it should be authored by automation and committed as `ci: bump version to 0.4.2 [skip ci]` directly on `main`.
+If a release commit is needed (changelog, version bump), it should be authored by automation and committed as `ci(release): bump version to 0.4.2 [skip ci]` directly on `main`.
 
 ## Splitting a change set
 
@@ -240,6 +244,7 @@ Note the README hunk goes with the feature, not as a separate `docs:` commit, be
 
 ## Common mistakes
 
+- **Omitting the scope** — every commit needs `(scope)`. If you can't pick one, the change is probably two changes; split it.
 - **One catch-all "update" commit** — the spec exists precisely to prevent this. Always split.
 - **Staging whole files when only some hunks belong** — use `git add -p`.
 - **`feat:` for a behavior-preserving change** — if behavior is unchanged, it's `chore:`, not `feat:`.
