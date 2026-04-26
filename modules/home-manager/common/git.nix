@@ -71,6 +71,9 @@ in {
     ignores = [
       # macOS metadata
       ".DS_Store"
+      # AI assistant per-repo state
+      ".codex/"
+      ".claude/"
     ];
     settings = {
       user.name = user.me.fullname;
