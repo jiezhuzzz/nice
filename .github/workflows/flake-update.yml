@@ -1,0 +1,32 @@
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - name: nix flake update
+        run: nix flake update
+
+      - name: nix flake check
+        run: nix flake check --no-build --accept-flake-config
+
+      - uses: planetscale/ghcommit-action@v0.2.20
+        with:
+          commit_message: "ci(flake): bump flake.lock [skip ci]"
+          repo: ${{ github.repository }}
+          branch: ${{ github.ref_name }}
+          file_pattern: flake.lock
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
