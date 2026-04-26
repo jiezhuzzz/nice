@@ -14,6 +14,7 @@
 in {
   programs.claude-code = {
     enable = true;
+    skills = ../../../skills;
     settings = {
       effortLevel = "high";
       defaultMode = "auto";
