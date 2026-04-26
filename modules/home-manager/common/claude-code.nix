@@ -16,7 +16,8 @@ in {
     enable = true;
     skills = ../../../skills;
     settings = {
-      effortLevel = "high";
+      model = "claude-opus-4-7[1m]";
+      effortLevel = "xhigh";
       defaultMode = "auto";
       skipDangerousModePermissionPrompt = true;
       deny = [
