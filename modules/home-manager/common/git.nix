@@ -74,6 +74,9 @@ in {
       # AI assistant per-repo state
       ".codex/"
       ".claude/"
+      # direnv local cache
+      ".direnv/"
+      ".envrc.local"
     ];
     settings = {
       user.name = user.me.fullname;
