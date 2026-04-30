@@ -32,24 +32,17 @@
           ];
         }
         {
-          "if".app-id = "com.apple.systempreferences";
-          run = "layout floating";
-        }
-        {
-          "if".app-id = "com.apple.finder";
-          run = "layout floating";
-        }
-        {
-          "if".app-id = "us.zoom.xos";
-          run = "layout floating";
-        }
-        {
           "if".app-id = "app.portal.ios.v1";
           run = ["layout floating" "move-node-to-workspace M"];
         }
         {
           "if".app-id = "com.apple.AppStore";
           run = ["layout floating" "move-node-to-workspace M"];
+        }
+        # Catch-all: anything not matched above floats by default.
+        # Specific rules win because aerospace stops at the first match.
+        {
+          run = "layout floating";
         }
       ];
       gaps = {
