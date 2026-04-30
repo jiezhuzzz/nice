@@ -43,27 +43,30 @@ in {
     casks = [
       "1password"
       "affinity"
-      "raycast"
-      "betterdisplay"
       "balenaetcher"
+      "betterdisplay"
       "claude"
+      "cleanshot"
+      "figma"
+      "ghostty"
       "iina"
+      "karabiner-elements"
       "keka"
+      "raycast"
+      "squirrel-app"
+      "stats"
+      "thebrowsercompany-dia"
+      "zed"
       "zen"
       "zoom"
-      "squirrel-app"
-      "cleanshot"
-      "ghostty"
-      "karabiner-elements"
-      "stats"
-      "zed"
       "zotero"
     ];
     masApps = {
+      Amphetamine = 937984704;
       Bitwarden = 1352778147;
+      "Pixelmator Pro" = 6746662575;
       Portal = 1436994560;
       WeChat = 836500024;
-      "Pixelmator Pro" = 6746662575;
     };
   };
 }
