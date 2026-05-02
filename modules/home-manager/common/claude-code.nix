@@ -21,6 +21,8 @@
     DIR=$(printf '%s' "$input" | jq -r '.workspace.current_dir')
     WORKTREE=$(printf '%s' "$input" | jq -r '.workspace.git_worktree // empty')
     PCT=$(printf '%s' "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
+    RL_5H=$(printf '%s' "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
+    RL_7D=$(printf '%s' "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty' | cut -d. -f1)
     COST=$(printf '%s' "$input" | jq -r '.cost.total_cost_usd // 0')
     DURATION_MS=$(printf '%s' "$input" | jq -r '.cost.total_duration_ms // 0')
 
@@ -66,7 +68,21 @@
     EFFORT_TAG=""
     [ -n "$EFFORT" ] && EFFORT_TAG=" ''${DIM}($EFFORT)''${RESET}"
 
-    printf '%s\n' "''${CYAN}[$MODEL]''${RESET}$EFFORT_TAG $ICON_DIR ''${DIR##*/}$BRANCH | ''${BAR_COLOR}$BAR''${RESET} $PCT% | ''${YELLOW}$COST_FMT''${RESET} | $ICON_CLOCK ''${TIME_FMT}"
+    LIMITS=""
+    if [ -n "$RL_5H" ] || [ -n "$RL_7D" ]; then
+      RL_MAX=0
+      [ -n "$RL_5H" ] && [ "$RL_5H" -gt "$RL_MAX" ] && RL_MAX=$RL_5H
+      [ -n "$RL_7D" ] && [ "$RL_7D" -gt "$RL_MAX" ] && RL_MAX=$RL_7D
+      if [ "$RL_MAX" -ge 90 ]; then RL_COLOR="$RED"
+      elif [ "$RL_MAX" -ge 70 ]; then RL_COLOR="$YELLOW"
+      else RL_COLOR="$GREEN"; fi
+      LIMITS_TXT=""
+      [ -n "$RL_5H" ] && LIMITS_TXT="5h:$RL_5H%"
+      [ -n "$RL_7D" ] && LIMITS_TXT="''${LIMITS_TXT:+$LIMITS_TXT }7d:$RL_7D%"
+      LIMITS=" | ''${RL_COLOR}''${LIMITS_TXT}''${RESET}"
+    fi
+
+    printf '%s\n' "''${CYAN}[$MODEL]''${RESET}$EFFORT_TAG $ICON_DIR ''${DIR##*/}$BRANCH | ''${BAR_COLOR}$BAR''${RESET} $PCT%$LIMITS | ''${YELLOW}$COST_FMT''${RESET} | $ICON_CLOCK ''${TIME_FMT}"
   '';
 in {
   programs.claude-code = {
