@@ -1,0 +1,23 @@
+{
+  "skill_name": "research-introduction-writing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Please draft a 300-word scientific introduction for a journal article titled 'A cover for the single-person pedal-powered vehicle'. The paper describes a computer-simulated aerodynamic cover for a pedal-powered vehicle. Use fake citation placeholders like [1]. The introduction should explain why urban cycling and pollution matter, summarize previous safety and comfort designs, identify the gap, and end by describing our study.",
+      "expected_output": "A 250-350 word introduction following the four-move model, with broad significance, prior research, explicit gap, present-work ending, and citation placeholders.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Diagnose and revise this introduction opening from a non-native English speaker: 'In this paper we test a new membrane reactor for brewery wastewater. The old studies are not good. We measured COD. Anaerobic treatment is popular. Chudoba studied aerobic systems. There is no anaerobic study. Our method is efficient.' Keep the revised version under 220 words and explain the main structural fixes.",
+      "expected_output": "A revised introduction opening that starts with significance/background, orders prior work logically, states the gap respectfully, ends with present work, and includes concise diagnostic notes.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I have notes for a paper on AFM height measurements of biological membranes: AFM images samples in liquids; many papers report nanometer resolution; height measurements vary across methods; previous explanations focus on soft-sample compression; our study tests whether electrostatic tip-sample interactions explain the variation. Build a paragraph-by-paragraph introduction outline using a conventional model.",
+      "expected_output": "A paragraph outline mapped to the introduction moves, including significance, background/prior work, gap/problem, and present paper.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "skill_name": "research-methodology-writing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Draft a 300-word Materials and Methods section for a paper about testing groundwater chemistry in the London Basin. Notes: six sites; 18 total samples; samples 1-9 collected in rinsed 25 ml brown glass bottles filled to the top and sealed; bottles shipped to two Reading University labs; samples 10-18 prepared in our lab using a revised precipitation method from ISF Germany; then shipped to ISF for accelerator mass spectrometry; two samples briefly touched plastic tubing but variation was negligible. Use passive voice and make the method reproducible.",
+      "expected_output": "A 250-400 word methodology section with overview, precise details, method-source relation, care markers, and a brief professional problem statement.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Diagnose and revise this Methods paragraph from a non-native English speaker: 'We did sample collection. Bottle was used. Samples put in bottles and sent to lab. The lab analysed them. We used method of Smith. Some plastic touched two samples but no problem.' Make it formal, specific where possible, and explain what information is still missing for reproducibility.",
+      "expected_output": "A revised methods paragraph using appropriate passive/active choices, clearer article use, relation to prior method, limitation handling, and a list of missing reproducibility details.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Build an outline for a computational methodology section. The study simulates airflow around a bicycle cover. The solver is OpenFOAM, the mesh has about 1.2 million cells, inlet speed is 5 m/s, turbulence model is k-omega SST, and the geometry is adapted from a prior vehicle model but modified to include a transparent polymer canopy. I need the outline to show what to justify and where to mention differences from the previous model.",
+      "expected_output": "A methodology outline mapped to the four-component model, including overview, precise computational parameters, justification points, relation to prior model, and missing details.",
+      "files": []
+    }
+  ]
+}

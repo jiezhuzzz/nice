@@ -1,0 +1,23 @@
+{
+  "skill_name": "research-results-evaluation-writing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Draft a 300-word Results section for a study on UFO sightings before earthquakes. Table notes: Russia 44 sightings vs weekly average 11, magnitude 3.2; India 15 vs 18, magnitude 4.4; Australia 90 vs 30, magnitude 6.0; USA 275 vs 75, magnitude 5.6; Canada 48 vs 6, magnitude 3.6. The aim was to test whether sightings within 300 km of the epicentre increase during the seven days before an earthquake. Mention that the USA result may be inflated because a popular science fiction film was released that week.",
+      "expected_output": "A Results section with aim/method link, table reference, evaluated key results, frequency/quantity language, problem handling, cautious implication, and no overclaiming.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Diagnose and revise this Results paragraph from a non-native English speaker: 'Figure 2 shows numbers. Walking was 23 and car was 31 in hour 1. Walking was 42 and car was 39 in hour 2. Walking was 20 and car was 33 in hour 3. This caused traffic management to be better.' The study compares CO exposure for pedestrians and car passengers during three afternoon peak hours. Make the result evaluation clearer and avoid unsupported causality.",
+      "expected_output": "A revised results paragraph that interprets the values, selects key contrasts, uses appropriate quantity/frequency language, references the figure, and softens unsupported causal claims.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Build an outline for a Results and Discussion subsection about TCP degradation by ozone. Notes: degradation rate was higher at pH 7.5 than pH 2; chloride release ranged from 1.5 to 1.9 ions per TCP molecule; adding H2O2 increased TCP degradation by only about 5% but increased chloride release to 1.7-2.7 ions per molecule; humic acid peaked at about 17 mg/L and increased degradation rate by about 25%. Show where to compare with previous studies and where to state implications cautiously.",
+      "expected_output": "An outline mapped to the results/evaluation model with key result ordering, table/figure invitations, comparisons, cautious causality, problem/limitation handling if needed, and implications.",
+      "files": []
+    }
+  ]
+}

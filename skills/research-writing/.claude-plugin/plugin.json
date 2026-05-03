@@ -1,0 +1,18 @@
+{
+  "name": "research-writing",
+  "description": "Skills for drafting, revising, and diagnosing scientific research papers — Abstract, Introduction, Methodology, and Results sections — adapted from Glasman-Deal's Science Research Writing for Non-Native Speakers of English.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Jie",
+    "email": "jiezzz@duck.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "writing",
+    "research",
+    "academic",
+    "scientific-writing",
+    "non-native-english"
+  ]
+}

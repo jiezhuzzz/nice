@@ -142,6 +142,7 @@ in {
       "${claude-plugins-official}/plugins/agent-sdk-dev"
       "${claude-plugins-official}/plugins/ralph-loop"
       "${codex-plugin-cc}/plugins/codex"
+      ../../../skills/research-writing
     ];
   };
 }

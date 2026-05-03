@@ -1,0 +1,23 @@
+{
+  "skill_name": "research-abstract-writing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a 250-word journal limit. Please write a single-paragraph abstract for a materials science paper. The study made a water-soluble polymer coating for ibuprofen tablets. We tested methylcellulose plus a water-soluble copolymer in vitro. The blend slowed drug release and made it steadier at about 10-20% per hour. The current draft is too vague and says only that release was better.",
+      "expected_output": "A concise results-focused abstract with method, specific numerical result, clear contribution, and word count.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Can you diagnose and revise this abstract for a non-native English speaker? Word limit is 150. 'Many researchers are interested in gum removing machines. We developed GumGone. It uses chemical spray and vacuum. It was tested on wood, stone, and carpet. It is good and better than other machines. More research is needed.' The paper compares GumGone with Gumsucker and Vacu-Gum; GumGone removed 79-82% of gum and caused no damage on wood or stone and minimal damage on carpet.",
+      "expected_output": "A revised abstract under 150 words, with specific results, reduced vagueness, appropriate tense, and brief diagnostic notes.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Suggest five journal-style titles for a paper about a new nanofiltration-coupled Heck reaction workflow. The key result is higher homogeneous catalyst productivity because the membrane separates the catalyst so it can be recycled and reused. Avoid hype and make the titles searchable.",
+      "expected_output": "Five concise sentence-case titles with relevant keywords, neutral tone, and no vague hype.",
+      "files": []
+    }
+  ]
+}
