@@ -61,7 +61,7 @@ _: {
     set -g @catppuccin_window_status_style "rounded"
 
     # Window text
-    set -g @catppuccin_window_default_text " #{b:pane_current_path}:#{pane_current_command}"
+    set -g @catppuccin_window_text " #{b:pane_current_path}:#{pane_current_command}"
     set -g @catppuccin_window_current_text " #{b:pane_current_path}:#{pane_current_command}"
 
     # Right status: hostname only, no date/time
