@@ -1,4 +1,11 @@
-_: {
+{pkgs, ...}: let
+  # tmux-mem-cpu-load with -m 2 (mem %), -g 0 (no graph), -a 0 (no load)
+  # outputs "MEM% CPU%" — wrap each with a catppuccin-colored nerd-font icon.
+  memCpuScript = pkgs.writeShellScript "tmux-mem-cpu" ''
+    set -- $(${pkgs.tmux-mem-cpu-load}/bin/tmux-mem-cpu-load -g 0 -m 2 -a 0 -i 2)
+    printf '#[fg=#{@thm_mauve}]󰍛 %s #[fg=#{@thm_blue}]󰻠 %s' "$1" "$2"
+  '';
+in {
   programs.tmux = {
     enable = true;
     mouse = true;
@@ -28,7 +35,7 @@ _: {
 
       # Right status: catppuccin host module only (no default date/time)
       set -g status-right-length 100
-      set -g status-right "#{E:@catppuccin_status_host}"
+      set -g status-right "#(${memCpuScript}) #{E:@catppuccin_status_host}"
 
       # Clipboard — vi copy mode yanks to system clipboard
       set -g set-clipboard on
