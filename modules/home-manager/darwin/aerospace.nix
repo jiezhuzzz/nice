@@ -87,6 +87,9 @@
         alt-tab = "workspace-back-and-forth";
         alt-shift-tab = "move-workspace-to-monitor --wrap-around next";
 
+        alt-shift-minus = "resize smart -50";
+        alt-shift-equal = "resize smart +50";
+
         alt-shift-semicolon = "mode service";
       };
       mode.service.binding = {
