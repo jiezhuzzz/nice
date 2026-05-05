@@ -10,8 +10,7 @@ _: {
       persistent-apps = [
         "/Applications/WeChat.app"
         "/Applications/Ghostty.app"
-        "/Applications/Zen.app"
-        "/Applications/Zed.app"
+        "/Applications/Dia.app"
       ];
     };
 
