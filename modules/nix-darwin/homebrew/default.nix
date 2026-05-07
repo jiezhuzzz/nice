@@ -48,6 +48,7 @@ in {
       "claude"
       "cleanshot"
       "figma"
+      "fuse-t"
       "ghostty"
       "iina"
       "karabiner-elements"
