@@ -58,6 +58,7 @@ in {
       "squirrel-app"
       "stats"
       "thebrowsercompany-dia"
+      "ungoogled-chromium"
       #"zed"
       "zen"
       "zoom"
