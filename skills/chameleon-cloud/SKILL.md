@@ -120,7 +120,7 @@ After the floating IP is attached and SSH is working, use the setup script. For 
 SSH_JUMP=cc@<floating-ip> <skill-base-dir>/scripts/setup-instance.sh <private-ip1> <private-ip2> ...
 ```
 
-This script handles per-instance: stale host key removal, env/op-token copy, Ghostty terminfo, apt update/upgrade, uidmap install, AppArmor unprivileged userns fix (required for rootless podman), and Nix install. Run instances in parallel as background tasks.
+This script handles per-instance: stale host key removal, env/op-token copy, rclone GDrive token copy (best-effort; requires `/run/agenix/rclone-gdrive-token` on the operator host), Ghostty terminfo, apt update/upgrade, uidmap install, AppArmor unprivileged userns fix (required for rootless podman), `loginctl enable-linger cc` for persistent user services, and Nix install. Run instances in parallel as background tasks.
 
 ## Quick Reference
 
