@@ -23,6 +23,7 @@ _: {
     matchBlocks."tacc" = {
       hostname = "129.114.108.248";
       user = "cc";
+      forwardAgent = true;
     };
     matchBlocks."10.52.*.*" = {
       user = "cc";
