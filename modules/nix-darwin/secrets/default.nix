@@ -22,4 +22,10 @@ in {
     owner = user.me.username;
     mode = "0400";
   };
+
+  age.secrets.rclone-gdrive-token = {
+    file = ../../../secrets/rclone-gdrive-token.age;
+    owner = user.me.username;
+    mode = "0400";
+  };
 }
