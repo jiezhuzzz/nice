@@ -36,6 +36,8 @@ for ip in "$@"; do
     ssh "${SSH_OPTS[@]}" cc@"$ip" 'mkdir -p ~/.local/share/rclone'
     scp "${SCP_OPTS[@]}" "$RCLONE_TOKEN_SRC" cc@"$ip":~/.local/share/rclone/gdrive-token
     ssh "${SSH_OPTS[@]}" cc@"$ip" 'chmod 600 ~/.local/share/rclone/gdrive-token'
+  elif [ -e "$RCLONE_TOKEN_SRC" ]; then
+    echo "WARN: $RCLONE_TOKEN_SRC exists but is not readable by current user; skipping rclone token copy" >&2
   else
     echo "WARN: $RCLONE_TOKEN_SRC not present on operator host; skipping rclone token copy" >&2
   fi
