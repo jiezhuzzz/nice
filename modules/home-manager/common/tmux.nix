@@ -1,8 +1,6 @@
 {pkgs, ...}: let
   # tmux-mem-cpu-load with -m 2 (mem %), -g 0 (no graph), -a 0 (no load)
-  # outputs just one number; framing is built in the status-right format
-  # so each indicator inherits the catppuccin module frame (separators,
-  # icon block bg, text block bg) used by status_host.
+  # outputs just one number per field.
   tmcl = "${pkgs.tmux-mem-cpu-load}/bin/tmux-mem-cpu-load -g 0 -m 2 -a 0 -i 2";
   memScript = pkgs.writeShellScript "tmux-mem" ''
     set -- $(${tmcl})
@@ -12,14 +10,6 @@
     set -- $(${tmcl})
     printf '%s' "$2"
   '';
-  # Disk usage % of the partition $HOME lives on (root on Linux, Data
-  # volume on macOS) — single number, no trailing %.
-  diskScript = pkgs.writeShellScript "tmux-disk" ''
-    df -P "$HOME" | ${pkgs.gawk}/bin/awk 'NR==2 {gsub("%",""); print $5}'
-  '';
-  # Replicate catppuccin's status module shape: left separator, icon on
-  # accent-colored bg, text on surface_0 bg, right separator.
-  framed = color: icon: content: ''#[fg=${color},bg=default]#{@catppuccin_status_left_separator}#[fg=#{@thm_bg},bg=${color}]${icon} #[fg=#{@thm_fg},bg=#{@thm_surface_0}] ${content} #[fg=#{@thm_surface_0},bg=default]#{@catppuccin_status_right_separator}'';
 in {
   programs.tmux = {
     enable = true;
@@ -48,9 +38,9 @@ in {
       # Only show session name if it's not a bare number (i.e. user-named)
       set -g status-left "#{?#{m:*[!0-9]*,#{session_name}},[#{session_name}] ,}"
 
-      # Right status: catppuccin host module only (no default date/time)
+      # Right status: catppuccin host module (icon + CPU/MEM/host text).
       set -g status-right-length 100
-      set -g status-right "${framed "#{@thm_red}" "" "#(${cpuScript})"} ${framed "#{@thm_yellow}" "" "#(${memScript})"} ${framed "#{@thm_green}" "󱛟" "#(${diskScript})"} #{E:@catppuccin_status_host}"
+      set -g status-right "#{E:@catppuccin_status_host}"
 
       # Clipboard — vi copy mode yanks to system clipboard
       set -g set-clipboard on
@@ -86,7 +76,8 @@ in {
     set -g @catppuccin_window_text " #{b:pane_current_path}:#{pane_current_command}"
     set -g @catppuccin_window_current_text " #{b:pane_current_path}:#{pane_current_command}"
 
-    # Right status: hostname only, no date/time
-    set -g @catppuccin_status_modules_right "host"
+    # Embed CPU/MEM into the host module text so the whole frame renders
+    # via catppuccin's own host module (icon + accent + separators).
+    set -g @catppuccin_host_text "CPU: #(${cpuScript})% MEM: #(${memScript})% #H"
   '';
 }
