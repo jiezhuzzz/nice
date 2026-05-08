@@ -28,6 +28,18 @@ for ip in "$@"; do
   scp "${SCP_OPTS[@]}" ~/.envs cc@"$ip":~/.envs
   scp "${SCP_OPTS[@]}" ~/.op-token cc@"$ip":~/.op-token
 
+  # Copy rclone GDrive OAuth token (decrypted by agenix on the operator host).
+  # Best-effort: skip with a warning if the operator host has not materialized
+  # the secret yet (e.g. fresh checkout, hasn't rebuilt).
+  RCLONE_TOKEN_SRC="/run/agenix/rclone-gdrive-token"
+  if [ -r "$RCLONE_TOKEN_SRC" ]; then
+    ssh "${SSH_OPTS[@]}" cc@"$ip" 'mkdir -p ~/.local/share/rclone'
+    scp "${SCP_OPTS[@]}" "$RCLONE_TOKEN_SRC" cc@"$ip":~/.local/share/rclone/gdrive-token
+    ssh "${SSH_OPTS[@]}" cc@"$ip" 'chmod 600 ~/.local/share/rclone/gdrive-token'
+  else
+    echo "WARN: $RCLONE_TOKEN_SRC not present on operator host; skipping rclone token copy" >&2
+  fi
+
   # Copy Ghostty terminfo
   infocmp -x xterm-ghostty | ssh "${SSH_OPTS[@]}" cc@"$ip" -- tic -x -
 
@@ -36,6 +48,10 @@ for ip in "$@"; do
 
   # Allow unprivileged user namespaces (required for podman rootless)
   ssh "${SSH_OPTS[@]}" cc@"$ip" 'sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 && echo "kernel.apparmor_restrict_unprivileged_userns=0" | sudo tee /etc/sysctl.d/99-userns.conf'
+
+  # Enable systemd user lingering so the rclone mount and other user services
+  # start at boot rather than at next interactive login.
+  ssh "${SSH_OPTS[@]}" cc@"$ip" 'sudo loginctl enable-linger cc'
 
   # Install Nix
   ssh "${SSH_OPTS[@]}" cc@"$ip" 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm'
