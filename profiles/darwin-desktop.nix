@@ -47,7 +47,7 @@ in {
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.extraSpecialArgs = {inherit inputs user;};
-  home-manager.users.${user.me.username} = {...}: {
+  home-manager.users.${user.me.username} = {config, ...}: {
     imports = [
       # common
       ../modules/home-manager/common/packages.nix
@@ -88,6 +88,7 @@ in {
     home.homeDirectory = "/Users/${user.me.username}";
     home.preferXdgDirectories = true;
     xdg.enable = true;
+    home.sessionVariables.CARGO_HOME = "${config.xdg.dataHome}/cargo";
     programs.man.generateCaches = false;
     programs.home-manager.enable = true;
     home.stateVersion = "26.05";

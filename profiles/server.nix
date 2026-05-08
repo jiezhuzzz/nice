@@ -1,6 +1,6 @@
 # profiles/server.nix
 # Shared home-manager profile for standalone HM on non-NixOS servers.
-{...}: {
+{config, ...}: {
   imports = [
     ../modules/home-manager/common/theme.nix
     ../modules/home-manager/common/bash.nix
@@ -34,6 +34,7 @@
 
   home.preferXdgDirectories = true;
   xdg.enable = true;
+  home.sessionVariables.CARGO_HOME = "${config.xdg.dataHome}/cargo";
   programs.man.generateCaches = false;
   programs.home-manager.enable = true;
   home.stateVersion = "26.05";
