@@ -78,6 +78,6 @@ in {
 
     # Embed CPU/MEM into the host module text so the whole frame renders
     # via catppuccin's own host module (icon + accent + separators).
-    set -g @catppuccin_host_text " #(${cpuScript})  #(${memScript}) #H"
+    set -g @catppuccin_host_text " #(${cpuScript}) #(${memScript}) #H"
   '';
 }
