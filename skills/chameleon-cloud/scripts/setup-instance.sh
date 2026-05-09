@@ -28,19 +28,23 @@ for ip in "$@"; do
   scp "${SCP_OPTS[@]}" ~/.envs cc@"$ip":~/.envs
   scp "${SCP_OPTS[@]}" ~/.op-token cc@"$ip":~/.op-token
 
-  # Copy rclone GDrive OAuth token (decrypted by agenix on the operator host).
+  # Copy rclone OAuth tokens (decrypted by agenix on the operator host).
   # Best-effort: skip with a warning if the operator host has not materialized
   # the secret yet (e.g. fresh checkout, hasn't rebuilt).
-  RCLONE_TOKEN_SRC="/run/agenix/rclone-gdrive-token"
-  if [ -r "$RCLONE_TOKEN_SRC" ]; then
-    ssh "${SSH_OPTS[@]}" cc@"$ip" 'mkdir -p ~/.local/share/rclone'
-    scp "${SCP_OPTS[@]}" "$RCLONE_TOKEN_SRC" cc@"$ip":~/.local/share/rclone/gdrive-token
-    ssh "${SSH_OPTS[@]}" cc@"$ip" 'chmod 600 ~/.local/share/rclone/gdrive-token'
-  elif [ -e "$RCLONE_TOKEN_SRC" ]; then
-    echo "WARN: $RCLONE_TOKEN_SRC exists but is not readable by current user; skipping rclone token copy" >&2
-  else
-    echo "WARN: $RCLONE_TOKEN_SRC not present on operator host; skipping rclone token copy" >&2
-  fi
+  ssh "${SSH_OPTS[@]}" cc@"$ip" 'mkdir -p ~/.local/share/rclone'
+  for remote in gdrive box; do
+    src="/run/agenix/rclone-${remote}-token"
+    dst=".local/share/rclone/${remote}-token"
+    if [ -r "$src" ]; then
+      scp "${SCP_OPTS[@]}" "$src" cc@"$ip":"$dst"
+      # shellcheck disable=SC2029  # remote path is intentionally expanded client-side
+      ssh "${SSH_OPTS[@]}" cc@"$ip" "chmod 600 $dst"
+    elif [ -e "$src" ]; then
+      echo "WARN: $src exists but is not readable by current user; skipping rclone $remote token copy" >&2
+    else
+      echo "WARN: $src not present on operator host; skipping rclone $remote token copy" >&2
+    fi
+  done
 
   # Copy Ghostty terminfo
   infocmp -x xterm-ghostty | ssh "${SSH_OPTS[@]}" cc@"$ip" -- tic -x -

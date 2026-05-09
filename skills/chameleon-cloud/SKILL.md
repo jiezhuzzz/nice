@@ -120,15 +120,15 @@ After the floating IP is attached and SSH is working, use the setup script. For 
 SSH_JUMP=cc@<floating-ip> <skill-base-dir>/scripts/setup-instance.sh <private-ip1> <private-ip2> ...
 ```
 
-This script handles per-instance: stale host key removal, env/op-token copy, rclone GDrive token copy (best-effort; requires `/run/agenix/rclone-gdrive-token` on the operator host), Ghostty terminfo, apt update/upgrade, uidmap install, AppArmor unprivileged userns fix (required for rootless podman), `loginctl enable-linger cc` for persistent user services, and Nix install. Run instances in parallel as background tasks.
+This script handles per-instance: stale host key removal, env/op-token copy, rclone OAuth token copy for GDrive and Box (best-effort; requires `/run/agenix/rclone-{gdrive,box}-token` on the operator host), Ghostty terminfo, apt update/upgrade, uidmap install, AppArmor unprivileged userns fix (required for rootless podman), `loginctl enable-linger cc` for persistent user services, and Nix install. Run instances in parallel as background tasks.
 
 ### Ordering note
 
-On a fresh chameleon node, run `setup-instance.sh` **before** the first `home-manager switch --flake github:jiezhuzzz/nice#chameleon`. The provisioning script writes `~/.local/share/rclone/gdrive-token`, which the rclone home-manager module reads at activation. If `home-manager switch` runs first on a node without the token, `rclone-config.service` fails and `rclone-mount:@gdrive.service` does not start. Recovery after dropping the token in:
+On a fresh chameleon node, run `setup-instance.sh` **before** the first `home-manager switch --flake github:jiezhuzzz/nice#chameleon`. The provisioning script writes `~/.local/share/rclone/{gdrive,box}-token`, which the rclone home-manager module reads at activation. If `home-manager switch` runs first on a node without the tokens, `rclone-config.service` fails and the `rclone-mount:@{gdrive,box}.service` units do not start. Recovery after dropping the tokens in:
 
 ```bash
 systemctl --user start rclone-config.service
-systemctl --user start 'rclone-mount:@gdrive.service'
+systemctl --user start 'rclone-mount:@gdrive.service' 'rclone-mount:@box.service'
 ```
 
 ## Quick Reference
