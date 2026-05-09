@@ -24,10 +24,6 @@ for ip in "$@"; do
   # Remove stale host key
   ssh-keygen -R "$ip" 2>/dev/null || true
 
-  # Copy env files and op-token
-  scp "${SCP_OPTS[@]}" ~/.envs cc@"$ip":~/.envs
-  scp "${SCP_OPTS[@]}" ~/.op-token cc@"$ip":~/.op-token
-
   # Copy rclone OAuth tokens (decrypted by agenix on the operator host).
   # Best-effort: skip with a warning if the operator host has not materialized
   # the secret yet (e.g. fresh checkout, hasn't rebuilt).
