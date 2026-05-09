@@ -24,4 +24,5 @@ in {
   "git-signing-key.age".publicKeys = allRecipients;
   "chameleon-ssh-key.age".publicKeys = allRecipients;
   "rclone-gdrive-token.age".publicKeys = allRecipients;
+  "rclone-box-token.age".publicKeys = allRecipients;
 }

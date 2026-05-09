@@ -28,4 +28,10 @@ in {
     owner = user.me.username;
     mode = "0400";
   };
+
+  age.secrets.rclone-box-token = {
+    file = ../../../secrets/rclone-box-token.age;
+    owner = user.me.username;
+    mode = "0400";
+  };
 }
