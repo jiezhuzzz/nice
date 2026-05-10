@@ -87,7 +87,7 @@
 in {
   programs.claude-code = {
     enable = true;
-    skills = ../../../skills;
+    skills = ../../../agents/skills;
     settings = {
       model = "claude-opus-4-7[1m]";
       effortLevel = "xhigh";
@@ -142,7 +142,7 @@ in {
       "${claude-plugins-official}/plugins/agent-sdk-dev"
       "${claude-plugins-official}/plugins/ralph-loop"
       "${codex-plugin-cc}/plugins/codex"
-      ../../../skills/research-writing
+      ../../../agents/plugins/research-writing
     ];
   };
 }
