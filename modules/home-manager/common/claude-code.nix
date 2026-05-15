@@ -2,14 +2,20 @@
   claude-plugins-official = pkgs.fetchFromGitHub {
     owner = "anthropics";
     repo = "claude-plugins-official";
-    rev = "cf62a6c02dc03db88da8eb7c61bdb9fd88da6326";
-    sha256 = "d28cc99927aa4b2d09ee077d3043e2ecfcc6d09971677b53b6f1f2816b72889b";
+    rev = "1a2f18b05cf5652fd25403e8d229fc884fb84103";
+    sha256 = "2e332eb2e7eff87f3eb763bd0c98114bd40eb877a57a9216b9616a88ae72dd44";
   };
   codex-plugin-cc = pkgs.fetchFromGitHub {
     owner = "openai";
     repo = "codex-plugin-cc";
     rev = "v1.0.4";
     sha256 = "cd675dcf5f1cdc4d794cfb84be3324064af088594add9a881b960fe715fa6482";
+  };
+  ast-grep-skill = pkgs.fetchFromGitHub {
+    owner = "ast-grep";
+    repo = "agent-skill";
+    rev = "577f4d4507678f2c8cee150fae25e6ce309f70b1";
+    sha256 = "2e0185b4f89ec8ab68aeedb60211d6f21be427c9021ced82afcac13961aec6f6";
   };
   statusline = pkgs.writeShellScript "claude-statusline" ''
     input=$(cat)
@@ -132,16 +138,17 @@ in {
       (pkgs.fetchFromGitHub {
         owner = "obra";
         repo = "superpowers";
-        rev = "v5.0.7";
-        sha256 = "1d0b4ef5c65f3cf2241c38fae0d790b86f69f568522815645865a1664663668a";
+        rev = "v5.1.0";
+        sha256 = "dc4deb3ba851f3b2547d2dd757511aa33e920d639fb65796bcdf543cd144323c";
         name = "superpowers";
       })
       "${claude-plugins-official}/plugins/skill-creator"
       "${claude-plugins-official}/plugins/code-review"
+      "${claude-plugins-official}/plugins/claude-code-setup"
       "${claude-plugins-official}/plugins/code-simplifier"
-      "${claude-plugins-official}/plugins/agent-sdk-dev"
       "${claude-plugins-official}/plugins/ralph-loop"
       "${codex-plugin-cc}/plugins/codex"
+      "${ast-grep-skill}/ast-grep"
       ../../../agents/plugins/research-writing
     ];
   };
