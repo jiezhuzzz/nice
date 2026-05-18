@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  config,
+  pkgs,
+  ...
+}: let
   claude-plugins-official = pkgs.fetchFromGitHub {
     owner = "anthropics";
     repo = "claude-plugins-official";
@@ -93,6 +97,7 @@
 in {
   programs.claude-code = {
     enable = true;
+    configDir = "${config.xdg.configHome}/claude";
     skills = ../../../agents/skills;
     settings = {
       model = "claude-opus-4-7[1m]";
