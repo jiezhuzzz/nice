@@ -82,6 +82,7 @@ in {
       # darwin
       ../modules/home-manager/darwin/aerospace.nix
       ../modules/home-manager/darwin/karabiner.nix
+      ../modules/home-manager/darwin/zotero.nix
       ../modules/home-manager/darwin/packages.nix
     ];
     home.username = user.me.username;
