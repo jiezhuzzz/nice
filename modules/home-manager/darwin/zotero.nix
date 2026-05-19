@@ -51,12 +51,17 @@ in {
       $DRY_RUN_CMD install -m 0644 ${profilesIni} "$iniFile"
     fi
 
-    # The rest writes under the rclone Dropbox mount. Skip entirely until the
-    # mount is up: pre-creating ~/Dropbox as a local dir would make rclone
-    # refuse to mount (it will not mount over a non-empty directory), and
-    # seeding into an unmounted path is meaningless. It runs on a later
+    # The rest writes under the rclone Dropbox mount. Skip until the FUSE
+    # mount is actually up — the rclone-sidecar-wrapper pre-creates
+    # ~/Dropbox as an empty local dir before each mount attempt, so a bare
+    # [ -d ~/Dropbox ] check is always true; seeding into that local stub
+    # makes the mountpoint non-empty and rclone then refuses to mount over
+    # it. Detect a real mount by comparing device numbers: a FUSE mount
+    # lives on a different filesystem than $HOME. Runs on a later
     # activation once the mount exists.
-    if [ -d "${homeDir}/Dropbox" ]; then
+    dropboxDev=$(stat -f %d "${homeDir}/Dropbox" 2>/dev/null || true)
+    homeDev=$(stat -f %d "${homeDir}" 2>/dev/null || true)
+    if [ -n "$dropboxDev" ] && [ "$dropboxDev" != "$homeDev" ]; then
       $DRY_RUN_CMD mkdir -p "$syncDir"
 
       # First-run seed: if the synced dir has no prefs.js yet, copy from the
