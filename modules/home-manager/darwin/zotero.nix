@@ -43,8 +43,9 @@ in {
 
     $DRY_RUN_CMD mkdir -p "$pinnedDir"
 
-    # Pin the profile: write profiles.ini only if absent or different, and
-    # keep it writable (Zotero rewrites it at runtime).
+    # Pin the profile: write profiles.ini only when the pinned Path is
+    # missing, so Zotero's runtime additions ([Install*], Version=) survive.
+    # Kept writable (Zotero rewrites it at runtime).
     iniFile="$zoteroBase/profiles.ini"
     if ! grep -qF "Path=Profiles/sync.default" "$iniFile" 2>/dev/null; then
       $DRY_RUN_CMD install -m 0644 ${profilesIni} "$iniFile"
