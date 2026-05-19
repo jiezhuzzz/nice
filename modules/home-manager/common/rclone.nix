@@ -19,11 +19,20 @@
   gdriveTokenPath = tokenPath "gdrive";
   boxTokenPath = tokenPath "box";
   dropboxTokenPath = tokenPath "dropbox";
+  # Drop macOS metadata cruft (AppleDouble shadow files emitted whenever a
+  # file with xattrs is written to a non-xattr-supporting FS like fuse-t/NFS,
+  # plus Finder's .DS_Store). Bidirectional in mount mode: cruft never
+  # reaches the cloud and never appears in the local mount view.
+  rcloneFilter = pkgs.writeText "rclone-mount-filter" ''
+    - ._*
+    - .DS_Store
+  '';
   mountOptions = {
     vfs-cache-mode = "writes";
     vfs-cache-max-size = "10G";
     dir-cache-time = "1h";
     umask = "022";
+    filter-from = "${rcloneFilter}";
   };
 in {
   programs.rclone = {
