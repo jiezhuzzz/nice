@@ -34,4 +34,10 @@ in {
     owner = user.me.username;
     mode = "0400";
   };
+
+  age.secrets.rclone-dropbox-token = {
+    file = ../../../secrets/rclone-dropbox-token.age;
+    owner = user.me.username;
+    mode = "0400";
+  };
 }
