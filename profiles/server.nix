@@ -28,7 +28,7 @@
     ../modules/home-manager/common/npm.nix
     ../modules/home-manager/common/oh-my-posh.nix
     ../modules/home-manager/common/tmux.nix
-    ../modules/home-manager/linux/rclone.nix
+    ../modules/home-manager/common/rclone.nix
     ../modules/home-manager/linux/shpool.nix
     ../modules/home-manager/common/packages.nix
   ];
