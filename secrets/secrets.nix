@@ -25,4 +25,5 @@ in {
   "chameleon-ssh-key.age".publicKeys = allRecipients;
   "rclone-gdrive-token.age".publicKeys = allRecipients;
   "rclone-box-token.age".publicKeys = allRecipients;
+  "rclone-dropbox-token.age".publicKeys = allRecipients;
 }
