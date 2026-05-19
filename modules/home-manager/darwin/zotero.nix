@@ -4,7 +4,7 @@
 #
 # Mechanism: Zotero profile dirs carry a random hash, so we pin the active
 # profile to Profiles/sync.default via an idempotent profiles.ini, then point
-# the three syncable items at ~/Dropbox/apps/zotero/ using out-of-store symlinks
+# the three syncable items at ~/Dropbox/Apps/Zotero/ using out-of-store symlinks
 # (Zotero must be able to write through them). On a machine whose synced dir
 # is still empty, the existing profile is copied in once to seed it.
 {
@@ -16,7 +16,7 @@
   homeDir = config.home.homeDirectory;
   zoteroRel = "Library/Application Support/Zotero";
   pinnedRel = "${zoteroRel}/Profiles/sync.default";
-  syncDir = "${homeDir}/Dropbox/apps/zotero";
+  syncDir = "${homeDir}/Dropbox/Apps/Zotero";
   profilesIni = pkgs.writeText "zotero-profiles.ini" ''
     [Profile0]
     Name=default
