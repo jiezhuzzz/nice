@@ -96,17 +96,17 @@ in {
     home.stateVersion = "26.05";
 
     # SSH identity pinning (keys decrypted by agenix to /run/agenix/)
-    programs.ssh.matchBlocks."github.com" = {
-      identityFile = "/run/agenix/github-ssh-key";
-      identitiesOnly = true;
+    programs.ssh.settings."github.com" = {
+      IdentityFile = "/run/agenix/github-ssh-key";
+      IdentitiesOnly = true;
     };
-    programs.ssh.matchBlocks."tacc" = {
-      identityFile = "/run/agenix/chameleon-ssh-key";
-      identitiesOnly = true;
+    programs.ssh.settings."tacc" = {
+      IdentityFile = "/run/agenix/chameleon-ssh-key";
+      IdentitiesOnly = true;
     };
-    programs.ssh.matchBlocks."10.52.*.*" = {
-      identityFile = "/run/agenix/chameleon-ssh-key";
-      identitiesOnly = true;
+    programs.ssh.settings."10.52.*.*" = {
+      IdentityFile = "/run/agenix/chameleon-ssh-key";
+      IdentitiesOnly = true;
     };
 
     # Auto-load SSH keys into macOS system agent at login
