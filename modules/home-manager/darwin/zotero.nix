@@ -1,12 +1,24 @@
 # Sync Zotero settings + extensions across macOS desktops via the rclone
-# Dropbox mount. Only prefs.js / extensions / extensions.json are redirected;
-# the library DB, storage/, and caches stay on Zotero's own built-in sync.
+# Dropbox mount. Only the config layer is synced (no library DB, no caches);
+# the library DB and storage/ stay on Zotero's own built-in sync.
 #
 # Mechanism: Zotero profile dirs carry a random hash, so we pin the active
-# profile to Profiles/sync.default via an idempotent profiles.ini, then point
-# the three syncable items at ~/Dropbox/Apps/Zotero/ using out-of-store symlinks
-# (Zotero must be able to write through them). On a machine whose synced dir
-# is still empty, the existing profile is copied in once to seed it.
+# profile to Profiles/sync.default via an idempotent profiles.ini, then make
+# the WHOLE pinned profile directory an out-of-store symlink to
+# ~/Dropbox/Apps/Zotero/. Atomic-rename writes (Mozilla apps' safe-save
+# pattern) now happen INSIDE the synced directory rather than overwriting
+# our symlink — the dir-level symlink lives one level above where renames
+# happen, so it cannot be replaced by an inner rewrite.
+#
+# Per-machine state that must not propagate (lock files, SQLite WAL/journal,
+# caches, sessionstore, credentials, telemetry) is filtered out at the
+# rclone mount layer (see common/rclone.nix's filter-from). Those files
+# still get written locally via rclone's VFS cache, just never uploaded.
+#
+# Migration: an activation script (entryBefore writeBoundary) handles the
+# transition from an existing real sync.default/ directory (either left over
+# from the previous per-file design, or the user's original random-hash
+# profile) by copying whitelisted items into the synced dir on first run.
 {
   config,
   lib,
@@ -28,57 +40,77 @@
     StartWithLastProfile=1
     Version=2
   '';
+  # Files inside the Zotero profile that are safe to share across machines.
+  # Kept in sync with the include-list in common/rclone.nix's filter-from.
+  syncWhitelist = [
+    "prefs.js"
+    "extensions"
+    "extensions.json"
+    "extensions.json.backup"
+    "xulstore.json"
+    "treePrefs.json"
+    "handlers.json"
+    "retractions.json"
+  ];
 in {
-  home.file."${pinnedRel}/prefs.js".source =
-    config.lib.file.mkOutOfStoreSymlink "${syncDir}/prefs.js";
-  home.file."${pinnedRel}/extensions".source =
-    config.lib.file.mkOutOfStoreSymlink "${syncDir}/extensions";
-  home.file."${pinnedRel}/extensions.json".source =
-    config.lib.file.mkOutOfStoreSymlink "${syncDir}/extensions.json";
+  home.file."${pinnedRel}".source =
+    config.lib.file.mkOutOfStoreSymlink "${syncDir}";
 
-  home.activation.zoteroSync = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  # Pre-link migration: if sync.default is currently a real directory
+  # (transitioning from the per-file design, or a fresh machine with the
+  # user's pre-existing random-hash *.default profile), copy whitelisted
+  # items into the synced Dropbox dir, then remove the real dir so
+  # home-manager can place its directory symlink. Skipped when the Dropbox
+  # mount isn't up (rclone-sidecar-wrapper's pre-created local stub is
+  # detected by comparing device numbers).
+  home.activation.zoteroMigrate = lib.hm.dag.entryBefore ["writeBoundary"] ''
     zoteroBase="${homeDir}/${zoteroRel}"
     syncDir="${syncDir}"
     pinnedDir="$zoteroBase/Profiles/sync.default"
 
-    $DRY_RUN_CMD mkdir -p "$pinnedDir"
-
-    # Pin the profile: write profiles.ini only when the pinned Path is
-    # missing, so Zotero's runtime additions ([Install*], Version=) survive.
-    # Kept writable (Zotero rewrites it at runtime).
-    iniFile="$zoteroBase/profiles.ini"
-    if ! grep -qF "Path=Profiles/sync.default" "$iniFile" 2>/dev/null; then
-      $DRY_RUN_CMD install -m 0644 ${profilesIni} "$iniFile"
-    fi
-
-    # The rest writes under the rclone Dropbox mount. Skip until the FUSE
-    # mount is actually up — the rclone-sidecar-wrapper pre-creates
-    # ~/Dropbox as an empty local dir before each mount attempt, so a bare
-    # [ -d ~/Dropbox ] check is always true; seeding into that local stub
-    # makes the mountpoint non-empty and rclone then refuses to mount over
-    # it. Detect a real mount by comparing device numbers: a FUSE mount
-    # lives on a different filesystem than $HOME. Runs on a later
-    # activation once the mount exists.
     dropboxDev=$(stat -f %d "${homeDir}/Dropbox" 2>/dev/null || true)
     homeDev=$(stat -f %d "${homeDir}" 2>/dev/null || true)
-    if [ -n "$dropboxDev" ] && [ "$dropboxDev" != "$homeDev" ]; then
-      $DRY_RUN_CMD mkdir -p "$syncDir"
+    if [ -z "$dropboxDev" ] || [ "$dropboxDev" = "$homeDev" ]; then
+      exit 0   # Dropbox not really mounted; defer migration to a later switch
+    fi
 
-      # First-run seed: if the synced dir has no prefs.js yet, copy from the
-      # existing (non-pinned) *.default profile so current settings + the
-      # dataDir pointer are preserved. Never overwrite an already-synced dir.
-      if [ ! -e "$syncDir/prefs.js" ]; then
-        src=""
-        for d in "$zoteroBase"/Profiles/*.default; do
-          [ -d "$d" ] || continue
-          if [ "$d" != "$pinnedDir" ]; then src="$d"; break; fi
-        done
-        if [ -n "$src" ]; then
-          [ -f "$src/prefs.js" ] && $DRY_RUN_CMD cp -p "$src/prefs.js" "$syncDir/prefs.js"
-          [ -f "$src/extensions.json" ] && $DRY_RUN_CMD cp -p "$src/extensions.json" "$syncDir/extensions.json"
-          [ -d "$src/extensions" ] && $DRY_RUN_CMD cp -pR "$src/extensions" "$syncDir/extensions"
-        fi
-      fi
+    $DRY_RUN_CMD mkdir -p "$syncDir"
+
+    copy_whitelist() {
+      local src="$1"
+      ${lib.concatMapStringsSep "\n      " (item: ''
+      if [ -e "$src/${item}" ] && [ ! -e "$syncDir/${item}" ]; then
+        $DRY_RUN_CMD cp -pR "$src/${item}" "$syncDir/${item}"
+      fi'')
+    syncWhitelist}
+    }
+
+    # Case A: pinnedDir is a real directory — migrate its content, then remove.
+    if [ -d "$pinnedDir" ] && [ ! -L "$pinnedDir" ]; then
+      copy_whitelist "$pinnedDir"
+      $DRY_RUN_CMD rm -rf "$pinnedDir"
+    fi
+
+    # Case B: still nothing in syncDir — seed from another *.default profile
+    # (the user's original random-hash profile on a fresh machine).
+    if [ ! -e "$syncDir/prefs.js" ]; then
+      for d in "$zoteroBase"/Profiles/*.default; do
+        [ -d "$d" ] || continue
+        [ "$d" = "$pinnedDir" ] && continue
+        copy_whitelist "$d"
+        break
+      done
+    fi
+  '';
+
+  # Post-link activation: pin profiles.ini idempotently. Lives at the Zotero
+  # base (not inside the symlinked profile dir), so unaffected by the dir
+  # symlink. Writes only when the pin marker is absent so Zotero's runtime
+  # additions ([Install*], Version=) survive.
+  home.activation.zoteroProfile = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    iniFile="${homeDir}/${zoteroRel}/profiles.ini"
+    if ! grep -qF "Path=Profiles/sync.default" "$iniFile" 2>/dev/null; then
+      $DRY_RUN_CMD install -m 0644 ${profilesIni} "$iniFile"
     fi
   '';
 }
