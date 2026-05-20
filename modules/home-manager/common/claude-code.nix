@@ -104,6 +104,11 @@ in {
       effortLevel = "xhigh";
       defaultMode = "auto";
       skipDangerousModePermissionPrompt = true;
+      env = {
+        CLAUDE_CODE_PLUGIN_CACHE_DIR = "${config.xdg.cacheHome}/claude/plugins";
+        CLAUDE_CODE_DEBUG_LOGS_DIR = "${config.xdg.stateHome}/claude/logs";
+        CLAUDE_CODE_TMPDIR = "/tmp/claude-code-${config.home.username}";
+      };
       statusLine = {
         type = "command";
         command = "${statusline}";
