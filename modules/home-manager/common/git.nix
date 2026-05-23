@@ -23,6 +23,8 @@ in {
       "*.avif binary"
       "*.heic binary"
       "*.psd binary"
+      # Diagrams
+      "*.drawio binary"
       # Audio / video
       "*.mp3 binary"
       "*.mp4 binary"
