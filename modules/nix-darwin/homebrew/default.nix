@@ -48,6 +48,7 @@ in {
       "claude"
       "cleanshot"
       "drawio"
+      "dropbox"
       "figma"
       "fuse-t"
       "ghostty"
