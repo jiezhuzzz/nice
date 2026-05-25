@@ -55,6 +55,7 @@ in {
       "iina"
       "karabiner-elements"
       "keka"
+      "pdf-expert"
       "raycast"
       "skim"
       "squirrel-app"

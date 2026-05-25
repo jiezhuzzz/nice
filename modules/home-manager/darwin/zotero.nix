@@ -1,19 +1,24 @@
-# Sync Zotero settings + extensions across macOS desktops via the rclone
-# Dropbox mount. Only the config layer is synced (no library DB, no caches);
+# Sync Zotero settings + extensions across macOS desktops via the native
+# Dropbox client. Only the config layer is synced (no library DB, no caches);
 # the library DB and storage/ stay on Zotero's own built-in sync.
 #
 # Mechanism: Zotero profile dirs carry a random hash, so we pin the active
 # profile to Profiles/sync.default via an idempotent profiles.ini, then make
 # the WHOLE pinned profile directory an out-of-store symlink to
-# ~/Dropbox/Apps/Zotero/. Atomic-rename writes (Mozilla apps' safe-save
+# ~/Library/CloudStorage/Dropbox/Apps/Zotero/ (macOS 12.3+ moved Dropbox to
+# the file-provider extension; the legacy ~/Dropbox path is no longer
+# created). Atomic-rename writes (Mozilla apps' safe-save
 # pattern) now happen INSIDE the synced directory rather than overwriting
 # our symlink — the dir-level symlink lives one level above where renames
 # happen, so it cannot be replaced by an inner rewrite.
 #
 # Per-machine state that must not propagate (lock files, SQLite WAL/journal,
-# caches, sessionstore, credentials, telemetry) is filtered out at the
-# rclone mount layer (see common/rclone.nix's filter-from). Those files
-# still get written locally via rclone's VFS cache, just never uploaded.
+# caches, sessionstore, telemetry) is filtered out by tagging the relevant
+# paths with Dropbox's com.dropbox.ignored xattr (see zoteroDropboxIgnore
+# activation below). Native Dropbox has no rclone-style include-list, so we
+# enumerate known-noisy paths instead. Re-runs every switch; files born and
+# deleted between switches sync briefly — acceptable for the
+# single-active-machine workflow this assumes.
 #
 # Migration: an activation script (entryBefore writeBoundary) handles the
 # transition from an existing real sync.default/ directory (either left over
@@ -28,7 +33,8 @@
   homeDir = config.home.homeDirectory;
   zoteroRel = "Library/Application Support/Zotero";
   pinnedRel = "${zoteroRel}/Profiles/sync.default";
-  syncDir = "${homeDir}/Dropbox/Apps/Zotero";
+  dropboxRoot = "${homeDir}/Library/CloudStorage/Dropbox";
+  syncDir = "${dropboxRoot}/Apps/Zotero";
   profilesIni = pkgs.writeText "zotero-profiles.ini" ''
     [Profile0]
     Name=default
@@ -41,7 +47,8 @@
     Version=2
   '';
   # Files inside the Zotero profile that are safe to share across machines.
-  # Kept in sync with the include-list in common/rclone.nix's filter-from.
+  # Used by the migration script below to seed the synced dir from an
+  # existing random-hash profile on first run.
   syncWhitelist = [
     "prefs.js"
     "extensions"
@@ -61,17 +68,15 @@ in {
   # user's pre-existing random-hash *.default profile), copy whitelisted
   # items into the synced Dropbox dir, then remove the real dir so
   # home-manager can place its directory symlink. Skipped when the Dropbox
-  # mount isn't up (rclone-sidecar-wrapper's pre-created local stub is
-  # detected by comparing device numbers).
+  # CloudStorage dir is missing or empty — Dropbox isn't set up here yet,
+  # so defer to a later switch.
   home.activation.zoteroMigrate = lib.hm.dag.entryBefore ["writeBoundary"] ''
     zoteroBase="${homeDir}/${zoteroRel}"
     syncDir="${syncDir}"
     pinnedDir="$zoteroBase/Profiles/sync.default"
 
-    dropboxDev=$(stat -f %d "${homeDir}/Dropbox" 2>/dev/null || true)
-    homeDev=$(stat -f %d "${homeDir}" 2>/dev/null || true)
-    if [ -z "$dropboxDev" ] || [ "$dropboxDev" = "$homeDev" ]; then
-      exit 0   # Dropbox not really mounted; defer migration to a later switch
+    if [ ! -d "${dropboxRoot}" ] || [ -z "$(ls -A "${dropboxRoot}" 2>/dev/null)" ]; then
+      exit 0   # Dropbox not yet initialized; defer migration to a later switch
     fi
 
     $DRY_RUN_CMD mkdir -p "$syncDir"
@@ -112,5 +117,32 @@ in {
     if ! grep -qF "Path=Profiles/sync.default" "$iniFile" 2>/dev/null; then
       $DRY_RUN_CMD install -m 0644 ${profilesIni} "$iniFile"
     fi
+  '';
+
+  # Tag per-machine state inside the synced profile with com.dropbox.ignored
+  # so Dropbox skips it. Runs every switch — files Zotero has created since
+  # the last activation get tagged now; files born and deleted between
+  # switches sync briefly. Extend the list when new noisy paths show up.
+  home.activation.zoteroDropboxIgnore = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    syncDir="${syncDir}"
+    [ -d "$syncDir" ] || exit 0
+
+    tag() {
+      if [ -e "$1" ]; then
+        $DRY_RUN_CMD /usr/bin/xattr -w com.dropbox.ignored 1 "$1" 2>/dev/null || true
+      fi
+    }
+
+    for p in parent.lock cache cache2 startupCache compatibility.ini \
+             times.json sessionstore.js sessionstore-backups crashes \
+             minidumps datareporting safebrowsing safebrowsing-cache \
+             thumbnails storage permissions.sqlite webappsstore.sqlite \
+             pluginsdb.sqlite; do
+      tag "$syncDir/$p"
+    done
+
+    for p in "$syncDir"/*.sqlite-wal "$syncDir"/*.sqlite-journal "$syncDir"/*.sqlite-shm; do
+      tag "$p"
+    done
   '';
 }
