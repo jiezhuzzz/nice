@@ -102,7 +102,16 @@ in {
     settings = {
       model = "claude-opus-4-7[1m]";
       effortLevel = "xhigh";
-      defaultMode = "auto";
+      permissions = {
+        defaultMode = "auto";
+        deny = [
+          "Bash(python *)"
+          "Bash(python3 *)"
+          "Bash(pip *)"
+          "Bash(pip3 *)"
+          "Bash(uv pip *)"
+        ];
+      };
       skipDangerousModePermissionPrompt = true;
       env = {
         CLAUDE_CODE_PLUGIN_CACHE_DIR = "${config.xdg.cacheHome}/claude/plugins";
@@ -113,13 +122,6 @@ in {
         type = "command";
         command = "${statusline}";
       };
-      deny = [
-        "Bash(python *)"
-        "Bash(python3 *)"
-        "Bash(pip *)"
-        "Bash(pip3 *)"
-        "Bash(uv pip *)"
-      ];
       attribution = {
         commit = "";
         pr = "";
