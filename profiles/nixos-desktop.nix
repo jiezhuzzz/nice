@@ -46,6 +46,7 @@ in {
     imports = [
       # common
       ../modules/home-manager/common/packages.nix
+      ../modules/home-manager/common/aliases.nix
       ../modules/home-manager/common/theme.nix
       ../modules/home-manager/common/helix.nix
       ../modules/home-manager/common/yazi.nix

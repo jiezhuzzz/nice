@@ -31,6 +31,7 @@
     ../modules/home-manager/common/rclone.nix
     ../modules/home-manager/linux/shpool.nix
     ../modules/home-manager/common/packages.nix
+    ../modules/home-manager/common/aliases.nix
   ];
 
   home.preferXdgDirectories = true;
