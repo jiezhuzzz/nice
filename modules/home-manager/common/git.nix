@@ -76,6 +76,7 @@ in {
       # AI assistant per-repo state
       ".codex/"
       ".claude/"
+      ".agents/"
       # direnv local cache
       ".direnv/"
       ".envrc.local"
