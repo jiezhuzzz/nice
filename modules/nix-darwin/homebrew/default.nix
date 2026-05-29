@@ -32,6 +32,9 @@ in {
       autoUpdate = false; # don't hit network on every darwin-rebuild
       upgrade = true; # upgrade installed casks on activation
       cleanup = "zap"; # remove anything not declared here
+      # Homebrew 4.x added a confirmation gate on `brew bundle install --cleanup`;
+      # unattended activation must opt in via --force-cleanup (or --force / $HOMEBREW_ASK).
+      extraFlags = ["--force-cleanup"];
     };
     # Keep state-side tap list in sync with nix-homebrew.taps above.
     taps = [
