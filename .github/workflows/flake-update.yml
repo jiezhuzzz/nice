@@ -20,7 +20,7 @@ jobs:
         run: nix flake update
 
       - name: nix flake check
-        run: nix flake check --no-build --accept-flake-config
+        run: nix flake check --accept-flake-config
 
       - uses: planetscale/ghcommit-action@v0.2.20
         with:
