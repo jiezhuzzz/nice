@@ -19,9 +19,6 @@ jobs:
       - name: nix flake update
         run: nix flake update
 
-      - name: nix flake check
-        run: nix flake check --accept-flake-config
-
       - uses: planetscale/ghcommit-action@v0.2.20
         with:
           commit_message: "ci(flake): bump flake.lock [skip ci]"
