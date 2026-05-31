@@ -138,16 +138,23 @@ in {
 
       - Always use `uv` to run Python scripts, never `python` or `python3` directly.
       - Run scripts with `uv run script.py`, never `python script.py`.
-      - When writing Python scripts, use PEP 723 inline script metadata to declare dependencies:
+      - When writing a standalone Python script, declare its dependencies inline
+        with PEP 723 (https://peps.python.org/pep-0723/) script metadata, then run
+        it with `uv run script.py`. uv reads the metadata block, builds an
+        ephemeral virtualenv with those deps, and runs the script — no separate
+        install step, no project files:
         ```python
         # /// script
+        # requires-python = ">=3.12"
         # dependencies = [
         #   "requests<3",
         #   "rich",
         # ]
         # ///
         ```
-        This lets `uv run script.py` automatically install dependencies without a separate install step.
+        Add deps to an existing inline script with
+        `uv add --script script.py 'requests<3'` (uv edits the block for you).
+        For a self-executing script, use the shebang `#!/usr/bin/env -S uv run --script`.
       - Do not use `pip install`, `pip3 install`, or `uv add` for standalone scripts. Inline the dependencies instead.
       - For Python projects (not standalone scripts), use `uv init`, `uv add`, and `uv run`.
       - Use `uv run` to execute any Python tooling (pytest, ruff, mypy, etc.).
