@@ -19,6 +19,21 @@ in {
       approval_policy = "on-request";
       approvals_reviewer = "auto_review";
       sandbox_mode = "workspace-write";
+      personality = "pragmatic";
+      tui.notifications = true;
+      # TUI footer status line (config-as-code for the /statusline picker).
+      # Ordered list of item identifiers; defaults to
+      # ["model-with-reasoning" "current-dir"] when unset, null disables it.
+      # Other valid items: context-used, fast-mode, run-state,
+      # branch-changes, pull-request-number. See `tui.status_line` in
+      # codex-rs/core/config.schema.json upstream.
+      tui.status_line = [
+        "model-with-reasoning"
+        "context-remaining"
+        "five-hour-limit"
+        "weekly-limit"
+        "current-dir"
+      ];
       # model = "gpt-5.5";
       # model_reasoning_effort = "high";
       # # Activate with `codex --profile server` on hosts that need the
