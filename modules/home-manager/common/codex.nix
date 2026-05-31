@@ -12,18 +12,22 @@ in {
     # skills = {
     #   "superpowers" = "${superpowers}/skills";
     # };
-    # settings = {
-    #   model = "gpt-5.5";
-    #   model_reasoning_effort = "high";
-    #   approval_policy = "on-request";
-    #   sandbox_mode = "workspace-write";
-    #   # Activate with `codex --profile server` on hosts that need the
-    #   # US-region OpenAI endpoint (e.g. chameleon).
-    #   profiles.server = {
-    #     openai_base_url = "https://us.api.openai.com/v1";
-    #     model = "gpt-5.4";
-    #   };
-    # };
+    settings = {
+      # Auto-review: route approval requests to Codex's Guardian reviewer
+      # agent instead of pausing for the user. Only takes effect with
+      # approval_policy = "on-request" (no requests to review under "never").
+      approval_policy = "on-request";
+      approvals_reviewer = "auto_review";
+      sandbox_mode = "workspace-write";
+      # model = "gpt-5.5";
+      # model_reasoning_effort = "high";
+      # # Activate with `codex --profile server` on hosts that need the
+      # # US-region OpenAI endpoint (e.g. chameleon).
+      # profiles.server = {
+      #   openai_base_url = "https://us.api.openai.com/v1";
+      #   model = "gpt-5.4";
+      # };
+    };
     # context = ''
     #   # Python
 
