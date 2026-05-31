@@ -37,8 +37,10 @@ in {
         "weekly-limit"
         "current-dir"
       ];
+      # Always use the highest reasoning effort.
+      # Valid: minimal | low | medium | high | xhigh.
+      model_reasoning_effort = "xhigh";
       # model = "gpt-5.5";
-      # model_reasoning_effort = "high";
       # # Activate with `codex --profile server` on hosts that need the
       # # US-region OpenAI endpoint (e.g. chameleon).
       # profiles.server = {
