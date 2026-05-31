@@ -158,6 +158,21 @@ in {
       - Do not use `pip install`, `pip3 install`, or `uv add` for standalone scripts. Inline the dependencies instead.
       - For Python projects (not standalone scripts), use `uv init`, `uv add`, and `uv run`.
       - Use `uv run` to execute any Python tooling (pytest, ruff, mypy, etc.).
+
+      # Nix dev environments
+
+      - Most projects here are Nix flakes. When the project root has a `flake.nix`
+        with a `devShell`, shell commands need that dev shell's tools.
+      - Treat the env as already active when `$IN_NIX_SHELL` or `$DIRENV_DIR` is
+        set (the usual case — the session is launched from a direnv-loaded
+        shell); run commands normally.
+      - When neither is set and a command fails with a missing tool, re-run it in
+        the dev shell instead of installing anything globally:
+        `nix develop -c '<command>'`. Each command runs in a fresh shell, so wrap
+        every command — entering the shell once does not persist.
+      - When a `flake.nix` devShell exists but there is no `.envrc`, suggest
+        adding one containing `use flake` (then `direnv allow`) so it loads
+        automatically — but do not create or commit the file.
     '';
     plugins = [
       (pkgs.fetchFromGitHub {
