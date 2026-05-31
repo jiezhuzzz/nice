@@ -102,6 +102,10 @@ in {
     settings = {
       model = "opus[1m]";
       # effortLevel = "xhigh";
+      # Disable auto memory: stop Claude from writing/updating its own notes
+      # under ~/.config/claude/projects/<project>/memory/. CLAUDE.md and
+      # `context` below still apply (those are user-authored, not auto memory).
+      autoMemoryEnabled = false;
       permissions = {
         defaultMode = "auto";
         deny = [

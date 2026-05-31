@@ -20,6 +20,9 @@ in {
       approvals_reviewer = "auto_review";
       sandbox_mode = "workspace-write";
       personality = "pragmatic";
+      # Disable the Memories feature so Codex never auto-generates memories or
+      # injects them into future sessions (off by default; pinned explicitly).
+      features.memories = false;
       tui.notifications = true;
       # TUI footer status line (config-as-code for the /statusline picker).
       # Ordered list of item identifiers; defaults to
