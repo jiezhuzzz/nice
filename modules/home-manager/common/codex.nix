@@ -9,9 +9,14 @@
 in {
   programs.codex = {
     enable = true;
-    # skills = {
-    #   "superpowers" = "${superpowers}/skills";
-    # };
+    skills = {
+      # Conventional Commits + Conventional Branch enforcement, sourced from
+      # this repo so Claude Code and Codex share one skill definition.
+      # Symlinked into Codex's skills dir (~/.agents/skills/ on Codex >=
+      # 0.94.0, else ~/.config/codex/skills/).
+      conventional-git = ../../../agents/skills/conventional-git;
+      # "superpowers" = "${superpowers}/skills";
+    };
     settings = {
       # Auto-review: route approval requests to Codex's Guardian reviewer
       # agent instead of pausing for the user. Only takes effect with
