@@ -7,6 +7,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CHI="$SCRIPT_DIR/chi.sh"
+# Prefer jaq (faster) but fall back to jq; one of them must exist.
+JQ="${JQ:-$(command -v jaq || command -v jq || true)}"
+[[ -n $JQ ]] || {
+  echo "Error: need 'jaq' or 'jq' on PATH" >&2
+  exit 1
+}
 
 LEASE_NAME="${1:?Usage: $0 <name> <node-type> <count> <end-date>}"
 NODE_TYPE="${2:?Missing node_type (e.g. compute_skylake, compute_cascadelake_r)}"
@@ -31,7 +37,7 @@ echo "  End date: $END_DATE"
 echo "Polling lease status (timeout ${TIMEOUT}s)..."
 elapsed=0
 while [ $elapsed -lt $TIMEOUT ]; do
-  status=$("$CHI" blazar lease-show "$LEASE_NAME" -f json | jaq -r '.status')
+  status=$("$CHI" blazar lease-show "$LEASE_NAME" -f json | "$JQ" -r '.status')
   echo "  Status: $status (${elapsed}s)"
   if [ "$status" = "ACTIVE" ]; then
     echo "Lease '$LEASE_NAME' is ACTIVE."

@@ -6,6 +6,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CHI="$SCRIPT_DIR/chi.sh"
+# Prefer jaq (faster) but fall back to jq; one of them must exist.
+JQ="${JQ:-$(command -v jaq || command -v jq || true)}"
+[[ -n $JQ ]] || {
+  echo "Error: need 'jaq' or 'jq' on PATH" >&2
+  exit 1
+}
 
 LEASE_NAME="${1:?Usage: $0 <lease-name>}"
 CHI_SITE="${CHI_SITE:-uc}"
@@ -25,7 +31,7 @@ echo "Target instance: $INSTANCE"
 
 # Detach from any existing server
 echo "Checking if floating IP is currently attached..."
-current_server=$("$CHI" openstack floating ip show "$FLOATING_IP" -f json | jaq -r '.port_id // empty')
+current_server=$("$CHI" openstack floating ip show "$FLOATING_IP" -f json | "$JQ" -r '.port_id // empty')
 if [ -n "$current_server" ]; then
   echo "  Detaching from current server..."
   ("$CHI" openstack floating ip unset --port "$FLOATING_IP")
@@ -37,7 +43,7 @@ echo "Attaching $FLOATING_IP to $INSTANCE..."
 
 echo ""
 echo "Verifying..."
-("$CHI" openstack server list -f json | jaq ".[] | select(.Name | startswith(\"$LEASE_NAME\")) | {Name, Status, Networks}")
+("$CHI" openstack server list -f json | "$JQ" ".[] | select(.Name | startswith(\"$LEASE_NAME\")) | {Name, Status, Networks}")
 
 echo ""
 echo "SSH access:"
