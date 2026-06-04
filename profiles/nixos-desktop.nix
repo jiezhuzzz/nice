@@ -116,12 +116,14 @@ in {
       User = "jiezhu";
       IdentityFile = "/run/agenix/lab-ssh-key";
       IdentitiesOnly = true;
+      ForwardAgent = true;
     };
     programs.ssh.settings."goku vegeta" = {
       ProxyJump = "uchicago";
       User = "jiezzz";
       IdentityFile = "/run/agenix/lab-ssh-key";
       IdentitiesOnly = true;
+      ForwardAgent = true;
     };
 
     # Auto-load SSH keys into agent at login
