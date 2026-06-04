@@ -5,7 +5,7 @@
 # can be host SSH pubkeys (deployed systems) and/or user pubkeys (for editing).
 #
 # Usage:
-#   nix run github:ryantm/agenix -- -e github-ssh-key.age
+#   nix run github:ryantm/agenix -- -e ssh/github.age
 let
   # Host keys (from /etc/ssh/ssh_host_ed25519_key.pub on each machine).
   nixps = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIApiDrorjoUu3XSvuzSEwDyMauOtmcqeRKW9SJWN1PT7";
@@ -20,9 +20,9 @@ let
   allUsers = [password-manager];
   allRecipients = allHosts ++ allUsers;
 in {
-  "github-ssh-key.age".publicKeys = allRecipients;
-  "git-signing-key.age".publicKeys = allRecipients;
-  "chameleon-ssh-key.age".publicKeys = allRecipients;
-  "rclone-gdrive-token.age".publicKeys = allRecipients;
-  "rclone-box-token.age".publicKeys = allRecipients;
+  "ssh/github.age".publicKeys = allRecipients;
+  "ssh/git-signing.age".publicKeys = allRecipients;
+  "ssh/chameleon.age".publicKeys = allRecipients;
+  "rclone/gdrive.age".publicKeys = allRecipients;
+  "rclone/box.age".publicKeys = allRecipients;
 }
