@@ -49,6 +49,8 @@ in {
 
   flake.homeConfigurations = {
     chameleon = mkHome "x86_64-linux" [../hosts/foreign/chameleon];
+    goku = mkHome "x86_64-linux" [../hosts/foreign/goku];
+    vegeta = mkHome "x86_64-linux" [../hosts/foreign/vegeta];
   };
 
   flake.darwinConfigurations = {
