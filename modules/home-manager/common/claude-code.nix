@@ -48,11 +48,12 @@
     ICON_WORKTREE=$'\xee\x97\xbb'
     ICON_CLOCK=$''
 
-    if [ "$PCT" -ge 90 ]; then BAR_COLOR="$RED"
-    elif [ "$PCT" -ge 70 ]; then BAR_COLOR="$YELLOW"
+    CTX_LEFT=$((100 - PCT))
+    if [ "$CTX_LEFT" -le 10 ]; then BAR_COLOR="$RED"
+    elif [ "$CTX_LEFT" -le 30 ]; then BAR_COLOR="$YELLOW"
     else BAR_COLOR="$GREEN"; fi
 
-    FILLED=$((PCT / 20))
+    FILLED=$((CTX_LEFT / 20))
     EMPTY=$((5 - FILLED))
     BAR=""
     [ "$FILLED" -gt 0 ] && printf -v FILL "%''${FILLED}s" && BAR="''${FILL// /█}"
@@ -80,19 +81,25 @@
 
     LIMITS=""
     if [ -n "$RL_5H" ] || [ -n "$RL_7D" ]; then
-      RL_MAX=0
-      [ -n "$RL_5H" ] && [ "$RL_5H" -gt "$RL_MAX" ] && RL_MAX=$RL_5H
-      [ -n "$RL_7D" ] && [ "$RL_7D" -gt "$RL_MAX" ] && RL_MAX=$RL_7D
-      if [ "$RL_MAX" -ge 90 ]; then RL_COLOR="$RED"
-      elif [ "$RL_MAX" -ge 70 ]; then RL_COLOR="$YELLOW"
+      RL_MIN_LEFT=100
+      if [ -n "$RL_5H" ]; then
+        RL_5H_LEFT=$((100 - RL_5H))
+        [ "$RL_5H_LEFT" -lt "$RL_MIN_LEFT" ] && RL_MIN_LEFT=$RL_5H_LEFT
+      fi
+      if [ -n "$RL_7D" ]; then
+        RL_7D_LEFT=$((100 - RL_7D))
+        [ "$RL_7D_LEFT" -lt "$RL_MIN_LEFT" ] && RL_MIN_LEFT=$RL_7D_LEFT
+      fi
+      if [ "$RL_MIN_LEFT" -le 10 ]; then RL_COLOR="$RED"
+      elif [ "$RL_MIN_LEFT" -le 30 ]; then RL_COLOR="$YELLOW"
       else RL_COLOR="$GREEN"; fi
       LIMITS_TXT=""
-      [ -n "$RL_5H" ] && LIMITS_TXT="5h:$RL_5H%"
-      [ -n "$RL_7D" ] && LIMITS_TXT="''${LIMITS_TXT:+$LIMITS_TXT }7d:$RL_7D%"
-      LIMITS=" | ''${RL_COLOR}''${LIMITS_TXT}''${RESET}"
+      [ -n "$RL_5H" ] && LIMITS_TXT="5h:$RL_5H_LEFT%"
+      [ -n "$RL_7D" ] && LIMITS_TXT="''${LIMITS_TXT:+$LIMITS_TXT }7d:$RL_7D_LEFT%"
+      LIMITS=" | ''${RL_COLOR}''${LIMITS_TXT} left''${RESET}"
     fi
 
-    printf '%s\n' "''${CYAN}[$MODEL]''${RESET}$EFFORT_TAG $ICON_DIR ''${DIR##*/}$BRANCH | ''${BAR_COLOR}$BAR''${RESET} $PCT%$LIMITS | ''${YELLOW}$COST_FMT''${RESET} | $ICON_CLOCK ''${TIME_FMT}"
+    printf '%s\n' "''${CYAN}[$MODEL]''${RESET}$EFFORT_TAG $ICON_DIR ''${DIR##*/}$BRANCH | ''${BAR_COLOR}$BAR''${RESET} $CTX_LEFT% left$LIMITS | ''${YELLOW}$COST_FMT''${RESET} | $ICON_CLOCK ''${TIME_FMT}"
   '';
 in {
   programs.claude-code = {
