@@ -23,6 +23,7 @@ in {
   "ssh/github.age".publicKeys = allRecipients;
   "ssh/git-signing.age".publicKeys = allRecipients;
   "ssh/chameleon.age".publicKeys = allRecipients;
+  "ssh/lab.age".publicKeys = allRecipients;
   "rclone/gdrive.age".publicKeys = allRecipients;
   "rclone/box.age".publicKeys = allRecipients;
 }

@@ -109,6 +109,18 @@ in {
       IdentityFile = "/run/agenix/chameleon-ssh-key";
       IdentitiesOnly = true;
     };
+    programs.ssh.settings."uchicago" = {
+      HostName = "linux.cs.uchicago.edu";
+      User = "jiezhu";
+      IdentityFile = "/run/agenix/lab-ssh-key";
+      IdentitiesOnly = true;
+    };
+    programs.ssh.settings."goku vegeta" = {
+      ProxyJump = "uchicago";
+      User = "jiezzz";
+      IdentityFile = "/run/agenix/lab-ssh-key";
+      IdentitiesOnly = true;
+    };
 
     # Auto-load SSH keys into macOS system agent at login
     launchd.agents.ssh-add-keys = {
@@ -120,6 +132,7 @@ in {
           "/run/agenix/github-ssh-key"
           "/run/agenix/git-signing-key"
           "/run/agenix/chameleon-ssh-key"
+          "/run/agenix/lab-ssh-key"
         ];
         RunAtLoad = true;
       };

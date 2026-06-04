@@ -111,13 +111,25 @@ in {
       IdentityFile = "/run/agenix/chameleon-ssh-key";
       IdentitiesOnly = true;
     };
+    programs.ssh.settings."uchicago" = {
+      HostName = "linux.cs.uchicago.edu";
+      User = "jiezhu";
+      IdentityFile = "/run/agenix/lab-ssh-key";
+      IdentitiesOnly = true;
+    };
+    programs.ssh.settings."goku vegeta" = {
+      ProxyJump = "uchicago";
+      User = "jiezzz";
+      IdentityFile = "/run/agenix/lab-ssh-key";
+      IdentitiesOnly = true;
+    };
 
     # Auto-load SSH keys into agent at login
     systemd.user.services.ssh-add-keys = {
       Unit.Description = "Load SSH keys into agent";
       Service = {
         Type = "oneshot";
-        ExecStart = "${pkgs.openssh}/bin/ssh-add /run/agenix/github-ssh-key /run/agenix/git-signing-key /run/agenix/chameleon-ssh-key";
+        ExecStart = "${pkgs.openssh}/bin/ssh-add /run/agenix/github-ssh-key /run/agenix/git-signing-key /run/agenix/chameleon-ssh-key /run/agenix/lab-ssh-key";
       };
       Install.WantedBy = ["default.target"];
     };
