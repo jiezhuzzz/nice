@@ -1,4 +1,9 @@
-{pkgs, ...}: let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   superpowers = pkgs.fetchFromGitHub {
     owner = "obra";
     repo = "superpowers";
@@ -6,6 +11,36 @@
     sha256 = "dc4deb3ba851f3b2547d2dd757511aa33e920d639fb65796bcdf543cd144323c";
     name = "superpowers";
   };
+
+  # Codex now rejects legacy `[profiles.<name>]` tables inside config.toml;
+  # each profile must be its own CODEX_HOME/<name>.config.toml using top-level
+  # keys (no `[profiles.x]` wrapper), overlaid on the base config when invoked
+  # with `--profile <name>`. See
+  # https://developers.openai.com/codex/config-advanced#profiles.
+  #
+  # Self-contained `api` profile: route Codex at OpenAI's US-region endpoint
+  # and authenticate with an API key from $OPENAI_API_KEY (a custom
+  # `model_providers` entry — ModelProviderInfo in config.schema.json — since
+  # there is no `openai_base_url` key) instead of the ChatGPT subscription
+  # login. Activate with `codex --profile api`.
+  apiProfile = (pkgs.formats.toml {}).generate "codex-api.config.toml" {
+    model_provider = "openai-us";
+    model_providers.openai-us = {
+      name = "OpenAI (US API)";
+      base_url = "https://us.api.openai.com/v1";
+      env_key = "OPENAI_API_KEY";
+      wire_api = "responses";
+    };
+  };
+
+  # Mirror the upstream home-manager codex module's path math (modules/programs/
+  # codex.nix) so this profile lands in the same CODEX_HOME as the generated
+  # config.toml on both XDG (preferXdgDirectories) and plain ~/.codex hosts.
+  xdgConfigHome = lib.removePrefix config.home.homeDirectory config.xdg.configHome;
+  codexConfigDir =
+    if config.home.preferXdgDirectories
+    then "${xdgConfigHome}/codex"
+    else ".codex";
 in {
   programs.codex = {
     enable = true;
@@ -46,12 +81,11 @@ in {
       # Valid: minimal | low | medium | high | xhigh.
       model_reasoning_effort = "xhigh";
       # model = "gpt-5.5";
-      # # Activate with `codex --profile server` on hosts that need the
-      # # US-region OpenAI endpoint (e.g. chameleon).
-      # profiles.server = {
-      #   openai_base_url = "https://us.api.openai.com/v1";
-      #   model = "gpt-5.4";
-      # };
+      #
+      # The US-region API profile is intentionally NOT defined here: Codex
+      # rejects legacy `[profiles.<name>]` tables in config.toml. It lives in
+      # its own CODEX_HOME/api.config.toml (see `apiProfile` and the
+      # `home.file` entry below). Run it with `codex --profile api`.
     };
     # Soft guidance: Codex's equivalent of AGENTS.md, mirrors the uv policy
     # from the global CLAUDE.md so Codex prefers uv on its own.
@@ -107,4 +141,8 @@ in {
       prefix_rule(pattern = ["uv", "pip"], decision = "forbidden", justification = "Use uv add or inline script metadata instead")
     '';
   };
+
+  # New-style Codex profile (config.toml rejects `[profiles.x]` tables). Lands
+  # next to the module-managed config.toml inside CODEX_HOME.
+  home.file."${codexConfigDir}/api.config.toml".source = apiProfile;
 }
