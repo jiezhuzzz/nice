@@ -59,6 +59,15 @@ in {
       approval_policy = "on-request";
       approvals_reviewer = "auto_review";
       sandbox_mode = "workspace-write";
+
+      # Pre-trust the home directory so Codex never persists trust at runtime.
+      # config.toml is a read-only nix-store symlink, so when Codex hits an
+      # untrusted dir and tries to write `[projects."<dir>"] trust_level`, the
+      # config/batchWrite fails (the TUI hides the real cause — openai/codex
+      # #25008). Declaring it here means the dir is already trusted, so no write
+      # is attempted. Path is per-host via config.home.homeDirectory.
+      projects.${config.home.homeDirectory}.trust_level = "trusted";
+
       personality = "pragmatic";
       # Disable the Memories feature so Codex never auto-generates memories or
       # injects them into future sessions (off by default; pinned explicitly).
