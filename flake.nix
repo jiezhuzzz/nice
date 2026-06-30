@@ -38,6 +38,10 @@
     agenix.inputs.home-manager.follows = "home-manager";
     agenix.inputs.darwin.follows = "nix-darwin";
 
+    # Declarative disk partitioning / ZFS layout for the nixmachine NAS.
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
+
     # Declarative Homebrew install (complements nix-darwin's `homebrew` state mgmt).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     # Override brew-src (nix-homebrew's own pin lags behind the homebrew-cask/

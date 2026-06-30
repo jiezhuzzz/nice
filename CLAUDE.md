@@ -36,7 +36,7 @@ Hosts are declared in `flake.nix` via `lib/mk-hosts.nix`:
 
 | Host | Platform | Type |
 |------|----------|------|
-| `nixps`, `nas` | x86_64-linux | NixOS |
+| `nixps`, `nixmachine` | x86_64-linux | NixOS |
 | `nixair`, `nixmini`, `nixneo` | aarch64-darwin | nix-darwin |
 | `chameleon` | x86_64-linux | standalone home-manager (remote server) |
 
