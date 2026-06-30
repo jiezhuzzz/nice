@@ -135,6 +135,8 @@ in {
         CLAUDE_CODE_DEBUG_LOGS_DIR = "${config.xdg.stateHome}/claude/logs";
         CLAUDE_CODE_TMPDIR = "/tmp/claude-code-${config.home.username}";
       };
+      theme = "auto";
+      tui = "fullscreen";
       statusLine = {
         type = "command";
         command = "${statusline}";

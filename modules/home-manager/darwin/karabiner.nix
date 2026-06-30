@@ -12,16 +12,20 @@ _: {
           complex_modifications = {
             rules = [
               {
-                description = "Caps Lock → Escape (alone) / Control (held) [Apple keyboard]";
+                description = "Caps Lock → Escape (alone) / Control (held) [any keyboard except HHKB]";
                 manipulators = [
                   {
                     type = "basic";
+                    # Applies to the built-in keyboard, the Lofree Flow2 (which
+                    # exposes no usable vendor/product id over Bluetooth LE), and
+                    # any other standard-layout keyboard. The HHKB is excluded
+                    # because it has its own left_control rule below.
                     conditions = [
                       {
-                        type = "device_if";
+                        type = "device_unless";
                         identifiers = [
                           {
-                            is_built_in_keyboard = true;
+                            vendor_id = 1278;
                           }
                         ];
                       }

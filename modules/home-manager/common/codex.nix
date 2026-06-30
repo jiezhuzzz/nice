@@ -44,6 +44,18 @@
 in {
   programs.codex = {
     enable = true;
+    # Patch Codex so project-trust lookup walks up ancestor paths instead of
+    # requiring an exact directory match. Upstream only trusts the literal
+    # path in `[projects."<dir>"]`, so pre-trusting $HOME below does NOT cover
+    # subdirectories — opening Codex in any repo under $HOME still shows the
+    # "Do you trust the contents of this directory?" prompt every time. With
+    # this patch, trusting $HOME recursively trusts everything beneath it.
+    # See https://github.com/openai/codex/issues/14601 (workaround comment).
+    # Verified to apply against codex 0.142.2 (tag rust-v0.142.2); revisit on
+    # nixpkgs bumps if the patchPhase fails.
+    package = pkgs.codex.overrideAttrs (old: {
+      patches = (old.patches or []) ++ [./recursive-project-trust.patch];
+    });
     skills = {
       # Conventional Commits + Conventional Branch enforcement, sourced from
       # this repo so Claude Code and Codex share one skill definition.
@@ -66,7 +78,16 @@ in {
       # config/batchWrite fails (the TUI hides the real cause — openai/codex
       # #25008). Declaring it here means the dir is already trusted, so no write
       # is attempted. Path is per-host via config.home.homeDirectory.
+      #
+      # Combined with the recursive-project-trust patch on `package` above, this
+      # single entry trusts every directory beneath $HOME (ancestor-path
+      # lookup), so the trust prompt no longer appears in any repo under $HOME.
       projects.${config.home.homeDirectory}.trust_level = "trusted";
+
+      # Remote MCP server (streamable HTTP). Renders to
+      # CODEX_HOME/config.toml as `[mcp_servers.notion]` with a `url` key,
+      # which Codex treats as a streamable-HTTP transport.
+      mcp_servers.notion.url = "https://mcp.notion.com/mcp";
 
       personality = "pragmatic";
       # Disable the Memories feature so Codex never auto-generates memories or
