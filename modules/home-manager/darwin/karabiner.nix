@@ -93,6 +93,18 @@ _: {
               };
               ignore = false;
             }
+            {
+              # Lofree Flow2 over Bluetooth LE — identified by its BLE address
+              # (no usable vendor/product id). Treated as built-in so the
+              # caps_lock rule above (device_unless vendor_id 1278) applies.
+              identifiers = {
+                device_address = "c8-01-29-28-fe-5e";
+                is_keyboard = true;
+                is_pointing_device = true;
+              };
+              ignore = false;
+              treat_as_built_in_keyboard = true;
+            }
           ];
           virtual_hid_keyboard = {
             country_code = 0;
