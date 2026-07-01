@@ -84,7 +84,7 @@ in {
         nvme0 = mkNvme nvme0Id "/boot";
         nvme1 = mkNvme nvme1Id "/boot/.fallback";
       }
-      // lib.mapAttrs (_: id: mkHdd id) hddIds;
+      // lib.mapAttrs (_: mkHdd) hddIds;
 
     zpool = {
       # ----------------------------------------------------------------
