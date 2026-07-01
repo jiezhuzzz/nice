@@ -125,13 +125,19 @@ in {
       IdentitiesOnly = true;
       ForwardAgent = true;
     };
+    programs.ssh.settings."192.168.86.*" = {
+      User = "jie";
+      IdentityFile = "/run/agenix/home-ssh-key";
+      IdentitiesOnly = true;
+      ForwardAgent = true;
+    };
 
     # Auto-load SSH keys into agent at login
     systemd.user.services.ssh-add-keys = {
       Unit.Description = "Load SSH keys into agent";
       Service = {
         Type = "oneshot";
-        ExecStart = "${pkgs.openssh}/bin/ssh-add /run/agenix/github-ssh-key /run/agenix/git-signing-key /run/agenix/chameleon-ssh-key /run/agenix/lab-ssh-key";
+        ExecStart = "${pkgs.openssh}/bin/ssh-add /run/agenix/github-ssh-key /run/agenix/git-signing-key /run/agenix/chameleon-ssh-key /run/agenix/lab-ssh-key /run/agenix/home-ssh-key";
       };
       Install.WantedBy = ["default.target"];
     };

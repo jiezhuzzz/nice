@@ -123,6 +123,12 @@ in {
       IdentitiesOnly = true;
       ForwardAgent = true;
     };
+    programs.ssh.settings."192.168.86.*" = {
+      User = "jie";
+      IdentityFile = "/run/agenix/home-ssh-key";
+      IdentitiesOnly = true;
+      ForwardAgent = true;
+    };
 
     # Auto-load SSH keys into macOS system agent at login
     launchd.agents.ssh-add-keys = {
@@ -135,6 +141,7 @@ in {
           "/run/agenix/git-signing-key"
           "/run/agenix/chameleon-ssh-key"
           "/run/agenix/lab-ssh-key"
+          "/run/agenix/home-ssh-key"
         ];
         RunAtLoad = true;
       };

@@ -34,6 +34,13 @@ in {
     mode = "0400";
   };
 
+  age.secrets.home-ssh-key = {
+    file = ../../../secrets/ssh/home.age;
+    owner = user.me.username;
+    group = "users";
+    mode = "0400";
+  };
+
   age.secrets.rclone-gdrive-token = {
     file = ../../../secrets/rclone/gdrive.age;
     owner = user.me.username;
