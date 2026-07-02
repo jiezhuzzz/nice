@@ -26,6 +26,7 @@
     ../modules/home-manager/common/codex.nix
     ../modules/home-manager/common/uv.nix
     ../modules/home-manager/common/npm.nix
+    ../modules/home-manager/common/bun.nix
     ../modules/home-manager/common/oh-my-posh.nix
     ../modules/home-manager/common/tmux.nix
     ../modules/home-manager/common/rclone.nix
