@@ -5,6 +5,7 @@
     ./storage.nix
     ./servarr.nix
     ./jellyfin.nix
+    ./metatube.nix
     ./recyclarr.nix
     ./firewall.nix
   ];
