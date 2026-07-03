@@ -16,8 +16,6 @@ _: {
     "d /tank/media/downloads/.incomplete 2775 transmission media -"
     "d /tank/media/downloads/radarr      2775 transmission media -"
     "d /tank/media/downloads/sonarr      2775 transmission media -"
-    "d /tank/media/downloads/lidarr      2775 transmission media -"
-    "d /tank/media/downloads/whisparr    2775 transmission media -"
     "d /tank/media/movies                2775 root         media -"
     "d /tank/media/tv                    2775 root         media -"
     "d /tank/media/anime                 2775 root         media -"
