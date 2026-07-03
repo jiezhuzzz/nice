@@ -2,9 +2,10 @@
 # syntax; nftables is already enabled on this host (for Transmission's 9091).
 # extraInputRules is a merged `lines` option, so this concatenates with the
 # host's existing 9091 rule rather than conflicting.
-# Ports: prowlarr 9696 · radarr 7878 · sonarr 8989 · bazarr 6767 · jellyfin 8096.
+# Ports: prowlarr 9696 · radarr 7878 · sonarr 8989 · bazarr 6767 · jellyfin 8096 ·
+#        moviepilot 3000.
 _: {
   networking.firewall.extraInputRules = ''
-    ip saddr 192.168.86.0/24 tcp dport { 9696, 7878, 8989, 6767, 8096 } accept
+    ip saddr 192.168.86.0/24 tcp dport { 9696, 7878, 8989, 6767, 8096, 3000 } accept
   '';
 }

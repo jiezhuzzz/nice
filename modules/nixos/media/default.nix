@@ -6,6 +6,7 @@
     ./servarr.nix
     ./jellyfin.nix
     ./metatube.nix
+    ./moviepilot.nix
     ./recyclarr.nix
     ./firewall.nix
   ];
