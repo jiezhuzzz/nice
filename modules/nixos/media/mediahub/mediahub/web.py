@@ -48,6 +48,19 @@ def _in_category(cat_ids, wanted) -> bool:
     return any(lo <= c <= hi for c in cat_ids)
 
 
+def _num(s, cast, default):
+    """Parse a query param that HTML forms may submit as an empty string.
+    FastAPI's int/float coercion 422s on "", so numeric filters arrive as str
+    and are parsed here: blank or invalid -> default (i.e. no filter)."""
+    s = (s or "").strip()
+    if not s:
+        return default
+    try:
+        return cast(s)
+    except ValueError:
+        return default
+
+
 def create_app(config, prowlarr, transmission, store, parser=parse_release) -> FastAPI:
     app = FastAPI()
     templates = _TEMPLATES
@@ -59,8 +72,10 @@ def create_app(config, prowlarr, transmission, store, parser=parse_release) -> F
     @app.get("/api/search", response_class=HTMLResponse)
     def search(request: Request, q: str, resolution: str = "", source: str = "",
                codec: str = "", hdr: str = "", audio: str = "", group: str = "",
-               site: str = "", category: str = "", min_seeders: int = 0,
-               min_size_gb: float = 0.0, sort: str = "seeders", order: str = "desc"):
+               site: str = "", category: str = "", min_seeders: str = "",
+               min_size_gb: str = "", sort: str = "seeders", order: str = "desc"):
+        min_seeders_n = _num(min_seeders, int, 0)
+        min_size_n = _num(min_size_gb, float, 0.0)
         try:
             releases = prowlarr.search(q)
         except Exception as e:
@@ -84,9 +99,9 @@ def create_app(config, prowlarr, transmission, store, parser=parse_release) -> F
                 continue
             if not _in_category(r.categories, category):
                 continue
-            if r.seeders < min_seeders:
+            if r.seeders < min_seeders_n:
                 continue
-            if min_size_gb and r.size < min_size_gb * (1024 ** 3):
+            if min_size_n and r.size < min_size_n * (1024 ** 3):
                 continue
             rows.append({"r": r, "f": f})
         keyfn = _SORT_KEYS.get(sort, _SORT_KEYS["seeders"])

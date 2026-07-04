@@ -125,3 +125,16 @@ def test_search_filters_by_category_and_site(tmp_path):
     assert "Movie.2024" not in client.get("/api/search", params={"q": "x", "category": "tv"}).text
     assert "Movie.2024" in client.get("/api/search", params={"q": "x", "site": "team"}).text
     assert "Movie.2024" not in client.get("/api/search", params={"q": "x", "site": "hdsky"}).text
+
+
+def test_search_tolerates_empty_numeric_filters(tmp_path):
+    # htmx submits every field, so empty numeric boxes arrive as "" — FastAPI's
+    # int/float coercion 422'd on those (the live "no response" bug). Must be 200.
+    client, *_ = _client(tmp_path, [_release("Batman.Begins.2005.2160p.BluRay-X")])
+    r = client.get("/api/search", params={
+        "q": "batman", "resolution": "", "source": "", "codec": "", "hdr": "",
+        "audio": "", "group": "", "site": "", "category": "",
+        "min_seeders": "", "min_size_gb": "", "sort": "seeders", "order": "desc",
+    })
+    assert r.status_code == 200
+    assert "Batman.Begins" in r.text
