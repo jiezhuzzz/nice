@@ -11,6 +11,7 @@ in {
     ../../../modules/nixos/hardware/audio.nix # PipeWire (ALSA + Pulse) for local playback
     ../../../modules/nixos/media # media automation stack
     ../../../modules/nixos/llm # open-webui + litellm LLM gateway
+    ../../../modules/nixos/stirling-pdf.nix # self-hosted PDF toolkit
     inputs.disko.nixosModules.disko
     ./disko.nix # ZFS layout — also generates fileSystems for the legacy mounts
     ./hardware.nix
