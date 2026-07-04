@@ -59,3 +59,37 @@ def test_review_lists_pending(tmp_path):
     r = client.get("/review")
     assert r.status_code == 200
     assert "Pending.Thing" in r.text
+
+
+def _client_with_root(tmp_path, media_root):
+    cfg = SimpleNamespace(downloads_dir="/dl", media_root=str(media_root))
+    store = ReviewStore(tmp_path / "r.db")
+    app = create_app(cfg, FakeProwlarr([]), FakeTransmission(), store)
+    return TestClient(app), store
+
+
+def test_place_hardlinks_and_marks_done(tmp_path):
+    import os
+    media_root = tmp_path / "lib"; media_root.mkdir()
+    src = tmp_path / "dl" / "Show"; src.mkdir(parents=True)
+    (src / "ep.mkv").write_text("data")
+    client, store = _client_with_root(tmp_path, media_root)
+    rid = store.add("h", "Show", str(src), "tv", "", "why")
+    dest = media_root / "tv" / "Show"
+    r = client.post("/api/place", data={"id": rid, "dest": str(dest)},
+                    follow_redirects=False)
+    assert r.status_code == 303
+    linked = dest / "ep.mkv"
+    assert linked.exists() and os.stat(linked).st_nlink == 2
+    assert store.get(rid).status == "done"
+
+
+def test_place_rejects_dest_outside_media_root(tmp_path):
+    media_root = tmp_path / "lib"; media_root.mkdir()
+    src = tmp_path / "dl" / "Show"; src.mkdir(parents=True)
+    client, store = _client_with_root(tmp_path, media_root)
+    rid = store.add("h", "Show", str(src), None, None, "why")
+    r = client.post("/api/place", data={"id": rid, "dest": "/etc/evil"},
+                    follow_redirects=False)
+    assert r.status_code == 400
+    assert store.get(rid).status == "pending"

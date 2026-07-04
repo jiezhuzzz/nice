@@ -29,8 +29,12 @@ def create_app(config, prowlarr, transmission, store, parser=parse_release) -> F
     @app.get("/api/search", response_class=HTMLResponse)
     def search(request: Request, q: str, resolution: str = "", source: str = "",
                group: str = "", min_seeders: int = 0):
+        try:
+            releases = prowlarr.search(q)
+        except Exception as e:
+            return HTMLResponse(f"<p style='color:red'>search failed: {e}</p>")
         rows = []
-        for r in prowlarr.search(q):
+        for r in releases:
             f = parser(r.title)
             if not _match(f.resolution, resolution):
                 continue
@@ -46,8 +50,11 @@ def create_app(config, prowlarr, transmission, store, parser=parse_release) -> F
 
     @app.post("/api/grab")
     def grab(downloadUrl: str = Form(...), title: str = Form(...)):
-        data = prowlarr.fetch_torrent(downloadUrl)
-        h = transmission.add_torrent(data, config.downloads_dir)
+        try:
+            data = prowlarr.fetch_torrent(downloadUrl)
+            h = transmission.add_torrent(data, config.downloads_dir)
+        except Exception as e:
+            return JSONResponse({"ok": False, "error": str(e)}, status_code=502)
         return JSONResponse({"ok": True, "hash": h, "title": title})
 
     @app.get("/review", response_class=HTMLResponse)
@@ -61,8 +68,17 @@ def create_app(config, prowlarr, transmission, store, parser=parse_release) -> F
         item = store.get(id)
         if item is None:
             return JSONResponse({"ok": False, "error": "not found"}, status_code=404)
-        for f in media_files(Path(item.src_dir)):
-            hardlink(f, Path(dest) / f.name)
+        media_root = Path(config.media_root).resolve()
+        dest_path = Path(dest).resolve()
+        if not dest_path.is_relative_to(media_root):
+            return JSONResponse(
+                {"ok": False, "error": "dest outside media_root"}, status_code=400
+            )
+        try:
+            for f in media_files(Path(item.src_dir)):
+                hardlink(f, dest_path / f.name)
+        except (FileExistsError, RuntimeError, OSError) as e:
+            return JSONResponse({"ok": False, "error": str(e)}, status_code=422)
         store.mark_done(id)
         return RedirectResponse("/review", status_code=303)
 
