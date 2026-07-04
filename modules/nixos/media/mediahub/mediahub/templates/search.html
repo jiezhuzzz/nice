@@ -7,8 +7,30 @@
   <input name="q" placeholder="search..." autofocus>
   <input name="resolution" placeholder="resolution (e.g. 1080p)">
   <input name="source" placeholder="source (e.g. WEB-DL)">
+  <input name="codec" placeholder="codec (e.g. H.265)">
+  <input name="hdr" placeholder="hdr (HDR / DV)">
+  <input name="audio" placeholder="audio (Atmos / DTS...)">
   <input name="group" placeholder="group">
+  <input name="site" placeholder="site">
+  <select name="category">
+    <option value="">any category</option>
+    <option value="movies">movies</option>
+    <option value="tv">tv</option>
+    <option value="xxx">xxx</option>
+    <option value="audio">music</option>
+  </select>
   <input name="min_seeders" placeholder="min seeders" type="number">
+  <input name="min_size_gb" placeholder="min GB" type="number" step="0.1">
+  <select name="sort">
+    <option value="seeders">sort: seeders</option>
+    <option value="size">sort: size</option>
+    <option value="date">sort: date</option>
+    <option value="title">sort: title</option>
+  </select>
+  <select name="order">
+    <option value="desc">desc</option>
+    <option value="asc">asc</option>
+  </select>
   <button>Search</button>
 </form>
 <p><a href="/review">Review queue</a></p>

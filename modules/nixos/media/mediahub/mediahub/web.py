@@ -18,6 +18,36 @@ def _match(facet_value, wanted) -> bool:
     return (facet_value or "").lower() == wanted.lower()
 
 
+_CATEGORY_RANGES = {
+    "movies": (2000, 2999),
+    "audio": (3000, 3999),
+    "tv": (5000, 5999),
+    "xxx": (6000, 6999),
+}
+_SORT_KEYS = {
+    "seeders": lambda x: x["r"].seeders,
+    "size": lambda x: x["r"].size,
+    "date": lambda x: x["r"].publish_date or "",
+    "title": lambda x: x["r"].title.lower(),
+}
+
+
+def _has(values, wanted) -> bool:
+    if not wanted:
+        return True
+    return wanted.lower() in [v.lower() for v in values]
+
+
+def _in_category(cat_ids, wanted) -> bool:
+    if not wanted:
+        return True
+    rng = _CATEGORY_RANGES.get(wanted.lower())
+    if rng is None:
+        return True
+    lo, hi = rng
+    return any(lo <= c <= hi for c in cat_ids)
+
+
 def create_app(config, prowlarr, transmission, store, parser=parse_release) -> FastAPI:
     app = FastAPI()
     templates = _TEMPLATES
@@ -28,7 +58,9 @@ def create_app(config, prowlarr, transmission, store, parser=parse_release) -> F
 
     @app.get("/api/search", response_class=HTMLResponse)
     def search(request: Request, q: str, resolution: str = "", source: str = "",
-               group: str = "", min_seeders: int = 0):
+               codec: str = "", hdr: str = "", audio: str = "", group: str = "",
+               site: str = "", category: str = "", min_seeders: int = 0,
+               min_size_gb: float = 0.0, sort: str = "seeders", order: str = "desc"):
         try:
             releases = prowlarr.search(q)
         except Exception as e:
@@ -40,12 +72,25 @@ def create_app(config, prowlarr, transmission, store, parser=parse_release) -> F
                 continue
             if not _match(f.source, source):
                 continue
+            if not _match(f.codec, codec):
+                continue
+            if not _has(f.hdr, hdr):
+                continue
+            if not _has(f.audio, audio):
+                continue
             if group and group.lower() not in (f.group or "").lower():
+                continue
+            if site and site.lower() not in r.indexer.lower():
+                continue
+            if not _in_category(r.categories, category):
                 continue
             if r.seeders < min_seeders:
                 continue
+            if min_size_gb and r.size < min_size_gb * (1024 ** 3):
+                continue
             rows.append({"r": r, "f": f})
-        rows.sort(key=lambda x: x["r"].seeders, reverse=True)
+        keyfn = _SORT_KEYS.get(sort, _SORT_KEYS["seeders"])
+        rows.sort(key=keyfn, reverse=(order != "asc"))
         return templates.TemplateResponse(request, "results.html", context={"rows": rows})
 
     @app.post("/api/grab")

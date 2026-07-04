@@ -93,3 +93,35 @@ def test_place_rejects_dest_outside_media_root(tmp_path):
                     follow_redirects=False)
     assert r.status_code == 400
     assert store.get(rid).status == "pending"
+
+
+def test_search_filters_by_hdr_and_codec(tmp_path):
+    releases = [
+        _release("A.2024.2160p.WEB-DL.H265.HDR.DV-X"),
+        _release("B.2024.1080p.WEB-DL.H264-Y"),
+    ]
+    client, *_ = _client(tmp_path, releases)
+    assert "A.2024" in client.get("/api/search", params={"q": "x", "codec": "H.265"}).text
+    r2 = client.get("/api/search", params={"q": "x", "codec": "H.265"})
+    assert "B.2024" not in r2.text
+    r3 = client.get("/api/search", params={"q": "x", "hdr": "DV"})
+    assert "A.2024" in r3.text and "B.2024" not in r3.text
+
+
+def test_search_min_size_and_sort_by_size(tmp_path):
+    big = _release("Big.2024.2160p.WEB-DL-X"); big.size = 30 * 1024 ** 3
+    small = _release("Small.2024.1080p.WEB-DL-Y"); small.size = 2 * 1024 ** 3
+    client, *_ = _client(tmp_path, [small, big])
+    r = client.get("/api/search", params={"q": "x", "min_size_gb": 10})
+    assert "Big.2024" in r.text and "Small.2024" not in r.text
+    r2 = client.get("/api/search", params={"q": "x", "sort": "size", "order": "desc"})
+    assert r2.text.index("Big.2024") < r2.text.index("Small.2024")
+
+
+def test_search_filters_by_category_and_site(tmp_path):
+    m = _release("Movie.2024.1080p-X")  # _release sets categories=[2000], indexer="M-Team"
+    client, *_ = _client(tmp_path, [m])
+    assert "Movie.2024" in client.get("/api/search", params={"q": "x", "category": "movies"}).text
+    assert "Movie.2024" not in client.get("/api/search", params={"q": "x", "category": "tv"}).text
+    assert "Movie.2024" in client.get("/api/search", params={"q": "x", "site": "team"}).text
+    assert "Movie.2024" not in client.get("/api/search", params={"q": "x", "site": "hdsky"}).text
