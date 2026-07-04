@@ -55,7 +55,7 @@ in {
     after = ["network.target" "prowlarr.service"];
     wantedBy = ["multi-user.target"];
     environment = {
-      MEDIAHUB_HOST = "127.0.0.1";
+      MEDIAHUB_HOST = "0.0.0.0"; # LAN-reachable; firewall.nix restricts 8083 to the home subnet
       MEDIAHUB_PORT = "8083";
       MEDIA_ROOT = "/tank/media";
       DOWNLOADS_DIR = "/tank/media/downloads";
@@ -69,7 +69,8 @@ in {
       Group = "media";
       UMask = "0002";
       # PROWLARR_API_KEY comes from this root-only env file (created manually later).
-      EnvironmentFile = "/var/lib/mediahub-secrets/env";
+      # Leading `-` makes it optional so a missing file doesn't block startup.
+      EnvironmentFile = "-/var/lib/mediahub-secrets/env";
       ReadWritePaths = ["/tank/media" "/var/lib/mediahub"];
       Restart = "on-failure";
     };
@@ -85,7 +86,8 @@ in {
   # The hook runs inside transmission.service's sandbox — widen it so the filer can
   # hardlink into the library, write the review DB, run claude, and read its key.
   systemd.services.transmission.serviceConfig = {
-    EnvironmentFile = "/var/lib/mediahub-secrets/transmission-env"; # ANTHROPIC_API_KEY
+    # Leading `-`: optional, so a missing file never breaks the existing transmission service.
+    EnvironmentFile = "-/var/lib/mediahub-secrets/transmission-env"; # ANTHROPIC_API_KEY
     ReadWritePaths = ["/tank/media" "/var/lib/mediahub"];
   };
 }
