@@ -5,6 +5,8 @@
     ./storage.nix
     ./jellyfin.nix
     ./metatube.nix
+    ./prowlarr.nix
+    ./mediahub.nix
     ./firewall.nix
   ];
 }
