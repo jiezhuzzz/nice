@@ -74,13 +74,20 @@ def _all(patterns, text):
     return out
 
 
+def _scalar(v):
+    """guessit yields a list when it finds multiple candidates for a field (e.g. two
+    years in separate bracket groups); collapse to the first (or None if empty) so
+    downstream scalar use — int(), .lower() — is safe."""
+    if isinstance(v, list):
+        return v[0] if v else None
+    return v
+
+
 def parse_release(title: str) -> Facets:
     g = guessit(title)
-    season = g.get("season")
-    if isinstance(season, list):
-        season = season[0]
-    year = g.get("year")
-    group = g.get("release_group")
+    season = _scalar(g.get("season"))
+    year = _scalar(g.get("year"))
+    group = _scalar(g.get("release_group"))
     if group and group.lower() in _TECH_TOKENS:
         group = None
     if group is None:

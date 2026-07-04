@@ -50,3 +50,11 @@ def test_dd_51_audio_detected():
 def test_no_false_group_from_technical_tail():
     assert parse_release("Movie.2022.1080p.WEB-DL").group is None
     assert parse_release("Movie.2022.1080p.BluRay.H265-10bit").group is None
+
+
+def test_multiple_years_does_not_crash():
+    # guessit returns a LIST for `year` when two years appear in separate groups
+    # (common on M-Team: content year + encode year). int(list) used to 500.
+    f = parse_release("[2020][2021] Some.Show.1080p.WEB-DL-X")
+    assert isinstance(f.year, int)
+    assert f.year in (2020, 2021)
