@@ -33,6 +33,7 @@
     volumes = [
       "/var/lib/moviepilot:/config"
       "/tank/media:/tank/media" # one mount → downloads+library one tree → hardlinks
+      "/var/lib/moviepilot-cloak:/moviepilot/.cloakbrowser" # persist the ~206MB CloakBrowser across recreates
     ];
     environment = {
       PUID = toString config.users.users.moviepilot.uid; # 984
@@ -48,6 +49,7 @@
   # env file, read by podman at container start).
   systemd.tmpfiles.rules = [
     "d /var/lib/moviepilot         0750 moviepilot moviepilot -"
+    "d /var/lib/moviepilot-cloak   0750 moviepilot moviepilot -"
     "d /var/lib/moviepilot-secrets 0700 root       root       -"
   ];
 }
