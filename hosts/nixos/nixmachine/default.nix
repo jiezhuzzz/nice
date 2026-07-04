@@ -126,6 +126,23 @@ in {
     ip saddr 192.168.86.0/24 tcp dport 9091 accept
   '';
 
+  # Run-time linker shim so unpatched, dynamically-linked binaries (e.g. tools
+  # fetched by language toolchains) can find an ld.so and the usual libraries
+  # under /run/current-system/sw/share/nix-ld/lib.
+  programs.nix-ld.enable = true;
+
+  # ----------------------------------------------------------------------
+  # Podman — rootless-capable container runtime. dockerCompat installs a
+  # `docker` shim so docker-cli/compose invocations transparently drive
+  # podman. DNS in the default network lets containers resolve each other
+  # by name (needed by most compose stacks).
+  # ----------------------------------------------------------------------
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
+
   environment.systemPackages = with pkgs; [
     git
     helix
