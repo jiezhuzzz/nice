@@ -1,0 +1,16 @@
+<!doctype html>
+<html><head><title>mediahub</title>
+<script src="https://unpkg.com/htmx.org@1.9.12"></script></head>
+<body>
+<h1>mediahub</h1>
+<form hx-get="/api/search" hx-target="#results">
+  <input name="q" placeholder="search..." autofocus>
+  <input name="resolution" placeholder="resolution (e.g. 1080p)">
+  <input name="source" placeholder="source (e.g. WEB-DL)">
+  <input name="group" placeholder="group">
+  <input name="min_seeders" placeholder="min seeders" type="number">
+  <button>Search</button>
+</form>
+<p><a href="/review">Review queue</a></p>
+<div id="results"></div>
+</body></html>

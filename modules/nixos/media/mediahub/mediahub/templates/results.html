@@ -1,0 +1,17 @@
+<table border="1">
+<tr><th>Title</th><th>Site</th><th>Res</th><th>Source</th><th>Codec</th>
+    <th>Group</th><th>Seed</th><th>Size(GB)</th><th></th></tr>
+{% for row in rows %}
+<tr>
+  <td>{{ row.r.title }}</td><td>{{ row.r.indexer }}</td>
+  <td>{{ row.f.resolution or "" }}</td><td>{{ row.f.source or "" }}</td>
+  <td>{{ row.f.codec or "" }}</td><td>{{ row.f.group or "" }}</td>
+  <td>{{ row.r.seeders }}</td><td>{{ "%.1f"|format(row.r.size / 1073741824) }}</td>
+  <td><form hx-post="/api/grab" hx-swap="none">
+    <input type="hidden" name="downloadUrl" value="{{ row.r.download_url }}">
+    <input type="hidden" name="title" value="{{ row.r.title }}">
+    <button>Grab</button></form></td>
+</tr>
+{% endfor %}
+</table>
+<p>{{ rows|length }} results</p>
