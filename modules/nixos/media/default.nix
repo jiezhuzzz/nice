@@ -5,7 +5,6 @@
     ./storage.nix
     ./jellyfin.nix
     ./metatube.nix
-    ./moviepilot.nix
     ./firewall.nix
   ];
 }
