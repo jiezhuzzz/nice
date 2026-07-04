@@ -21,6 +21,16 @@
     # Tests run in the dev loop via uv; skip them in the package build.
     doCheck = false;
   };
+
+  # The Transmission done-hook: runs as the `transmission` user, sets the env the
+  # filer needs, and execs the mediahub-file binary by store path.
+  doneHook = pkgs.writeShellScript "mediahub-done-hook" ''
+    export MEDIA_ROOT=/tank/media
+    export MEDIAHUB_DB=/var/lib/mediahub/review.db
+    export CLAUDE_BIN=${pkgs.claude-code}/bin/claude
+    export HOME=/var/lib/transmission/.mediahub-home
+    exec ${mediahub}/bin/mediahub-file
+  '';
 in {
   # Expose the built app + the filer binary system-wide (for the Transmission hook).
   environment.systemPackages = [mediahub];
@@ -37,6 +47,7 @@ in {
     # Review DB dir — group `media` so the transmission-run filer can write it too.
     "d /var/lib/mediahub         2775 mediahub media -"
     "d /var/lib/mediahub-secrets 0700 root     root  -"
+    "d /var/lib/transmission/.mediahub-home 0750 transmission transmission -"
   ];
 
   systemd.services.mediahub-web = {
@@ -62,5 +73,19 @@ in {
       ReadWritePaths = ["/tank/media" "/var/lib/mediahub"];
       Restart = "on-failure";
     };
+  };
+
+  # Fire the filer on completion. Merges with the Transmission config in
+  # hosts/nixos/nixmachine/default.nix.
+  services.transmission.settings = {
+    script-torrent-done-enabled = true;
+    script-torrent-done-filename = "${doneHook}";
+  };
+
+  # The hook runs inside transmission.service's sandbox — widen it so the filer can
+  # hardlink into the library, write the review DB, run claude, and read its key.
+  systemd.services.transmission.serviceConfig = {
+    EnvironmentFile = "/var/lib/mediahub-secrets/transmission-env"; # ANTHROPIC_API_KEY
+    ReadWritePaths = ["/tank/media" "/var/lib/mediahub"];
   };
 }
