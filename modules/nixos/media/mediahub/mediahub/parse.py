@@ -35,12 +35,14 @@ _AUDIO = [(re.compile(r, re.I), n) for r, n in [
     (r"dts[-. ]?hd", "DTS-HD"),
     (r"(?<![a-z])dts(?![a-z])", "DTS"),
     (r"ddp|dd\+|e[-. ]?ac3", "DDP"),
-    (r"(?<![a-z])ac3(?![a-z])|(?<![a-z])dd(?![a-z0-9])", "DD"),
+    (r"(?<![a-z])ac3(?![a-z])|(?<![a-z])dd(?![a-z])", "DD"),
     (r"(?<![a-z])aac(?![a-z])", "AAC"),
     (r"flac", "FLAC"),
 ]]
 # Trailing release group: "...-UBWEB" / "...-DIY@HDSWEB"
 _GROUP_TAIL = re.compile(r"[-](?P<g>[A-Za-z0-9]+(?:@[A-Za-z0-9]+)?)\s*$")
+_TECH_TOKENS = {"dl", "10bit", "8bit", "x264", "x265", "h264", "h265",
+                "hevc", "avc", "hdr", "sdr", "dv"}
 
 
 @dataclass
@@ -79,9 +81,14 @@ def parse_release(title: str) -> Facets:
         season = season[0]
     year = g.get("year")
     group = g.get("release_group")
-    m = _GROUP_TAIL.search(title)
-    if m:
-        group = m.group("g")
+    if group and group.lower() in _TECH_TOKENS:
+        group = None
+    if group is None:
+        m = _GROUP_TAIL.search(title)
+        if m:
+            cand = m.group("g")
+            if len(cand) >= 4 and cand.lower() not in _TECH_TOKENS:
+                group = cand
     return Facets(
         title=g.get("title"),
         year=int(year) if year else None,

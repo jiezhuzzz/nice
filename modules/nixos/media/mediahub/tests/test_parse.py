@@ -39,3 +39,14 @@ def test_jav_code_has_no_quality():
     f = parse_release("JUX-455")
     assert f.resolution is None
     assert f.source is None
+    assert f.group is None
+
+
+def test_dd_51_audio_detected():
+    f = parse_release("Movie.2022.1080p.BluRay.DD5.1.x264-GRP")
+    assert "DD" in f.audio
+
+
+def test_no_false_group_from_technical_tail():
+    assert parse_release("Movie.2022.1080p.WEB-DL").group is None
+    assert parse_release("Movie.2022.1080p.BluRay.H265-10bit").group is None
