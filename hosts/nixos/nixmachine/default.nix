@@ -10,6 +10,7 @@ in {
     ../../../profiles/homelab.nix
     ../../../modules/nixos/hardware/audio.nix # PipeWire (ALSA + Pulse) for local playback
     ../../../modules/nixos/media # media automation stack
+    ../../../modules/nixos/llm # open-webui + litellm LLM gateway
     inputs.disko.nixosModules.disko
     ./disko.nix # ZFS layout — also generates fileSystems for the legacy mounts
     ./hardware.nix
