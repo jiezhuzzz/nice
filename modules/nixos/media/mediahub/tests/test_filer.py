@@ -49,3 +49,21 @@ def test_prompt_mentions_hardlink_only(tmp_path):
 def test_dry_run_prompt_says_do_not_execute():
     p = build_prompt("/dl/Foo", "/tank/media", dry_run=True)
     assert "do not execute" in p.lower()
+
+
+def test_tools_for_selects_readonly_in_dry_run():
+    from mediahub.filer import _tools_for, ALLOWED_TOOLS, ALLOWED_TOOLS_DRY
+    assert _tools_for({"DRY_RUN": "1"}) == ALLOWED_TOOLS_DRY
+    assert _tools_for({}) == ALLOWED_TOOLS
+    assert "ln" not in ALLOWED_TOOLS_DRY and "mkdir" not in ALLOWED_TOOLS_DRY
+
+
+def test_dry_run_env_uses_dry_prompt(tmp_path):
+    from mediahub.store import ReviewStore
+    store = ReviewStore(tmp_path / "r.db")
+    captured = {}
+    def agent(prompt, cwd, env):
+        captured["prompt"] = prompt
+        return "RESULT: linked 0\n"
+    file_torrent("/dl/Foo", "Foo", "h", "/tank/media", store, agent=agent, env={"DRY_RUN": "1"})
+    assert "do not execute" in captured["prompt"].lower()
