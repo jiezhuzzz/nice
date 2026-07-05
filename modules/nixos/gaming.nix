@@ -16,16 +16,23 @@
 {pkgs, ...}: let
   user = import ../../users/jie.nix;
 
-  # Session wrapper launched by greetd. It brings up jie's user
-  # `graphical-session.target` so services bound to it (Sunshine, below) actually
-  # start, runs the gamescope → Steam Big Picture session, then tears the target
-  # back down when Steam exits — which also stops Sunshine and returns the box to
-  # the headless/agreety state. (We don't `exec`, so the EXIT trap can fire.)
+  # Session wrapper launched by greetd. Responsibilities:
+  #  1. Fix PATH. greetd starts sessions with a minimal PATH that lacks both the
+  #     NixOS system profile and the setuid-wrapper dir, so `steam-gamescope`
+  #     (and the `gamescope` / `steam` / `mangoapp` it shells out to) were not
+  #     found and the session died in ~1s. `/run/wrappers/bin` must come first so
+  #     the capSysNice-wrapped `gamescope` wins over the plain one.
+  #  2. Bring up jie's `graphical-session.target` so services bound to it
+  #     (Sunshine) start, and tear it back down when Steam exits — which stops
+  #     Sunshine and returns the box to the headless/agreety state. (No `exec`,
+  #     so the EXIT trap can fire.)
+  #  3. Log the (verbose) session so a boot-time failure is debuggable over SSH.
   gamescope-session = pkgs.writeShellScript "gamescope-session" ''
-    ${pkgs.systemd}/bin/systemctl --user import-environment
+    export PATH="/run/wrappers/bin:/run/current-system/sw/bin:$PATH"
+    ${pkgs.systemd}/bin/systemctl --user import-environment PATH
     ${pkgs.systemd}/bin/systemctl --user start graphical-session.target
     trap '${pkgs.systemd}/bin/systemctl --user stop graphical-session.target' EXIT
-    steam-gamescope
+    steam-gamescope &> /tmp/gamescope-session.log
   '';
 in {
   # Steam + the gamescope "steam" session. programs.steam.enable already turns
@@ -73,6 +80,13 @@ in {
     capSysNice = true;
   };
 
+  # The gamescope session's `--mangoapp` flag launches the `mangoapp` binary
+  # (from mangohud) directly from gamescope — which lives OUTSIDE Steam's FHS, so
+  # the mangohud in programs.steam.extraPackages isn't visible to it. Put it on
+  # the system PATH so gamescope can find it (else: endless "Failed to start
+  # process mangoapp" errors).
+  environment.systemPackages = [pkgs.mangohud];
+
   # Performance CPU governor while a game is running.
   programs.gamemode.enable = true;
 
@@ -90,7 +104,11 @@ in {
         user = user.me.username;
       };
       default_session = {
-        command = "${pkgs.greetd}/bin/agreety --cmd $SHELL";
+        # A concrete shell, NOT `$SHELL` — that resolved to the `greeter` system
+        # user's shell (nologin), so authenticating as jie ran nologin →
+        # "account currently unavailable". agreety runs --cmd as the user who
+        # just authenticated, so this gives jie a real login shell.
+        command = "${pkgs.greetd}/bin/agreety --cmd ${pkgs.bashInteractive}/bin/bash";
         # user defaults to "greeter"
       };
     };
