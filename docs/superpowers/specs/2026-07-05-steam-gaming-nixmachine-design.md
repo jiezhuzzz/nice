@@ -137,3 +137,31 @@ imported by `hosts/nixos/nixmachine/default.nix`. Contents:
 - `nixos-rebuild build --flake .#nixmachine` — builds without error.
 - On the machine: boot → lands in Steam Big Picture; Exit → text console; SSH
   and homelab services reachable throughout. (Manual, on hardware.)
+
+## Addendum (2026-07-05) — scope extension
+
+After the initial console session landed, the scope was extended on branch
+`feature/gaming-streaming`. This supersedes the "no remote streaming / no extra
+tooling" non-goals above for the following, agreed items:
+
+- **Steam polish** (`feat(gaming): proton-ge, mangohud, and 4k120 hdr gamescope
+  session`): `extraCompatPackages = [proton-ge-bin]`, `extraPackages =
+  [mangohud gamescope-wsi]`, and `gamescopeSession.args` tuned for the attached
+  **4K / 120 Hz HDR** display (`-w 3840 -h 2160 -r 120 --xwayland-count 2 -e
+  --hdr-enabled --mangoapp`). `capSysNice` retained.
+- **Sunshine, model A** (`feat(gaming): sunshine stream host … via
+  graphical-session wrapper`): `services.sunshine` with `openFirewall`,
+  `capSysAdmin` (KMS capture), `autoStart`. Chosen over Steam's built-in Remote
+  Play for real HDR / higher bitrate. It mirrors the physical gamescope → Steam
+  session to Moonlight clients (Moonlight is a *client* — installed on other
+  devices, not nixmachine; `moonlight-qt` deliberately NOT added to nixps).
+  - **Session-target bridge:** greetd's `initial_session.command` now runs a
+    `gamescope-session` wrapper (`pkgs.writeShellScript`) that
+    `systemctl --user start graphical-session.target` (so the Sunshine user
+    service, which is bound to that target, actually starts), runs
+    `steam-gamescope`, and stops the target on exit (which also stops Sunshine —
+    preserving the "exit → headless" behavior).
+  - **Known risk (hardware-only):** gamescope *direct scanout* can defeat KMS
+    capture (black frame). Mitigation = force composition on-hardware, or fall
+    back to model B (Sunshine on a virtual display). The Nix build is unaffected.
+  - **First use:** one-time PIN pairing at `https://<host>:47990`.
