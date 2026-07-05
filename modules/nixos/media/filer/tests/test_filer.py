@@ -160,3 +160,18 @@ def test_movie_without_year_unfiled(tmp_path):
     results = filer.process_job(_job(dl, src.name), root=root, classify=stub)
     assert results and all(r.action == "unfiled" for r in results)
     assert not list(root.rglob("*.mkv"))
+
+
+def test_link_oserror_reported_not_crash(tmp_path):
+    # a real os.link failure (e.g. EPERM from protected_hardlinks) surfaces as
+    # Result(action="error") and never crashes the drain
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "The.Matrix.1999.1080p-GRP"
+    _mk(src / "the.matrix.1999.mkv", 8192)
+
+    def boom(s, d):
+        raise PermissionError(1, "Operation not permitted")
+
+    results = filer.process_job(_job(dl, src.name), root=root, classify=never_agent, link=boom)
+    assert any(r.action == "error" for r in results)

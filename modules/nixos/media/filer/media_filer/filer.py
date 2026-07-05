@@ -140,5 +140,11 @@ def _place(src: Path, dest: Path, root: Path, link) -> Result:
     except hardlink_mod.LinkConflict as e:
         log.warning("conflict: %s", e)
         return Result("conflict", str(src), str(dest), str(e))
+    except OSError as e:
+        # e.g. EPERM (protected_hardlinks on a non-group-writable source) or
+        # EXDEV (dest on a different dataset). Log cleanly instead of crashing
+        # the drain; the job is still consumed (a retry wouldn't help these).
+        log.error("error: could not link %s -> %s: %s", src.name, dest, e)
+        return Result("error", str(src), str(dest), str(e))
     log.info("%s: %s -> %s", action, src.name, dest)
     return Result(action, str(src), str(dest))
