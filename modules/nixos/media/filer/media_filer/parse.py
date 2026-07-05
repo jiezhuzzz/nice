@@ -47,13 +47,15 @@ def parse_name(name: str) -> Candidate:
 
 
 def confident(c: Candidate) -> bool:
-    """Deterministic-confident only when we can name a destination unambiguously.
-    Anything else (CJK title, missing type, episode without S+E, movie without a
-    year) escalates to the agent."""
+    """Deterministic-confident only when we can route unambiguously. Anything
+    else (CJK title, missing type, movie without a year, episode without a
+    season) escalates to the agent."""
     if not c.title or is_cjk(c.title):
         return False
     if c.type == "movie":
         return c.year is not None
     if c.type == "episode":
-        return c.season is not None and c.episode is not None
+        # Episodes route on category + title + season; the episode NUMBER is
+        # resolved per-file (season packs carry no episode in the torrent name).
+        return c.season is not None
     return False

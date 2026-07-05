@@ -40,3 +40,9 @@ def test_is_cjk():
     assert is_cjk("基督山伯爵") is True
     assert is_cjk("The Matrix") is False
     assert is_cjk("Amélie") is False  # accented latin is fine
+
+
+def test_season_pack_is_confident():
+    # a season-pack name has a season but no episode; still routable
+    c = parse_name("Severance.S02.1080p.WEB-DL-GRP")
+    assert confident(c) is True
