@@ -92,13 +92,16 @@ Small, modular, TDD'd:
 
 ## Naming conventions (Jellyfin-standard)
 
-- **Movies** → `movies/<Title> (<Year>)/<Title> (<Year>).<ext>` (+ sidecar subs
-  sharing the basename).
+- **Movies** → `movies/<Title> (<Year>)/<Title> (<Year>).<ext>`.
 - **TV** → `tv/<Show>/Season <NN>/<Show> - S<NN>E<MM>.<ext>`; season packs
   produce one hardlink per episode.
 - **Anime** → `anime/<Title>/Season <NN>/<Title> - S<NN>E<MM>.<ext>` when a
   season is known; for absolute-numbered fansubs with no season,
   `anime/<Title>/<Title> - <NNN>.<ext>`. The agent decides which applies.
+
+Only video files are linked. **Sidecar subtitle linking is a deferred
+follow-up** — external `.srt`/`.ass` files stay in the download dir for now
+(embedded subtitles play fine either way).
 
 All links are within the single `tank/media` ZFS dataset (one copy on disk); the
 original download is never touched and keeps seeding.
