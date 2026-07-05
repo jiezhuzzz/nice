@@ -175,3 +175,45 @@ def test_link_oserror_reported_not_crash(tmp_path):
 
     results = filer.process_job(_job(dl, src.name), root=root, classify=never_agent, link=boom)
     assert any(r.action == "error" for r in results)
+
+
+def test_movie_links_sidecar_subs(tmp_path):
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "The.Matrix.1999.1080p.BluRay-GRP"
+    _mk(src / "the.matrix.1999.1080p.mkv", 8192)
+    _mk(src / "the.matrix.1999.en.srt", 200)
+    (src / "Subs").mkdir(parents=True, exist_ok=True)
+    _mk(src / "Subs" / "French.srt", 200)
+    filer.process_job(_job(dl, src.name), root=root, classify=never_agent)
+    base = root / "movies" / "The Matrix (1999)"
+    assert (base / "The Matrix (1999).mkv").exists()
+    assert (base / "The Matrix (1999).en.srt").exists()
+    assert (base / "The Matrix (1999).fr.srt").exists()
+
+
+def test_season_pack_links_per_episode_subs(tmp_path):
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "Severance.S02.1080p.WEB-DL-GRP"
+    _mk(src / "Severance.S02E01.1080p.mkv")
+    _mk(src / "Severance.S02E02.1080p.mkv")
+    _mk(src / "Severance.S02E01.en.srt", 200)
+    _mk(src / "Severance.S02E02.en.srt", 200)
+    filer.process_job(_job(dl, src.name), root=root, classify=never_agent)
+    tv = root / "tv" / "Severance" / "Season 02"
+    assert (tv / "Severance - S02E01.en.srt").exists()
+    assert (tv / "Severance - S02E02.en.srt").exists()
+
+
+def test_unmatched_subtitle_logged_not_linked(tmp_path):
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "Severance.S02.1080p.WEB-DL-GRP"
+    _mk(src / "Severance.S02E01.1080p.mkv")
+    (src / "Subs").mkdir(parents=True, exist_ok=True)
+    _mk(src / "Subs" / "2_English.srt", 200)  # no episode marker -> ambiguous
+    results = filer.process_job(_job(dl, src.name), root=root, classify=never_agent)
+    assert (root / "tv" / "Severance" / "Season 02" / "Severance - S02E01.mkv").exists()
+    assert not list(root.rglob("*.srt"))  # ambiguous sub not linked
+    assert any(r.action == "unfiled" and r.reason == "subtitle matched no episode" for r in results)

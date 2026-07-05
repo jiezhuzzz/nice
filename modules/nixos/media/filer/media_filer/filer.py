@@ -8,7 +8,7 @@ from pathlib import Path
 
 from . import agent as agent_mod
 from . import hardlink as hardlink_mod
-from . import layout, parse
+from . import layout, parse, subs
 
 log = logging.getLogger("media_filer")
 
@@ -103,6 +103,7 @@ def process_job(env: dict, *, root: Path = layout.MEDIA_ROOT,
         log.info("unfiled: %s (undetermined)", name)
         return [Result("unfiled", str(src_root), None, "undetermined")]
 
+    all_subs = subs.find_subtitles(src_root)
     results: list[Result] = []
     if decision.type == "movie":
         if decision.year is None:
@@ -110,9 +111,13 @@ def process_job(env: dict, *, root: Path = layout.MEDIA_ROOT,
             return [Result("unfiled", str(src_root), None, "movie without year")]
         feature = max(files, key=lambda p: p.stat().st_size)
         dest = layout.movie_dest(root, decision.title, decision.year, feature.suffix)
-        results.append(_place(feature, dest, root, link))
+        r = _place(feature, dest, root, link)
+        results.append(r)
+        if r.action in ("linked", "exists"):
+            results.extend(_place_subs(dest, all_subs, root, link))  # all subs -> the feature
     else:  # tv | anime
         anime = decision.type == "anime"
+        matched: set[Path] = set()
         for f in files:
             season, episode = _file_episode(f.name)
             if season is None:
@@ -127,8 +132,28 @@ def process_job(env: dict, *, root: Path = layout.MEDIA_ROOT,
                 results.append(Result("unfiled", str(f), None, "no episode number"))
                 log.info("unfiled: %s (no episode number)", f.name)
                 continue
-            results.append(_place(f, dest, root, link))
+            r = _place(f, dest, root, link)
+            results.append(r)
+            if r.action in ("linked", "exists"):
+                ep_subs = [s for s in all_subs if subs.matches_episode(s, season, episode)]
+                matched.update(ep_subs)
+                results.extend(_place_subs(dest, ep_subs, root, link))
+        for s in all_subs:
+            if s not in matched:
+                log.info("unfiled subtitle: %s (matched no episode)", s.name)
+                results.append(Result("unfiled", str(s), None, "subtitle matched no episode"))
     return results
+
+
+def _place_subs(video_dest: Path, sub_list: list[Path], root: Path, link) -> list[Result]:
+    """Hardlink each subtitle next to the video, de-duplicating dest names."""
+    out = []
+    taken: set[Path] = set()
+    for sub in sub_list:
+        dest = subs.subtitle_dest(video_dest, sub, taken)
+        taken.add(dest)
+        out.append(_place(sub, dest, root, link))
+    return out
 
 
 def _place(src: Path, dest: Path, root: Path, link) -> Result:
