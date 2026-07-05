@@ -7,5 +7,6 @@
     ./jellyfin.nix
     ./metatube.nix
     ./firewall.nix
+    ./filer.nix
   ];
 }
