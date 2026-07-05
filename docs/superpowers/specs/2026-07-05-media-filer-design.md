@@ -106,14 +106,18 @@ original download is never touched and keeps seeding.
 ## Confidence & category selection
 
 Deterministic-confident when: type ∈ {movie, episode}, title is non-empty and
-ASCII-clean, and (movie has a year *or* is unambiguously a movie) / (episode has
-both season and episode). Escalate to Claude when: title is non-ASCII/CJK, type
-is missing, or an episodic release lacks S/E.
+ASCII-clean, and (movie has a year) / (episode has at least a season — the
+episode *number* is resolved per-file, so season packs still qualify). Escalate
+to Claude when: title is non-ASCII/CJK, type is missing, a movie lacks a year, or
+an episode lacks a season.
 
 **Label hint (wired now):** if `TR_TORRENT_LABELS` contains a known category
-keyword (`movie`/`tv`/`anime`), it is treated as a strong hint that overrides the
-guessed category. Free and reliable when the PT client sets labels; a no-op when
-it doesn't.
+keyword (`movie`/`tv`/`anime`), it is a strong hint. When it is *compatible* with
+guessit's structural type (`movie` label ↔ movie parse; `tv`/`anime` label ↔
+episode parse) it selects/overrides the category; when it *conflicts* (e.g. a
+`movie` label on a season pack) the release is escalated to Claude rather than
+mis-filed. Free and reliable when the PT client sets labels; a no-op when it
+doesn't.
 
 Claude returns its own confidence. If Claude is also unsure → leave unfiled + log.
 
