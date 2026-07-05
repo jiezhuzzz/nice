@@ -15,6 +15,18 @@
 #     Picture's plain "Exit" (quit Steam), NOT Shutdown.
 {pkgs, ...}: let
   user = import ../../users/jie.nix;
+
+  # Session wrapper launched by greetd. It brings up jie's user
+  # `graphical-session.target` so services bound to it (Sunshine, below) actually
+  # start, runs the gamescope → Steam Big Picture session, then tears the target
+  # back down when Steam exits — which also stops Sunshine and returns the box to
+  # the headless/agreety state. (We don't `exec`, so the EXIT trap can fire.)
+  gamescope-session = pkgs.writeShellScript "gamescope-session" ''
+    ${pkgs.systemd}/bin/systemctl --user import-environment
+    ${pkgs.systemd}/bin/systemctl --user start graphical-session.target
+    trap '${pkgs.systemd}/bin/systemctl --user stop graphical-session.target' EXIT
+    steam-gamescope
+  '';
 in {
   # Steam + the gamescope "steam" session. programs.steam.enable already turns
   # on hardware.steam-hardware (controller udev rules) and 32-bit audio, and
@@ -74,7 +86,7 @@ in {
     enable = true;
     settings = {
       initial_session = {
-        command = "steam-gamescope"; # on PATH via programs.steam.gamescopeSession
+        command = "${gamescope-session}"; # wrapper: starts graphical-session.target (for Sunshine), then steam-gamescope
         user = user.me.username;
       };
       default_session = {
@@ -82,5 +94,24 @@ in {
         # user defaults to "greeter"
       };
     };
+  };
+
+  # Sunshine — self-hosted game-stream host; Moonlight clients on your other
+  # devices connect to it. Model A: it KMS-captures the physical gamescope →
+  # Steam session and mirrors it. Runs as jie's user service bound to
+  # graphical-session.target (brought up by the gamescope-session wrapper above),
+  # so it is live during the session and stops when you exit Steam.
+  #   openFirewall → Moonlight discovery + stream ports
+  #   capSysAdmin  → CAP_SYS_ADMIN, required for KMS/DRM capture of the output
+  #   uinput (Moonlight virtual controllers) + Avahi discovery are auto-enabled.
+  # First connection needs a one-time PIN pairing at https://<host>:47990.
+  # ⚠️  gamescope direct scanout can defeat KMS capture (black frame). If that
+  #     happens it needs an on-hardware tweak (force composition) — the Nix build
+  #     is unaffected either way.
+  services.sunshine = {
+    enable = true;
+    openFirewall = true;
+    capSysAdmin = true;
+    autoStart = true;
   };
 }
