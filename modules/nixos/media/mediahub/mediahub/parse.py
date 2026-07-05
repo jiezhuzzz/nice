@@ -6,10 +6,11 @@ from dataclasses import dataclass, field
 from guessit import guessit
 
 _RES = [(re.compile(r, re.I), n) for r, n in [
-    (r"2160p|\b4k\b|\buhd\b", "2160p"),
-    (r"1080p", "1080p"),
-    (r"720p", "720p"),
-    (r"480p", "480p"),
+    # p-notation, plus WxH dimension + interlaced notation (common on U2/anime)
+    (r"2160p|\b4k\b|\buhd\b|3840\s*x\s*216\d|4096\s*x\s*216\d", "2160p"),
+    (r"1080[pi]|1920\s*x\s*1080", "1080p"),
+    (r"720[pi]|1280\s*x\s*720", "720p"),
+    (r"480[pi]|720\s*x\s*480|640\s*x\s*480", "480p"),
 ]]
 _SOURCE = [(re.compile(r, re.I), n) for r, n in [
     (r"remux", "Remux"),
@@ -17,6 +18,8 @@ _SOURCE = [(re.compile(r, re.I), n) for r, n in [
     (r"web[-. ]?rip", "WEBRip"),
     (r"bd[-. ]?rip", "BDRip"),
     (r"blu[-. ]?ray|bdmv|\bbd\b", "BluRay"),
+    (r"dvd[-. ]?rip", "DVDRip"),
+    (r"dvdiso|dvd[59]|(?<![a-z])dvd(?![a-z])", "DVD"),
     (r"hdtv", "HDTV"),
     (r"hd[-. ]?rip", "HDRip"),
 ]]

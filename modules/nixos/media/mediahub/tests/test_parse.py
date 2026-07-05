@@ -58,3 +58,15 @@ def test_multiple_years_does_not_crash():
     f = parse_release("[2020][2021] Some.Show.1080p.WEB-DL-X")
     assert isinstance(f.year, int)
     assert f.year in (2020, 2021)
+
+
+def test_u2_disc_and_dimension_naming():
+    # U2/anime naming: BDRip/BDMV with WxH dims, DVDISO, interlaced, webrip.
+    a = parse_release("[Sousou no Frieren][BDRip][1920x1080][TV 01-28 Fin][AVC]")
+    assert a.source == "BDRip" and a.resolution == "1080p"
+    b = parse_release("[Show][DVDISO][480i][Season 1]")
+    assert b.source == "DVD" and b.resolution == "480p"
+    c = parse_release("[Show][Webrip][1280x720][TV 01-39][AVC]")
+    assert c.source == "WEBRip" and c.resolution == "720p"
+    d = parse_release("[Show][BDMV][1080p][Vol.1]")
+    assert d.source == "BluRay" and d.resolution == "1080p"
