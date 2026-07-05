@@ -35,3 +35,9 @@ def test_is_inside_true():
 
 def test_is_inside_rejects_escape():
     assert layout.is_inside(ROOT / ".." / "etc" / "passwd", ROOT) is False
+
+
+def test_sanitize_neutralizes_traversal_components():
+    assert layout.sanitize("..") == "_"
+    assert layout.sanitize(".") == "_"
+    assert layout.sanitize("") == "_"

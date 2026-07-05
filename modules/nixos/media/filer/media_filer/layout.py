@@ -10,7 +10,12 @@ _HOSTILE = re.compile(r'[\\/:*?"<>|]')
 
 
 def sanitize(name: str) -> str:
-    return _HOSTILE.sub("", name).strip()
+    cleaned = _HOSTILE.sub("", name).strip()
+    # `is_inside` is the real backstop, but a path component of "." or ".."
+    # (or empty) should never become a directory name.
+    if cleaned in ("", ".", ".."):
+        return "_"
+    return cleaned
 
 
 def movie_dest(root: Path, title: str, year: int, ext: str) -> Path:

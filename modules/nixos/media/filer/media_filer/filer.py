@@ -13,7 +13,6 @@ from . import layout, parse
 log = logging.getLogger("media_filer")
 
 VIDEO_EXTS = {".mkv", ".mp4", ".avi", ".ts", ".m2ts", ".mov", ".wmv"}
-SUB_EXTS = {".srt", ".ass", ".ssa", ".sub"}
 _SAMPLE = re.compile(r"(?i)(^|[\W_])(sample|trailer|extras?)([\W_]|$)")
 MIN_VIDEO_BYTES = 100 * 1024 * 1024  # 100 MB — below this is treated as a sample
 _LABEL_CATS = {"movie", "tv", "anime"}

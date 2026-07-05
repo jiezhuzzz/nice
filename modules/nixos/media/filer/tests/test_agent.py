@@ -44,3 +44,18 @@ def test_unknown_type_is_not_confident():
                           "season": None, "episode": None, "confident": True})
     r = classify("MyShow", ["MyShow.mkv"], runner=fake_runner_returning(payload))
     assert r.confident is False  # type unknown overrides claimed confidence
+
+
+def test_forbids_all_mutating_and_task_tools():
+    seen = {}
+
+    def runner(argv, timeout):
+        seen["argv"] = argv
+        return '{"type":"movie","title":"X","year":2020,"season":null,"episode":null,"confident":true}'
+
+    from media_filer.agent import classify
+    classify("MyShow.X", ["MyShow.X.mkv"], runner=runner)
+    idx = seen["argv"].index("--disallowedTools")
+    disallowed = seen["argv"][idx + 1]
+    for tool in ("Write", "Edit", "MultiEdit", "NotebookEdit", "Bash", "Task"):
+        assert tool in disallowed, f"{tool} must be disallowed"

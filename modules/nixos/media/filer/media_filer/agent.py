@@ -25,7 +25,7 @@ Files:
 
 # Defense in depth: even though the prompt asks for pure JSON, forbid every
 # mutating tool so a misbehaving model still cannot alter the filesystem.
-_DISALLOWED = "Write,Edit,MultiEdit,NotebookEdit,Bash"
+_DISALLOWED = "Write,Edit,MultiEdit,NotebookEdit,Bash,Task"
 
 
 @dataclass
