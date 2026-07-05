@@ -23,11 +23,39 @@ in {
   # host.
   programs.steam = {
     enable = true;
+
+    # GE-Proton as a selectable per-game compatibility tool — broader game
+    # coverage than stock Proton.
+    extraCompatPackages = [pkgs.proton-ge-bin];
+
+    # Injected into Steam's FHS runtime: the MangoHud overlay and the gamescope
+    # Vulkan WSI layer (the latter is what makes HDR / tearing control work under
+    # gamescope).
+    extraPackages = with pkgs; [
+      mangohud
+      gamescope-wsi
+    ];
+
     gamescopeSession.enable = true;
+    # gamescope session tuned for the attached 4K/120 Hz HDR display:
+    #   -w / -h / -r → 3840×2160 @ 120 Hz   --hdr-enabled → HDR output (relies on
+    #   the gamescope-wsi layer above)      --mangoapp    → MangoHud overlay
+    #   --xwayland-count 2 and -e are the standard Steam-Deck-style session flags.
+    # These are validated at runtime by gamescope on the actual hardware.
+    gamescopeSession.args = [
+      "-w 3840"
+      "-h 2160"
+      "-r 120"
+      "--xwayland-count 2"
+      "-e"
+      "--hdr-enabled"
+      "--mangoapp"
+    ];
   };
 
-  # gamescope compositor. capSysNice lets it request realtime priority for
-  # smoother frame pacing.
+  # gamescope compositor. Enabling gamescopeSession already defaults
+  # programs.gamescope.enable to true; we keep this block for capSysNice, which
+  # lets gamescope request realtime priority for smoother frame pacing.
   programs.gamescope = {
     enable = true;
     capSysNice = true;
