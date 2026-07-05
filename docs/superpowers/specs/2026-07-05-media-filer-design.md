@@ -99,9 +99,11 @@ Small, modular, TDD'd:
   season is known; for absolute-numbered fansubs with no season,
   `anime/<Title>/<Title> - <NNN>.<ext>`. The agent decides which applies.
 
-Only video files are linked. **Sidecar subtitle linking is a deferred
-follow-up** — external `.srt`/`.ass` files stay in the download dir for now
-(embedded subtitles play fine either way).
+**Sidecar subtitles** (`.srt/.ass/.ssa/.sub/.vtt/.idx`, incl. a `Subs/` folder)
+are hardlinked next to their video as `<video-stem>[.<lang>][.<flag>].<ext>` —
+language/flags via `guessit` (`en`, `en.forced`, …). Movies take all subs;
+episodes match a sub to its `S/E`. A sub that matches no episode (e.g. a
+language-only name in a season pack) is logged and left in place.
 
 All links are within the single `tank/media` ZFS dataset (one copy on disk); the
 original download is never touched and keeps seeding.
