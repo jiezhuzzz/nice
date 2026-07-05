@@ -4,6 +4,7 @@ import pytest
 
 from media_filer import filer
 from media_filer.agent import AgentResult
+from media_filer.hardlink import LinkConflict
 
 
 @pytest.fixture(autouse=True)
@@ -104,3 +105,58 @@ def test_no_video_files_unfiled(tmp_path):
     _mk(src / "01.track.flac")  # not a video extension
     results = filer.process_job(_job(dl, src.name), root=root, classify=never_agent)
     assert results and all(r.action == "unfiled" for r in results)
+
+
+def test_anime_absolute_episode(tmp_path):
+    # agent resolves anime; file uses absolute numbering (no season) -> anime/Show/Show - N.ext
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "[SubsPlease] One Piece - 1071 (1080p)"
+    _mk(src / "[SubsPlease] One Piece - 1071 (1080p).mkv", 8192)
+
+    def stub(name, files, **k):
+        return AgentResult("anime", "One Piece", None, None, None, True)
+
+    filer.process_job(_job(dl, src.name), root=root, classify=stub)
+    assert (root / "anime" / "One Piece" / "One Piece - 1071.mkv").exists()
+
+
+def test_partial_unfiled_in_batch(tmp_path):
+    # one good episode links; a file with no episode number is left unfiled
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "Severance.S02.1080p.WEB-DL-GRP"
+    _mk(src / "Severance.S02E01.1080p.mkv")
+    _mk(src / "Severance.Recap.Special.mkv")
+    results = filer.process_job(_job(dl, src.name), root=root, classify=never_agent)
+    assert (root / "tv" / "Severance" / "Season 02" / "Severance - S02E01.mkv").exists()
+    assert any(r.action == "unfiled" for r in results)
+
+
+def test_link_conflict_reported(tmp_path):
+    # a LinkConflict from the linker surfaces as Result(action="conflict"), not a crash
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "The.Matrix.1999.1080p-GRP"
+    _mk(src / "the.matrix.1999.mkv", 8192)
+
+    def boom(s, d):
+        raise LinkConflict("boom")
+
+    results = filer.process_job(_job(dl, src.name), root=root, classify=never_agent, link=boom)
+    assert any(r.action == "conflict" for r in results)
+
+
+def test_movie_without_year_unfiled(tmp_path):
+    # a confident-movie decision with no year must NOT build a "Title (None)" path
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "Some.Mystery.Movie.1080p-GRP"
+    _mk(src / "some.mystery.movie.1080p.mkv", 8192)
+
+    def stub(name, files, **k):
+        return AgentResult("movie", "Some Mystery Movie", None, None, None, True)
+
+    results = filer.process_job(_job(dl, src.name), root=root, classify=stub)
+    assert results and all(r.action == "unfiled" for r in results)
+    assert not list(root.rglob("*.mkv"))

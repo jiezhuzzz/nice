@@ -28,10 +28,9 @@ class Result:
 
 
 def _video_files(root: Path) -> list[Path]:
-    if root.is_file():
-        return [root] if root.suffix.lower() in VIDEO_EXTS else []
+    candidates = [root] if root.is_file() else sorted(root.rglob("*"))
     out = []
-    for p in sorted(root.rglob("*")):
+    for p in candidates:
         if not p.is_file() or p.suffix.lower() not in VIDEO_EXTS:
             continue
         if _SAMPLE.search(p.name):
@@ -50,17 +49,32 @@ def _label_category(labels: str) -> str | None:
     return None
 
 
+def _compatible(label_cat: str | None, gtype: str | None) -> bool:
+    """A category label is compatible with guessit's structural type when it
+    does not contradict it: `movie` labels only fit movies; `tv`/`anime` labels
+    only fit episodes. Incompatible pairs escalate to the agent instead of
+    mis-filing."""
+    if label_cat is None:
+        return True
+    if gtype == "movie":
+        return label_cat == "movie"
+    if gtype == "episode":
+        return label_cat in ("tv", "anime")
+    return False
+
+
 def _resolve(name: str, files: list[Path], labels: str, classify) -> agent_mod.AgentResult | None:
     """Decide (category, title, year, season, episode). Returns an AgentResult-shaped
     decision, or None if we cannot confidently file it."""
     label_cat = _label_category(labels)
     c = parse.parse_name(name)
 
-    if parse.confident(c) and (label_cat is None or label_cat != "anime" or c.type == "episode"):
+    if parse.confident(c) and _compatible(label_cat, c.type):
         category = label_cat or ("movie" if c.type == "movie" else "tv")
         return agent_mod.AgentResult(category, c.title, c.year, c.season, c.episode, True)
 
-    # Escalate: CJK, missing type, or unresolved category.
+    # Escalate: CJK, missing type, unresolved category, or a label that
+    # contradicts the parsed structure.
     decision = classify(name, [f.name for f in files])
     if not decision.confident:
         return None
@@ -92,6 +106,9 @@ def process_job(env: dict, *, root: Path = layout.MEDIA_ROOT,
 
     results: list[Result] = []
     if decision.type == "movie":
+        if decision.year is None:
+            log.info("unfiled: %s (movie without year)", name)
+            return [Result("unfiled", str(src_root), None, "movie without year")]
         feature = max(files, key=lambda p: p.stat().st_size)
         dest = layout.movie_dest(root, decision.title, decision.year, feature.suffix)
         results.append(_place(feature, dest, root, link))
