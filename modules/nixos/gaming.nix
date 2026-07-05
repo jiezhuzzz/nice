@@ -72,13 +72,15 @@ in {
     ];
   };
 
-  # gamescope compositor. Enabling gamescopeSession already defaults
-  # programs.gamescope.enable to true; we keep this block for capSysNice, which
-  # lets gamescope request realtime priority for smoother frame pacing.
-  programs.gamescope = {
-    enable = true;
-    capSysNice = true;
-  };
+  # gamescope is auto-enabled by gamescopeSession, so this only needs `enable`.
+  # We deliberately do NOT set capSysNice: the NixOS security wrapper grants
+  # gamescope *inheritable* CAP_SYS_NICE (getcap shows `cap_sys_nice=eip`), and
+  # that inheritable cap leaks into Steam's bubblewrap sandbox, which aborts with
+  # "bwrap: Unexpected capabilities but not setuid" → Steam never launches and
+  # the session dies in ~1s, falling back to the greeter. Losing gamescope's
+  # realtime scheduling priority is a minor frame-pacing cost; a Steam that
+  # actually starts is the point.
+  programs.gamescope.enable = true;
 
   # The gamescope session's `--mangoapp` flag launches the `mangoapp` binary
   # (from mangohud) directly from gamescope — which lives OUTSIDE Steam's FHS, so
