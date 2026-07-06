@@ -111,18 +111,16 @@ in {
   # Performance CPU governor while a game is running.
   programs.gamemode.enable = true;
 
-  # Game-library storage on the gpool NVMe pool (see disko.nix). The /gpool/steam
-  # and /gpool/lutris datasets mount root-owned, but the tools run as jie. Rather
-  # than hand a single user the mounts, use a shared `games` group: jie is a
-  # member, and each dataset root is group-owned by `games` with mode 2775 — the
-  # setgid bit means everything created underneath stays group-`games`, so
-  # ownership never drifts. (Group membership takes effect on jie's next login.)
-  # Then add /gpool/steam as a Steam library (Settings → Storage) and set default.
+  # Game-library storage. gpool is a single ~4.8 TiB NVMe dataset mounted at
+  # /gpool (see disko.nix); the Steam/Lutris libraries live as subdirectories. It
+  # mounts root-owned, so give the shared `games` group ownership + setgid (2775)
+  # on the dataset root — one rule, and every subdir/file created underneath
+  # inherits group `games`, so ownership never drifts. jie is a member (takes
+  # effect on next login). Add /gpool (or a subdir) as a Steam library.
   users.groups.games = {};
   users.users.${user.me.username}.extraGroups = ["games"];
   systemd.tmpfiles.rules = [
-    "d /gpool/steam 2775 root games - -"
-    "d /gpool/lutris 2775 root games - -"
+    "d /gpool 2775 root games - -"
   ];
 
   # greetd: a minimal login daemon (no graphical greeter). It opens a logind

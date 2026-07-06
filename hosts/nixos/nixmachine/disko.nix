@@ -257,6 +257,9 @@ in {
       # ----------------------------------------------------------------
       # gpool — games, 2-way NVMe stripe, ~4.8 TiB. NO REDUNDANCY.
       # If either NVMe dies, all game installs are gone. Saves live on rpool.
+      # A single dataset mounted (legacy) at /gpool; game libraries (steam,
+      # lutris, …) are plain subdirectories, group-owned by `games` via setgid
+      # (see modules/nixos/gaming.nix).
       # ----------------------------------------------------------------
       gpool = {
         type = "zpool";
@@ -265,27 +268,16 @@ in {
           ashift = "12";
           autotrim = "on";
         };
+        mountpoint = "/gpool";
         rootFsOptions = {
           compression = "lz4";
           atime = "off";
           xattr = "sa";
           acltype = "posixacl";
-          mountpoint = "none";
-          canmount = "off";
+          mountpoint = "legacy";
           recordsize = "1M";
         };
-        datasets = {
-          "steam" = {
-            type = "zfs_fs";
-            mountpoint = "/gpool/steam";
-            options.mountpoint = "legacy";
-          };
-          "lutris" = {
-            type = "zfs_fs";
-            mountpoint = "/gpool/lutris";
-            options.mountpoint = "legacy";
-          };
-        };
+        datasets = {};
       };
     };
   };
