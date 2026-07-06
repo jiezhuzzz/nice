@@ -23,16 +23,19 @@
   #     died in ~1s. We prepend /run/current-system/sw/bin (and the standard
   #     /run/wrappers/bin). gamescope must resolve to the *plain* binary, not a
   #     capSysNice-wrapped one — see the programs.gamescope note below.
-  #  2. Bring up jie's `graphical-session.target` so services bound to it
-  #     (Sunshine) start, and tear it back down when Steam exits — which stops
-  #     Sunshine and returns the box to the headless/agreety state. (No `exec`,
-  #     so the EXIT trap can fire.)
+  #  2. Start Sunshine so it can capture the session, and stop it on exit —
+  #     returning the box to the headless/agreety state. We start sunshine.service
+  #     directly rather than graphical-session.target: the target has
+  #     RefuseManualStart=yes so `systemctl start` of it silently fails, but
+  #     sunshine `Wants=` it, so starting sunshine pulls the target in as a
+  #     dependency (verified: both go active). Sunshine is the only consumer.
+  #     (No `exec`, so the EXIT trap can fire.)
   #  3. Log the (verbose) session so a boot-time failure is debuggable over SSH.
   gamescope-session = pkgs.writeShellScript "gamescope-session" ''
     export PATH="/run/wrappers/bin:/run/current-system/sw/bin:$PATH"
     ${pkgs.systemd}/bin/systemctl --user import-environment PATH
-    ${pkgs.systemd}/bin/systemctl --user start graphical-session.target
-    trap '${pkgs.systemd}/bin/systemctl --user stop graphical-session.target' EXIT
+    ${pkgs.systemd}/bin/systemctl --user start sunshine.service
+    trap '${pkgs.systemd}/bin/systemctl --user stop sunshine.service' EXIT
     steam-gamescope &> /tmp/gamescope-session.log
   '';
 
