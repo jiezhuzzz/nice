@@ -17,11 +17,12 @@
   user = import ../../users/jie.nix;
 
   # Session wrapper launched by greetd. Responsibilities:
-  #  1. Fix PATH. greetd starts sessions with a minimal PATH that lacks both the
-  #     NixOS system profile and the setuid-wrapper dir, so `steam-gamescope`
-  #     (and the `gamescope` / `steam` / `mangoapp` it shells out to) were not
-  #     found and the session died in ~1s. `/run/wrappers/bin` must come first so
-  #     the capSysNice-wrapped `gamescope` wins over the plain one.
+  #  1. Fix PATH. greetd starts sessions with a minimal PATH that lacks the
+  #     NixOS system profile, so `steam-gamescope` (and the `gamescope` /
+  #     `steam` / `mangoapp` it shells out to) were not found and the session
+  #     died in ~1s. We prepend /run/current-system/sw/bin (and the standard
+  #     /run/wrappers/bin). gamescope must resolve to the *plain* binary, not a
+  #     capSysNice-wrapped one — see the programs.gamescope note below.
   #  2. Bring up jie's `graphical-session.target` so services bound to it
   #     (Sunshine) start, and tear it back down when Steam exits — which stops
   #     Sunshine and returns the box to the headless/agreety state. (No `exec`,
@@ -33,6 +34,18 @@
     ${pkgs.systemd}/bin/systemctl --user start graphical-session.target
     trap '${pkgs.systemd}/bin/systemctl --user stop graphical-session.target' EXIT
     steam-gamescope &> /tmp/gamescope-session.log
+  '';
+
+  # THE way to exit the gaming session: ends gamescope, returning greetd to the
+  # text console. Runnable as jie from SSH or any console — no sudo, since
+  # gamescope is jie's own process. Steam's Big Picture "Switch to Desktop" does
+  # NOT work here — it triggers a Steam self-shutdown that hangs in the gamescope
+  # session — so this is the intended exit. SIGTERM first, then SIGKILL.
+  game-stop = pkgs.writeShellScriptBin "game-stop" ''
+    ${pkgs.procps}/bin/pkill -TERM -f 'gamescope --steam'
+    ${pkgs.coreutils}/bin/sleep 3
+    ${pkgs.procps}/bin/pkill -KILL -f 'gamescope --steam'
+    exit 0
   '';
 in {
   # Steam + the gamescope "steam" session. programs.steam.enable already turns
@@ -87,7 +100,10 @@ in {
   # the mangohud in programs.steam.extraPackages isn't visible to it. Put it on
   # the system PATH so gamescope can find it (else: endless "Failed to start
   # process mangoapp" errors).
-  environment.systemPackages = [pkgs.mangohud];
+  environment.systemPackages = [
+    pkgs.mangohud
+    game-stop # end the gaming session from SSH/console (the intended exit)
+  ];
 
   # Performance CPU governor while a game is running.
   programs.gamemode.enable = true;
