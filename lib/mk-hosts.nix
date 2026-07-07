@@ -1,30 +1,52 @@
 # flake-parts module that declares flake.nixosConfigurations,
 # flake.darwinConfigurations, flake.homeConfigurations.
+#
+# The builders own all cross-cutting plumbing: `inputs` + `user` in every
+# layer's specialArgs, home-manager wiring for the system builders, and the
+# settings every machine sets (allowUnfree; flakes on NixOS). Profiles and
+# hosts only describe what is specific to them.
 {inputs, ...}: let
-  # HM module injected into every home-manager user managed via NixOS/darwin
+  user = import ../users/jie.nix;
+
+  # HM module injected into every home-manager user, however it is wired in.
   hmSharedModules = [inputs.catppuccin.homeModules.catppuccin];
+
+  # home-manager wiring shared by the NixOS and darwin system builders.
+  hmSystemWiring = {
+    home-manager = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      extraSpecialArgs = {inherit inputs user;};
+      sharedModules = hmSharedModules;
+    };
+  };
 
   mkNixos = modules:
     inputs.nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
+      specialArgs = {inherit inputs user;};
       modules =
         modules
         ++ [
           inputs.home-manager.nixosModules.home-manager
           inputs.catppuccin.nixosModules.catppuccin
           inputs.agenix.nixosModules.default
-          {home-manager.sharedModules = hmSharedModules;}
+          hmSystemWiring
+          {
+            nixpkgs.config.allowUnfree = true;
+            nix.settings.experimental-features = ["nix-command" "flakes"];
+          }
         ];
     };
 
   mkDarwin = modules:
     inputs.nix-darwin.lib.darwinSystem {
-      specialArgs = {inherit inputs;};
+      specialArgs = {inherit inputs user;};
       modules =
         modules
         ++ [
           inputs.home-manager.darwinModules.home-manager
-          {home-manager.sharedModules = hmSharedModules;}
+          hmSystemWiring
+          {nixpkgs.config.allowUnfree = true;}
         ];
     };
 
@@ -34,12 +56,8 @@
         inherit system;
         config.allowUnfree = true;
       };
-      extraSpecialArgs = {inherit inputs;};
-      modules =
-        modules
-        ++ [
-          inputs.catppuccin.homeModules.catppuccin
-        ];
+      extraSpecialArgs = {inherit inputs user;};
+      modules = modules ++ hmSharedModules;
     };
 in {
   flake.nixosConfigurations = {

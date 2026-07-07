@@ -3,19 +3,15 @@
 {
   inputs,
   pkgs,
+  user,
   ...
-}: let
-  user = import ../users/jie.nix;
-in {
+}: {
   imports = [
     ../modules/nixos/boot
     ../modules/nixos/hardware
     ../modules/nixos/desktop
     ../modules/nixos/secrets
   ];
-
-  nixpkgs.config.allowUnfree = true;
-  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   programs.fish.enable = true;
 
@@ -36,9 +32,6 @@ in {
     shell = pkgs.fish;
   };
 
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.extraSpecialArgs = {inherit inputs user;};
   home-manager.users.${user.me.username} = {pkgs, ...}: {
     imports = [
       ./home/desktop.nix

@@ -2,10 +2,9 @@
   inputs,
   lib,
   pkgs,
+  user,
   ...
-}: let
-  user = import ../../../users/jie.nix;
-in {
+}: {
   imports = [
     ../../../profiles/homelab.nix
     ../../../modules/nixos/hardware/audio.nix # PipeWire (ALSA + Pulse) for local playback
@@ -17,9 +16,6 @@ in {
     ./disko.nix # ZFS layout — also generates fileSystems for the legacy mounts
     ./hardware.nix
   ];
-
-  # nixpkgs.config.allowUnfree and nix.settings.experimental-features are set
-  # by the homelab profile.
 
   networking.hostName = "nixmachine";
   # Required by ZFS: a stable 8-hex-digit host id (guards against importing a
