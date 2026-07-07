@@ -7,10 +7,10 @@
   ...
 }: {
   imports = [
-    ../modules/nix-darwin/fonts
-    ../modules/nix-darwin/homebrew
-    ../modules/nix-darwin/secrets
-    ../modules/nix-darwin/system
+    ../modules/nix-darwin/fonts.nix
+    ../modules/nix-darwin/homebrew.nix
+    ../modules/nix-darwin/secrets.nix
+    ../modules/nix-darwin/system.nix
   ];
 
   # direnv 2.37.1 checkPhase hangs on macOS due to sandbox restrictions

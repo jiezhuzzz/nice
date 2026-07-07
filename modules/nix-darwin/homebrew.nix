@@ -7,7 +7,7 @@
 #
 # Manages casks and Mac App Store apps.
 {inputs, ...}: let
-  user = import ../../../users/jie.nix;
+  user = import ../../users/jie.nix;
 in {
   imports = [
     inputs.nix-homebrew.darwinModules.nix-homebrew

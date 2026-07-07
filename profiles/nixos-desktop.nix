@@ -7,10 +7,10 @@
   ...
 }: {
   imports = [
-    ../modules/nixos/boot
+    ../modules/nixos/boot.nix
     ../modules/nixos/hardware
     ../modules/nixos/desktop
-    ../modules/nixos/secrets
+    ../modules/nixos/secrets.nix
   ];
 
   programs.fish.enable = true;
