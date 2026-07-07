@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from media_filer import filer
+from media_filer import filer, parse
 from media_filer.agent import AgentResult
 from media_filer.hardlink import LinkConflict
 
@@ -217,3 +217,77 @@ def test_unmatched_subtitle_logged_not_linked(tmp_path):
     assert (root / "tv" / "Severance" / "Season 02" / "Severance - S02E01.mkv").exists()
     assert not list(root.rglob("*.srt"))  # ambiguous sub not linked
     assert any(r.action == "unfiled" and r.reason == "subtitle matched no episode" for r in results)
+
+
+def _hdsky_job(dir_, name):
+    return {
+        "TR_TORRENT_DIR": str(dir_),
+        "TR_TORRENT_NAME": name,
+        "TR_TORRENT_TRACKERS": "https://pt.hdsky.me/announce?passkey=SECRET",
+    }
+
+
+def test_hdsky_movie_skips_agent(tmp_path):
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "满江红.Full.River.Red.2023.2160p.WEB-DL.H265@HDSky"
+    _mk(src / "满江红.Full.River.Red.2023.2160p.WEB-DL.H265@HDSky.mkv", 8192)
+    # End-to-end smoke test: an HDSky release files correctly without escalating.
+    # (guessit also parses these names, so this doesn't isolate the tracker path;
+    # the *_when_guessit_blind tests below do that.)
+    results = filer.process_job(_hdsky_job(dl, src.name), root=root, classify=never_agent)
+    dest = root / "movies" / "Full River Red (2023)" / "Full River Red (2023).mkv"
+    assert dest.exists()
+    assert any(r.action == "linked" for r in results)
+
+
+def test_hdsky_season_pack_skips_agent(tmp_path):
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "狂飙.The.Knockout.S01.2023.1080p.WEB-DL.H264.AAC@HDSky"
+    _mk(src / "狂飙.The.Knockout.S01.E01.2023.1080p.WEB-DL.H264.AAC@HDSky.mkv")
+    _mk(src / "狂飙.The.Knockout.S01.E02.2023.1080p.WEB-DL.H264.AAC@HDSky.mkv")
+    # End-to-end smoke test: an HDSky release files correctly without escalating.
+    # (guessit also parses these names, so this doesn't isolate the tracker path;
+    # the *_when_guessit_blind tests below do that.)
+    filer.process_job(_hdsky_job(dl, src.name), root=root, classify=never_agent)
+    tv = root / "tv" / "The Knockout" / "Season 01"
+    assert (tv / "The Knockout - S01E01.mkv").exists()
+    assert (tv / "The Knockout - S01E02.mkv").exists()
+
+
+def test_hdsky_movie_files_via_tracker_when_guessit_blind(tmp_path, monkeypatch):
+    # Prove the tracker path is actually used: blind guessit so parse_name returns
+    # a non-confident Candidate. Only trackers.release can then yield a confident
+    # decision -- if the tracker layer weren't wired in, this would escalate to
+    # never_agent and raise.
+    monkeypatch.setattr(
+        parse, "parse_name", lambda name: parse.Candidate(None, None, None, None, None)
+    )
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "满江红.Full.River.Red.2023.2160p.WEB-DL.H265@HDSky"
+    _mk(src / "满江红.Full.River.Red.2023.2160p.WEB-DL.H265@HDSky.mkv", 8192)
+    results = filer.process_job(_hdsky_job(dl, src.name), root=root, classify=never_agent)
+    dest = root / "movies" / "Full River Red (2023)" / "Full River Red (2023).mkv"
+    assert dest.exists()
+    assert any(r.action == "linked" for r in results)
+
+
+def test_hdsky_season_pack_files_via_tracker_when_guessit_blind(tmp_path, monkeypatch):
+    # Isolate BOTH tracker branches: blind guessit so parse_name yields no
+    # season/episode. Only trackers.release (show + season) and trackers.file
+    # (per-episode numbers) can file these; if the _file_episode wiring were
+    # dropped, the episodes would have no number and be left unfiled.
+    monkeypatch.setattr(
+        parse, "parse_name", lambda name: parse.Candidate(None, None, None, None, None)
+    )
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    src = dl / "狂飙.The.Knockout.S01.2023.1080p.WEB-DL.H264.AAC@HDSky"
+    _mk(src / "狂飙.The.Knockout.S01.E01.2023.1080p.WEB-DL.H264.AAC@HDSky.mkv")
+    _mk(src / "狂飙.The.Knockout.S01.E02.2023.1080p.WEB-DL.H264.AAC@HDSky.mkv")
+    filer.process_job(_hdsky_job(dl, src.name), root=root, classify=never_agent)
+    tv = root / "tv" / "The Knockout" / "Season 01"
+    assert (tv / "The Knockout - S01E01.mkv").exists()
+    assert (tv / "The Knockout - S01E02.mkv").exists()

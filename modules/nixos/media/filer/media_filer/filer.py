@@ -9,6 +9,7 @@ from pathlib import Path
 from . import agent as agent_mod
 from . import hardlink as hardlink_mod
 from . import layout, parse, subs
+from . import trackers
 
 log = logging.getLogger("media_filer")
 
@@ -62,11 +63,17 @@ def _compatible(label_cat: str | None, gtype: str | None) -> bool:
     return False
 
 
-def _resolve(name: str, files: list[Path], labels: str, classify) -> agent_mod.AgentResult | None:
+def _resolve(name: str, files: list[Path], labels: str, tracker: str | None, classify) -> agent_mod.AgentResult | None:
     """Decide (category, title, year, season, episode). Returns an AgentResult-shaped
-    decision, or None if we cannot confidently file it."""
+    decision, or None if we cannot confidently file it. Tries the tracker-specific
+    parser first (recognized trackers), then guessit, then the Claude agent."""
     label_cat = _label_category(labels)
-    c = parse.parse_name(name)
+
+    # trackers.release returns None on a convention miss (so we fall back to
+    # guessit); a recognized tracker never returns a low-confidence guess.
+    c = trackers.release(tracker, name) if tracker else None
+    if c is None:
+        c = parse.parse_name(name)
 
     if parse.confident(c) and _compatible(label_cat, c.type):
         category = label_cat or ("movie" if c.type == "movie" else "tv")
@@ -82,7 +89,11 @@ def _resolve(name: str, files: list[Path], labels: str, classify) -> agent_mod.A
     return decision
 
 
-def _file_episode(fname: str) -> tuple[int | None, int | None]:
+def _file_episode(fname: str, tracker: str | None = None) -> tuple[int | None, int | None]:
+    if tracker:
+        r = trackers.file(tracker, fname)
+        if r is not None:
+            return r
     c = parse.parse_name(fname)
     return c.season, c.episode
 
@@ -92,13 +103,14 @@ def process_job(env: dict, *, root: Path = layout.MEDIA_ROOT,
     name = env["TR_TORRENT_NAME"]
     src_root = Path(env["TR_TORRENT_DIR"]) / name
     labels = env.get("TR_TORRENT_LABELS", "")
+    tracker = trackers.tracker_for(env.get("TR_TORRENT_TRACKERS", ""))
 
     files = _video_files(src_root)
     if not files:
         log.info("unfiled: %s (no video files)", name)
         return [Result("unfiled", str(src_root), None, "no video files")]
 
-    decision = _resolve(name, files, labels, classify)
+    decision = _resolve(name, files, labels, tracker, classify)
     if decision is None:
         log.info("unfiled: %s (undetermined)", name)
         return [Result("unfiled", str(src_root), None, "undetermined")]
@@ -119,7 +131,7 @@ def process_job(env: dict, *, root: Path = layout.MEDIA_ROOT,
         anime = decision.type == "anime"
         matched: set[Path] = set()
         for f in files:
-            season, episode = _file_episode(f.name)
+            season, episode = _file_episode(f.name, tracker)
             if season is None:
                 season = decision.season
             if episode is None:
