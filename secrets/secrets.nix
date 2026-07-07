@@ -12,6 +12,7 @@ let
   nixair = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILd3vgPew3ZkrxUrPxWieOlctLjqw9r0MH48HsAbNfcb";
   nixmini = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJFdGfQiCHk30nWql1kwmIVPNzIkM9io+7Q9AqA4+y7k";
   nixneo = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAekmUrW6WXWL2IWlhuvGQSq3MM2Zf94UJBzdZHEClJ";
+  nixmachine = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBhpaKcPL+8+O0D+Vb4wRdvVEGOv2zfeTSCgVRR9evZX";
 
   # User keys (for editing secrets and as a recovery path).
   password-manager = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIkFCNadE6kTViKssYg8SBEHf9H0BEa92p3l0UfMELOF";
@@ -20,8 +21,8 @@ let
   allUsers = [password-manager];
   allRecipients = allHosts ++ allUsers;
 in {
-  "ssh/github.age".publicKeys = allRecipients;
-  "ssh/git-signing.age".publicKeys = allRecipients;
+  "ssh/github.age".publicKeys = allRecipients ++ [nixmachine];
+  "ssh/git-signing.age".publicKeys = allRecipients ++ [nixmachine];
   "ssh/chameleon.age".publicKeys = allRecipients;
   "ssh/lab.age".publicKeys = allRecipients;
   "ssh/home.age".publicKeys = allRecipients;
