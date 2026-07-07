@@ -5,5 +5,6 @@
 # the two never drift. Boot, storage, networking and the user account stay
 # with the host.
 {user, ...}: {
+  imports = [../modules/nixos/agenix-git.nix];
   home-manager.users.${user.me.username}.imports = [./home/server.nix];
 }
