@@ -54,3 +54,16 @@ def test_hdsky_movie_with_number_in_title():
     assert trackers.release("hdsky", name) == Candidate(
         type="movie", title="Blade Runner 2049", year=2017, season=None, episode=None
     )
+
+
+def test_hdsky_file_episode():
+    fname = "狂飙.The.Knockout.S01.E05.2023.1080p.WEB-DL.H264.AAC@HDSky.mkv"
+    assert trackers.file("hdsky", fname) == (1, 5)
+
+
+def test_hdsky_file_no_episode_returns_none():
+    assert trackers.file("hdsky", "满江红.Full.River.Red.2023.1080p@HDSky.mkv") is None
+
+
+def test_file_unknown_tracker_returns_none():
+    assert trackers.file("nope", "whatever.mkv") is None

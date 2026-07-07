@@ -40,6 +40,7 @@ class HDSky:
     _TV = re.compile(
         r"^[^.]+\.(?P<title>.+?)\.S(?P<season>\d{1,2})(?:\.E(?P<episode>\d{1,3}))?(?:\.|@|$)"
     )
+    _FILE = re.compile(r"\.S(?P<season>\d{1,2})\.E(?P<episode>\d{1,3})\b")
 
     def release(self, name: str) -> Candidate | None:
         # TV first: a TV name also contains a year the movie regex would grab.
@@ -64,6 +65,12 @@ class HDSky:
             )
         return None
 
+    def file(self, name: str) -> tuple[int | None, int | None] | None:
+        m = self._FILE.search(name)
+        if not m:
+            return None
+        return int(m.group("season")), int(m.group("episode"))
+
 
 _REGISTRY: dict[str, HDSky] = {"hdsky": HDSky()}
 
@@ -71,3 +78,8 @@ _REGISTRY: dict[str, HDSky] = {"hdsky": HDSky()}
 def release(tracker: str, name: str) -> Candidate | None:
     parser = _REGISTRY.get(tracker)
     return parser.release(name) if parser else None
+
+
+def file(tracker: str, name: str) -> tuple[int | None, int | None] | None:
+    parser = _REGISTRY.get(tracker)
+    return parser.file(name) if parser else None
