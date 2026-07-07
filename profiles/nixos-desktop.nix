@@ -76,6 +76,7 @@ in {
       ../modules/home-manager/common/delta.nix
       ../modules/home-manager/common/gh.nix
       ../modules/home-manager/common/ghostty
+      ../modules/home-manager/common/ssh-identities.nix
       # linux
       ../modules/home-manager/linux/packages.nix
       ../modules/home-manager/linux/niri.nix
@@ -96,50 +97,6 @@ in {
       package = pkgs.banana-cursor;
       size = 32;
       gtk.enable = true;
-    };
-
-    # SSH identity pinning (keys decrypted by agenix to /run/agenix/)
-    programs.ssh.settings."github.com" = {
-      IdentityFile = "/run/agenix/github-ssh-key";
-      IdentitiesOnly = true;
-    };
-    programs.ssh.settings."tacc" = {
-      IdentityFile = "/run/agenix/chameleon-ssh-key";
-      IdentitiesOnly = true;
-    };
-    programs.ssh.settings."10.52.*.*" = {
-      IdentityFile = "/run/agenix/chameleon-ssh-key";
-      IdentitiesOnly = true;
-    };
-    programs.ssh.settings."uchicago" = {
-      HostName = "linux.cs.uchicago.edu";
-      User = "jiezhu";
-      IdentityFile = "/run/agenix/lab-ssh-key";
-      IdentitiesOnly = true;
-      ForwardAgent = true;
-    };
-    programs.ssh.settings."goku vegeta" = {
-      ProxyJump = "uchicago";
-      User = "jiezzz";
-      IdentityFile = "/run/agenix/lab-ssh-key";
-      IdentitiesOnly = true;
-      ForwardAgent = true;
-    };
-    programs.ssh.settings."192.168.86.*" = {
-      User = "jie";
-      IdentityFile = "/run/agenix/home-ssh-key";
-      IdentitiesOnly = true;
-      ForwardAgent = true;
-    };
-
-    # Auto-load SSH keys into agent at login
-    systemd.user.services.ssh-add-keys = {
-      Unit.Description = "Load SSH keys into agent";
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${pkgs.openssh}/bin/ssh-add /run/agenix/github-ssh-key /run/agenix/git-signing-key /run/agenix/chameleon-ssh-key /run/agenix/lab-ssh-key /run/agenix/home-ssh-key";
-      };
-      Install.WantedBy = ["default.target"];
     };
   };
 }
