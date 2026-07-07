@@ -81,6 +81,7 @@ in {
       ../modules/home-manager/common/delta.nix
       ../modules/home-manager/common/gh.nix
       ../modules/home-manager/common/ghostty
+      ../modules/home-manager/common/ssh-identities.nix
       # darwin
       ../modules/home-manager/darwin/aerospace.nix
       ../modules/home-manager/darwin/karabiner.nix
@@ -95,57 +96,6 @@ in {
     programs.man.generateCaches = false;
     programs.home-manager.enable = true;
     home.stateVersion = "26.05";
-
-    # SSH identity pinning (keys decrypted by agenix to /run/agenix/)
-    programs.ssh.settings."github.com" = {
-      IdentityFile = "/run/agenix/github-ssh-key";
-      IdentitiesOnly = true;
-    };
-    programs.ssh.settings."tacc" = {
-      IdentityFile = "/run/agenix/chameleon-ssh-key";
-      IdentitiesOnly = true;
-    };
-    programs.ssh.settings."10.52.*.*" = {
-      IdentityFile = "/run/agenix/chameleon-ssh-key";
-      IdentitiesOnly = true;
-    };
-    programs.ssh.settings."uchicago" = {
-      HostName = "linux.cs.uchicago.edu";
-      User = "jiezhu";
-      IdentityFile = "/run/agenix/lab-ssh-key";
-      IdentitiesOnly = true;
-      ForwardAgent = true;
-    };
-    programs.ssh.settings."goku vegeta" = {
-      ProxyJump = "uchicago";
-      User = "jiezzz";
-      IdentityFile = "/run/agenix/lab-ssh-key";
-      IdentitiesOnly = true;
-      ForwardAgent = true;
-    };
-    programs.ssh.settings."192.168.86.*" = {
-      User = "jie";
-      IdentityFile = "/run/agenix/home-ssh-key";
-      IdentitiesOnly = true;
-      ForwardAgent = true;
-    };
-
-    # Auto-load SSH keys into macOS system agent at login
-    launchd.agents.ssh-add-keys = {
-      enable = true;
-      config = {
-        Label = "com.user.ssh-add-keys";
-        ProgramArguments = [
-          "/usr/bin/ssh-add"
-          "/run/agenix/github-ssh-key"
-          "/run/agenix/git-signing-key"
-          "/run/agenix/chameleon-ssh-key"
-          "/run/agenix/lab-ssh-key"
-          "/run/agenix/home-ssh-key"
-        ];
-        RunAtLoad = true;
-      };
-    };
   };
 
   system.stateVersion = 6;
