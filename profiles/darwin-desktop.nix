@@ -3,18 +3,15 @@
 {
   inputs,
   pkgs,
+  user,
   ...
-}: let
-  user = import ../users/jie.nix;
-in {
+}: {
   imports = [
     ../modules/nix-darwin/fonts
     ../modules/nix-darwin/homebrew
     ../modules/nix-darwin/secrets
     ../modules/nix-darwin/system
   ];
-
-  nixpkgs.config.allowUnfree = true;
 
   # direnv 2.37.1 checkPhase hangs on macOS due to sandbox restrictions
   nixpkgs.overlays = [
@@ -44,9 +41,6 @@ in {
     shell = pkgs.fish;
   };
 
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.extraSpecialArgs = {inherit inputs user;};
   home-manager.users.${user.me.username} = {
     imports = [
       ./home/desktop.nix
