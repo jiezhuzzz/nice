@@ -11,6 +11,7 @@
     ../../../modules/nixos/media # media automation stack
     ../../../modules/nixos/llm # open-webui + litellm LLM gateway
     ../../../modules/nixos/stirling-pdf.nix # self-hosted PDF toolkit
+    ../../../modules/nixos/mdns.nix # Avahi mDNS — nixmachine.local resolves on the LAN
     ../../../modules/nixos/gaming.nix # console-like Steam gamescope session (local play)
     inputs.disko.nixosModules.disko
     ./disko.nix # ZFS layout — also generates fileSystems for the legacy mounts
