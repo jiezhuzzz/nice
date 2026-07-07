@@ -1,49 +1,14 @@
-{inputs, ...}: let
-  user = import ../../users/jie.nix;
-in {
-  imports = [inputs.agenix.darwinModules.default];
-
+# age-encrypted secrets decrypted at activation time using the host's
+# SSH host key (see age.identityPaths). Each secret lands at
+# /run/agenix/<name> with the owner/mode specified here.
+{user, ...}: {
   age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
 
-  age.secrets.github-ssh-key = {
-    file = ../../secrets/ssh/github.age;
-    owner = user.me.username;
-    mode = "0400";
-  };
-
-  age.secrets.git-signing-key = {
-    file = ../../secrets/ssh/git-signing.age;
-    owner = user.me.username;
-    mode = "0400";
-  };
-
-  age.secrets.chameleon-ssh-key = {
-    file = ../../secrets/ssh/chameleon.age;
-    owner = user.me.username;
-    mode = "0400";
-  };
-
-  age.secrets.lab-ssh-key = {
-    file = ../../secrets/ssh/lab.age;
-    owner = user.me.username;
-    mode = "0400";
-  };
-
-  age.secrets.home-ssh-key = {
-    file = ../../secrets/ssh/home.age;
-    owner = user.me.username;
-    mode = "0400";
-  };
-
-  age.secrets.rclone-gdrive-token = {
-    file = ../../secrets/rclone/gdrive.age;
-    owner = user.me.username;
-    mode = "0400";
-  };
-
-  age.secrets.rclone-box-token = {
-    file = ../../secrets/rclone/box.age;
-    owner = user.me.username;
-    mode = "0400";
-  };
+  age.secrets =
+    builtins.mapAttrs (_: file: {
+      inherit file;
+      owner = user.me.username;
+      mode = "0400";
+    })
+    (import ../../secrets/definitions.nix);
 }
