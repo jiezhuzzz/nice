@@ -91,12 +91,12 @@
           programs.shfmt.enable = true;
           programs.actionlint.enable = true;
         };
-        # devShells.default = pkgs.mkShellNoCC {
-        #   packages = with pkgs; [
-        #     nil
-        #     alejandra
-        #   ];
-        # };
+        devShells.default = pkgs.mkShellNoCC {
+          packages = with pkgs; [
+            nil
+            alejandra
+          ];
+        };
       };
     };
 }
