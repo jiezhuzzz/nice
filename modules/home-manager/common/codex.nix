@@ -4,14 +4,6 @@
   pkgs,
   ...
 }: let
-  superpowers = pkgs.fetchFromGitHub {
-    owner = "obra";
-    repo = "superpowers";
-    rev = "v5.1.0";
-    sha256 = "dc4deb3ba851f3b2547d2dd757511aa33e920d639fb65796bcdf543cd144323c";
-    name = "superpowers";
-  };
-
   # Codex now rejects legacy `[profiles.<name>]` tables inside config.toml;
   # each profile must be its own CODEX_HOME/<name>.config.toml using top-level
   # keys (no `[profiles.x]` wrapper), overlaid on the base config when invoked
@@ -62,7 +54,6 @@ in {
       # Symlinked into Codex's skills dir (~/.agents/skills/ on Codex >=
       # 0.94.0, else ~/.config/codex/skills/).
       conventional-git = ../../../agents/skills/conventional-git;
-      # "superpowers" = "${superpowers}/skills";
     };
     settings = {
       # Auto-review: route approval requests to Codex's Guardian reviewer
