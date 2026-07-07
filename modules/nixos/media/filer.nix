@@ -25,7 +25,11 @@
     set -eu
     umask 0002
     tmp="${queue}/''${TR_TORRENT_HASH}.job.tmp"
-    ${pkgs.coreutils}/bin/env | ${pkgs.gnugrep}/bin/grep '^TR_' > "$tmp"
+    # Dump TR_* but redact tracker passkeys: private-tracker announce URLs in
+    # TR_TORRENT_TRACKERS embed the passkey, and only hostnames are needed
+    # downstream, so keep the secret out of the on-disk queue file.
+    ${pkgs.coreutils}/bin/env | ${pkgs.gnugrep}/bin/grep '^TR_' \
+      | ${pkgs.gnused}/bin/sed -E 's/(passkey|authkey)=[^&[:space:],]*/\1=REDACTED/g' > "$tmp"
     ${pkgs.coreutils}/bin/mv "$tmp" "${queue}/''${TR_TORRENT_HASH}.job"
   '';
 in {
