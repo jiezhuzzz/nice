@@ -15,7 +15,7 @@ in {
   home-manager.extraSpecialArgs = {inherit inputs user;};
   home-manager.users.${user.me.username} = {
     # Same module set + settings as the standalone server profile.
-    imports = [./server.nix];
+    imports = [./home/server.nix];
     home.username = user.me.username;
     home.homeDirectory = "/home/${user.me.username}";
   };
