@@ -102,11 +102,26 @@ the parsing feature.
 
 ## Confidence & fallback
 
-A tracker parse is confident under the same rules as `parse.confident`: a
-non-CJK title plus a year (movie) or a season (tv). A confident, label-compatible
-tracker `Candidate` short-circuits to filing; anything else — unknown tracker,
-non-matching name, low-confidence, contradicting label — falls through to the
-untouched `guessit → Claude` pipeline. Defense-in-depth is preserved.
+A tracker parser returns a confident `Candidate` or `None` — the registration
+contract is to signal a convention miss with `None`, never a low-confidence
+guess. Confidence is judged by the same `parse.confident` gate used for guessit
+(a non-CJK title plus a year for movies or a season for episodes).
+
+The routing in `_resolve` is therefore:
+
+- **`None`** (unknown tracker, or a name that doesn't match the tracker's
+  convention) → fall through to the untouched `guessit → confident() → Claude`
+  pipeline.
+- **Confident `Candidate`, label-compatible** → files directly (short-circuits
+  guessit *and* the agent).
+- **Confident `Candidate`, but an explicit label contradicts its type** →
+  escalates straight to the Claude agent, mirroring how a label-incompatible
+  *guessit* result already behaves (guessit is not retried, since the tracker
+  already parsed the name authoritatively).
+
+So a recognized tracker's match is authoritative: guessit is bypassed on a hit,
+and the agent remains the defense-in-depth fallback for every unrecognized or
+unmatched torrent.
 
 ## Testing (TDD, uv dev loop)
 
