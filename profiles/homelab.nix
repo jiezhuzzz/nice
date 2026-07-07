@@ -6,5 +6,8 @@
 # with the host.
 {user, ...}: {
   imports = [../modules/nixos/agenix-git.nix];
-  home-manager.users.${user.me.username}.imports = [./home/server.nix];
+  home-manager.users.${user.me.username}.imports = [
+    ./home/server.nix
+    ../modules/home-manager/common/git-agentless-signing.nix
+  ];
 }
