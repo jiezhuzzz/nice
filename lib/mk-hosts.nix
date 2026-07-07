@@ -45,6 +45,7 @@
         modules
         ++ [
           inputs.home-manager.darwinModules.home-manager
+          inputs.agenix.darwinModules.default
           hmSystemWiring
           {nixpkgs.config.allowUnfree = true;}
         ];
