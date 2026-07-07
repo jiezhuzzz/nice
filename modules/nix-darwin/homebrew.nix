@@ -68,7 +68,6 @@
       "thebrowsercompany-dia"
       "tor-browser"
       "ungoogled-chromium"
-      #"zed"
       "zen"
       "zoom"
       "zotero"
