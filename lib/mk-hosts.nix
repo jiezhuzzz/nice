@@ -34,6 +34,9 @@
           {
             nixpkgs.config.allowUnfree = true;
             nix.settings.experimental-features = ["nix-command" "flakes"];
+            catppuccin.enable = true;
+            catppuccin.autoEnable = true;
+            catppuccin.flavor = user.theme.flavor;
           }
         ];
     };

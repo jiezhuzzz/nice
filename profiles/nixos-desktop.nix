@@ -20,10 +20,6 @@
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
-  catppuccin.enable = true;
-  catppuccin.autoEnable = true;
-  catppuccin.flavor = user.theme.flavor;
-
   networking.networkmanager.enable = true;
 
   users.users.${user.me.username} = {
