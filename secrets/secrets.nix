@@ -28,4 +28,7 @@ in {
   "ssh/home.age".publicKeys = allRecipients;
   "rclone/gdrive.age".publicKeys = allRecipients;
   "rclone/box.age".publicKeys = allRecipients;
+  # Glance's air-quality widget (WAQI API token). Only nixmachine runs glance;
+  # password-manager is kept as the editing/recovery recipient.
+  "glance/waqi-token.age".publicKeys = [nixmachine password-manager];
 }
