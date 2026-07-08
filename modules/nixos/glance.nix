@@ -22,14 +22,10 @@ _: {
               size = "small";
               widgets = [
                 {
-                  type = "clock";
-                  "hour-format" = "12h";
-                }
-                {
                   type = "weather";
                   location = "Chicago, Illinois, United States";
-                  units = "imperial";
-                  "hour-format" = "12h";
+                  units = "metric";
+                  "hour-format" = "24h";
                 }
               ];
             }
