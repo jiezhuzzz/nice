@@ -107,6 +107,45 @@ def test_no_video_files_unfiled(tmp_path):
     assert results and all(r.action == "unfiled" for r in results)
 
 
+def test_excluded_download_dir_skipped(tmp_path, monkeypatch):
+    # A torrent that landed in the excluded downloads dir is left alone, even
+    # though its name would otherwise file confidently as a movie.
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    xxx = dl / "xxx"
+    monkeypatch.setattr(filer, "EXCLUDED_DOWNLOAD_DIRS", (xxx,))
+    src = xxx / "The.Matrix.1999.1080p.BluRay-GRP"
+    _mk(src / "the.matrix.1999.1080p.mkv", 8192)
+    results = filer.process_job(_job(xxx, src.name), root=root, classify=never_agent)
+    assert results and all(r.action == "skipped" for r in results)
+    assert not list(root.rglob("*.mkv"))  # nothing hardlinked into the library
+
+
+def test_excluded_download_subdir_skipped(tmp_path, monkeypatch):
+    # Descendants of an excluded dir are excluded too (e.g. per-studio subfolders).
+    root = tmp_path / "media"
+    dl = tmp_path / "dl"
+    xxx = dl / "xxx"
+    monkeypatch.setattr(filer, "EXCLUDED_DOWNLOAD_DIRS", (xxx,))
+    sub = xxx / "studio"
+    src = sub / "The.Matrix.1999.1080p-GRP"
+    _mk(src / "the.matrix.1999.mkv", 8192)
+    results = filer.process_job(_job(sub, src.name), root=root, classify=never_agent)
+    assert results and all(r.action == "skipped" for r in results)
+    assert not list(root.rglob("*.mkv"))
+
+
+def test_default_excludes_xxx_downloads(tmp_path):
+    # The shipped default keeps /tank/media/downloads/xxx out of the library and
+    # short-circuits before touching the filesystem (the src need not exist).
+    root = tmp_path / "media"
+    results = filer.process_job(
+        _job("/tank/media/downloads/xxx", "Some.Movie.2020.1080p-GRP"),
+        root=root, classify=never_agent,
+    )
+    assert results and all(r.action == "skipped" for r in results)
+
+
 def test_anime_absolute_episode(tmp_path):
     # agent resolves anime; file uses absolute numbering (no season) -> anime/Show/Show - N.ext
     root = tmp_path / "media"

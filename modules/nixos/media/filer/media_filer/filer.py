@@ -18,10 +18,16 @@ _SAMPLE = re.compile(r"(?i)(^|[\W_])(sample|trailer|extras?)([\W_]|$)")
 MIN_VIDEO_BYTES = 100 * 1024 * 1024  # 100 MB — below this is treated as a sample
 _LABEL_CATS = {"movie", "tv", "anime"}
 
+# Downloads routed into one of these dirs are intentionally kept out of the
+# Jellyfin library (e.g. adult content, which lives in its own place). A torrent
+# whose download dir is one of these — or a descendant — is skipped without
+# hardlinking. Route such torrents by setting their download location here.
+EXCLUDED_DOWNLOAD_DIRS = (layout.MEDIA_ROOT / "downloads" / "xxx",)
+
 
 @dataclass
 class Result:
-    action: str  # "linked" | "exists" | "unfiled" | "conflict"
+    action: str  # "linked" | "exists" | "unfiled" | "conflict" | "error" | "skipped"
     src: str
     dest: str | None
     reason: str | None = None
@@ -39,6 +45,10 @@ def _video_files(root: Path) -> list[Path]:
             continue
         out.append(p)
     return out
+
+
+def _is_excluded(src_dir: Path) -> bool:
+    return any(layout.is_inside(src_dir, d) for d in EXCLUDED_DOWNLOAD_DIRS)
 
 
 def _label_category(labels: str) -> str | None:
@@ -101,7 +111,11 @@ def _file_episode(fname: str, tracker: str | None = None) -> tuple[int | None, i
 def process_job(env: dict, *, root: Path = layout.MEDIA_ROOT,
                 classify=agent_mod.classify, link=hardlink_mod.hardlink) -> list[Result]:
     name = env["TR_TORRENT_NAME"]
-    src_root = Path(env["TR_TORRENT_DIR"]) / name
+    src_dir = Path(env["TR_TORRENT_DIR"])
+    src_root = src_dir / name
+    if _is_excluded(src_dir):
+        log.info("skipped: %s (excluded download dir %s)", name, src_dir)
+        return [Result("skipped", str(src_root), None, "excluded download dir")]
     labels = env.get("TR_TORRENT_LABELS", "")
     tracker = trackers.tracker_for(env.get("TR_TORRENT_TRACKERS", ""))
 
