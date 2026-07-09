@@ -1,5 +1,5 @@
 # Glance — lightweight self-hosted dashboard for the homelab. A single "glanceable"
-# landing page: news feeds (Hacker News, Reddit, Lobsters, RSS) plus a monitor
+# landing page: news feeds (Hacker News, Lobsters, RSS) plus a monitor
 # widget that health-checks and links to the other web UIs on this box by their
 # mDNS names (nixmachine.local — see ./mdns.nix) rather than a DHCP-assigned IP.
 # Native NixOS service; binds 0.0.0.0, so the nftables input rule restricts it to
@@ -91,10 +91,6 @@
               size = "full";
               widgets = [
                 {type = "hacker-news";}
-                {
-                  type = "reddit";
-                  subreddit = "programming+selfhosted";
-                }
                 {type = "lobsters";}
                 {
                   type = "rss";

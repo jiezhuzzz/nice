@@ -189,10 +189,11 @@ in {
     '';
     plugins = [
       (pkgs.fetchFromGitHub {
-        owner = "obra";
+        owner = "jiezhuzzz";
         repo = "superpowers";
-        rev = "v5.1.0";
-        sha256 = "dc4deb3ba851f3b2547d2dd757511aa33e920d639fb65796bcdf543cd144323c";
+        # feat/modern branch, pinned to a commit for reproducibility
+        rev = "ebfb33ff491e3b7cb3ce257f99e00c0645ec8b17";
+        sha256 = "20021101d89002e891a03ba4bd661ba5a0113bb99c2b30d919e2d10366d4565c";
         name = "superpowers";
       })
       "${claude-plugins-official}/plugins/skill-creator"
@@ -201,8 +202,8 @@ in {
       "${claude-plugins-official}/plugins/code-simplifier"
       "${claude-plugins-official}/plugins/ralph-loop"
       "${codex-plugin-cc}/plugins/codex"
-      "${ast-grep-skill}/ast-grep"
-      ../../../agents/plugins/research-writing
+      # "${ast-grep-skill}/ast-grep"
+      # ../../../agents/plugins/research-writing
     ];
   };
 }
