@@ -5,6 +5,10 @@
       enable = true;
     };
     settings = {
+      config-version = 2;
+      # v2 no longer infers persistent workspaces from keybindings — declare the
+      # five named workspaces explicitly so they stay alive even when empty.
+      persistent-workspaces = ["T" "B" "E" "C" "M"];
       enable-normalization-flatten-containers = true;
       enable-normalization-opposite-orientation-for-nested-containers = true;
       accordion-padding = 30;
@@ -46,6 +50,7 @@
         # Catch-all: anything not matched above floats by default.
         # Specific rules win because aerospace stops at the first match.
         {
+          "if" = "true";
           run = "layout floating";
         }
       ];
