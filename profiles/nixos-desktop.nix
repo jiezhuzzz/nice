@@ -11,6 +11,7 @@
     ../modules/nixos/hardware
     ../modules/nixos/desktop
     ../modules/nixos/secrets.nix
+    ../modules/nixos/tailscale.nix
   ];
 
   programs.fish.enable = true;
