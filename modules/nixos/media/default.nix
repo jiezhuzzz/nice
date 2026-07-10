@@ -1,12 +1,11 @@
 # Media stack for nixmachine: shared storage/permissions, Transmission,
-# Jellyfin, MetaTube, and the LAN-only firewall rules that front them.
+# Jellyfin, and MetaTube. Firewall holes live with each service module.
 {...}: {
   imports = [
     ./storage.nix
     ./transmission.nix
     ./jellyfin.nix
     ./metatube.nix
-    ./firewall.nix
     ./filer.nix
   ];
 }

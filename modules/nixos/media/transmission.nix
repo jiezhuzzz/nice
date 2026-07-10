@@ -1,7 +1,7 @@
 # Transmission — BitTorrent daemon. Downloads land on the tank pool under the
-# media dataset. RPC/web UI is restricted to the home LAN with no password
-# (network-trust model); the LAN firewall rule for port 9091 lives in
-# ./firewall.nix. The module auto-adds download-dir and incomplete-dir to the
+# media dataset. RPC/web UI has no password; openRPCPort admits 9091 and the
+# app-level rpc-whitelist below (127.0.0.1 + LAN) is the real gate. The
+# module auto-adds download-dir and incomplete-dir to the
 # unit's ReadWritePaths and creates them owned by the `transmission` user, so
 # writing under /tank/media needs no chown.
 #
@@ -13,6 +13,7 @@ _: {
   services.transmission = {
     enable = true;
     openFirewall = true; # peer port 51413 (tcp+udp)
+    openRPCPort = true; # web UI / RPC 9091 (app-level rpc-whitelist still applies)
     settings = {
       umask = 2; # octal 002 — downloaded files land group-writable (group `media`)
       download-dir = "/tank/media/downloads";

@@ -50,6 +50,12 @@
   # Wired DHCP; headless box, so no NetworkManager.
   networking.useDHCP = lib.mkDefault true;
 
+  # nftables firewall backend. The remaining extraInputRules (stirling-pdf,
+  # karakeep — no upstream openFirewall option) require it, and it's the
+  # modern backend regardless. Was set in modules/nixos/media/firewall.nix
+  # before the per-service openFirewall migration.
+  networking.nftables.enable = true;
+
   # Headless access — key-only, no password over SSH (jie has an authorized key
   # below). The console password (initialPassword) still works for physical
   # recovery.
