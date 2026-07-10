@@ -147,6 +147,11 @@
                       url = "http://nixmachine.local:8082";
                       icon = "di:stirling-pdf";
                     }
+                    {
+                      title = "Karakeep";
+                      url = "http://nixmachine.local:8084";
+                      icon = "di:karakeep";
+                    }
                   ];
                 }
               ];
