@@ -12,8 +12,8 @@
 # embeddings) run through the local LiteLLM gateway — see extraEnvironment below.
 #
 # The Next.js server binds 0.0.0.0; its default port 3000 is moved to 8084 to
-# sit alongside the other homelab web UIs (stirling 8082, glance 8083), and the
-# nftables input rule restricts it to the home LAN. Reachable at
+# sit alongside the other homelab web UIs (stirling 8082, glance 8083).
+# Reachable at
 # http://nixmachine.local:8084 — on the first visit, create the admin account
 # (sign-ups stay open until you add DISABLE_SIGNUPS = "true" below).
 _: {
@@ -45,8 +45,7 @@ _: {
     };
   };
 
-  # LAN-only, following the same nftables pattern as the other web UIs on this box.
-  networking.firewall.extraInputRules = ''
-    ip saddr 192.168.86.0/24 tcp dport 8084 accept
-  '';
+  # Upstream has no openFirewall option (the port is an opaque env var, so the
+  # module can't know it); allowedTCPPorts is exactly what openFirewall would do.
+  networking.firewall.allowedTCPPorts = [8084];
 }
