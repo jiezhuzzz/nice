@@ -2,9 +2,10 @@
 # landing page: news feeds (Hacker News, Lobsters, RSS) plus a monitor
 # widget that health-checks and links to the other web UIs on this box by their
 # mDNS names (nixmachine.local — see ./mdns.nix) rather than a DHCP-assigned IP.
-# Native NixOS service; binds 0.0.0.0, so the nftables input rule restricts it to
-# the home LAN, matching the other media/LLM UIs. Reachable at
-# http://nixmachine.local:8083. Feeds and links are plain data — edit freely.
+# Native NixOS service; binds 0.0.0.0 with openFirewall (any-source — the box
+# is NAT'd and the tailnet interface is trusted), matching the other web UIs.
+# Reachable at http://nixmachine.local:8083. Feeds and links are plain data —
+# edit freely.
 #
 # The air-quality widget (custom-api) hits the WAQI API; its free token is an
 # agenix secret (secrets/glance/waqi-token.age → WAQI_TOKEN), fed to the service
@@ -12,6 +13,7 @@
 {config, ...}: {
   services.glance = {
     enable = true;
+    openFirewall = true;
     # WAQI_TOKEN for the air-quality widget, via the module's EnvironmentFile.
     environmentFile = config.age.secrets.waqi-token.path;
     settings = {
@@ -171,9 +173,4 @@
     file = ../../secrets/glance/waqi-token.age;
     mode = "0400";
   };
-
-  # LAN-only, following the same nftables pattern as the other web UIs on this box.
-  networking.firewall.extraInputRules = ''
-    ip saddr 192.168.86.0/24 tcp dport 8083 accept
-  '';
 }
