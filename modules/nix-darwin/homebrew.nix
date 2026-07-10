@@ -65,6 +65,7 @@
       "skim"
       "squirrel-app"
       "stats"
+      "tailscale-app"
       "thebrowsercompany-dia"
       "tor-browser"
       "ungoogled-chromium"
