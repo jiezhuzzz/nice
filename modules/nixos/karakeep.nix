@@ -8,6 +8,9 @@
 # by the karakeep-init unit into /var/lib/karakeep/settings.env — no agenix
 # wiring required, unlike glance/litellm.
 #
+# AI features (bookmark auto-tagging, image tagging, and semantic-search
+# embeddings) run through the local LiteLLM gateway — see extraEnvironment below.
+#
 # The Next.js server binds 0.0.0.0; its default port 3000 is moved to 8084 to
 # sit alongside the other homelab web UIs (stirling 8082, glance 8083), and the
 # nftables input rule restricts it to the home LAN. Reachable at
@@ -20,6 +23,19 @@ _: {
       PORT = "8084";
       # This box is declaratively managed, so silence the in-app upgrade nag.
       DISABLE_NEW_RELEASE_CHECK = "true";
+
+      # ---- AI features via the local LiteLLM gateway (llm/litellm.nix, :4000) ----
+      # Karakeep speaks the OpenAI API; point it at LiteLLM, which fronts Claude
+      # and OpenAI. LiteLLM has no master key (localhost-only), so any non-empty
+      # key satisfies the OpenAI client — this is a placeholder, not a secret. If
+      # you ever set a LiteLLM master key, move OPENAI_API_KEY to an environmentFile.
+      OPENAI_BASE_URL = "http://127.0.0.1:4000/v1";
+      OPENAI_API_KEY = "litellm-local";
+      # Auto-tagging + image tagging on cheap/fast Haiku; embeddings (semantic
+      # search) on OpenAI text-embedding-3-small. Names match LiteLLM's model_list.
+      INFERENCE_TEXT_MODEL = "Claude Haiku 4.5";
+      INFERENCE_IMAGE_MODEL = "Claude Haiku 4.5";
+      EMBEDDING_TEXT_MODEL = "text-embedding-3-small";
     };
   };
 
