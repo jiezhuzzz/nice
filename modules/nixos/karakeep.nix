@@ -17,8 +17,14 @@
 # http://nixmachine.local:8084 — on the first visit, create the admin account
 # (sign-ups stay open until you add DISABLE_SIGNUPS = "true" below).
 _: {
+  # pnpm 9.15.9 is karakeep's build-time tool (used by karakeep-init to build the
+  # Next.js frontend); nixpkgs marked it insecure. The vuln is build-time only, so
+  # allow it here until upstream karakeep bumps its pnpm. Remove this when it does.
+  nixpkgs.config.permittedInsecurePackages = ["pnpm-9.15.9"];
+
   services.karakeep = {
     enable = true;
+    browser.enable = false;
     extraEnvironment = {
       PORT = "8084";
       # This box is declaratively managed, so silence the in-app upgrade nag.

@@ -11,5 +11,8 @@
   programs.ssh.settings."github.com" = {
     IdentityFile = "/run/agenix/github-ssh-key";
     IdentitiesOnly = true;
+    # Agent-free by design (see header): don't let a dead/forwarded agent
+    # socket hang `git push` — auth uses the key file directly.
+    IdentityAgent = "none";
   };
 }

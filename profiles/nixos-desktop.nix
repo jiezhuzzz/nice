@@ -17,6 +17,8 @@
 
   environment.systemPackages = with pkgs; [
     git
+    jq
+    wget
     inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 

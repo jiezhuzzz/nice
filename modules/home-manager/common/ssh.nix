@@ -20,6 +20,9 @@ _: {
       HostName = "github.com";
       User = "git";
     };
+    # Chameleon (user `cc`) is the ONLY place we forward the agent: you hop
+    # from the tacc gateway onto reserved bare-metal nodes (10.52.*.*) and use
+    # your keys there. No other host forwards — see ssh-identities.nix for why.
     settings."tacc" = {
       HostName = "129.114.108.248";
       User = "cc";

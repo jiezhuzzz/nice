@@ -108,6 +108,8 @@
     helix
     btop
     tmux
+    jq
+    wget
     alsa-utils # aplay -l / speaker-test to enumerate and test outputs
   ];
 
