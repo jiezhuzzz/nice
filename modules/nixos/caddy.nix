@@ -18,8 +18,8 @@
   services.caddy = {
     enable = true;
     # Stock caddy can't do Cloudflare DNS-01; withPlugins rebuilds it with the
-    # caddy-dns module baked in. Hash is TOFU: build once, copy the real hash
-    # from the mismatch error.
+    # caddy-dns module baked in. To bump the plugin: set hash = lib.fakeHash,
+    # rebuild, and copy the real hash from the mismatch error.
     package = pkgs.caddy.withPlugins {
       plugins = ["github.com/caddy-dns/cloudflare@v0.2.4"];
       hash = "sha256-hEHgAG0F0ozHRAPuxEqLyTATBrE+pajeXDiSNwniorg=";

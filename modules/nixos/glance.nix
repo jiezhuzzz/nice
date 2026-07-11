@@ -3,7 +3,7 @@
 # widget that health-checks and links to the other web UIs on this box by their
 # mDNS names (nixmachine.local — see ./mdns.nix) rather than a DHCP-assigned IP.
 # Native NixOS service; binds 0.0.0.0 with openFirewall (any-source — the box
-# is NAT'd and the tailnet interface is trusted), matching the other web UIs.
+# is NAT'd (v4) and ULA-only (v6) and the tailnet interface is trusted), matching the other web UIs.
 # Reachable at http://nixmachine.local:8083. Feeds and links are plain data —
 # edit freely.
 #

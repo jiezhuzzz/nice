@@ -24,6 +24,8 @@ _: {
       rpc-port = 9091;
       rpc-authentication-required = false; # trusted-LAN model
       rpc-whitelist-enabled = true;
+      # NOTE: direct tailnet access to :9091 (100.x source) is 403'd by this whitelist;
+      # remote use goes via transmission.jiezhu.me (caddy proxies from 127.0.0.1).
       rpc-whitelist = "127.0.0.1,192.168.86.*"; # app-level IP restriction
       rpc-host-whitelist-enabled = false; # avoid 403 when hitting the UI by IP
     };

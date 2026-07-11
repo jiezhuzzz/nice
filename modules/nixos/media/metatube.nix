@@ -4,7 +4,7 @@
 # The scraper engine + SQLite DB persist under /var/lib/metatube; a bare-path
 # `-dsn` selects SQLite and `-db-auto-migrate` creates/upgrades the schema on
 # start (idempotent). Published to 127.0.0.1 only — Jellyfin runs on this host
-# and reaches it at localhost:8080 — so firewall.nix stays closed for 8080.
+# and reaches it at localhost:8080 — so no firewall hole is needed for 8080.
 #
 # Image is pinned by digest for reproducibility; bump it deliberately (pull the
 # tag, then `podman inspect --format '{{index .RepoDigests 0}}'`).

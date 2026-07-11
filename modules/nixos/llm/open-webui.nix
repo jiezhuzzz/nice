@@ -1,6 +1,6 @@
 # Open WebUI — chat UI for LLMs. Talks to LiteLLM (127.0.0.1:4000) as its single
 # OpenAI-compatible backend, so it holds no real API keys — those live in
-# litellm.nix. Exposed on 8081 via openFirewall (any-source — the box is NAT'd
+# litellm.nix. Exposed on 8081 via openFirewall (any-source — the box is NAT'd (v4) and ULA-only (v6)
 # and the tailnet interface is trusted).
 # OPENAI_API_KEY here is a throwaway: Open WebUI only enables the connection when
 # the key is non-empty, and LiteLLM on localhost does no auth, so its value is
