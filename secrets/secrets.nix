@@ -31,4 +31,7 @@ in {
   # Glance's air-quality widget (WAQI API token). Only nixmachine runs glance;
   # password-manager is kept as the editing/recovery recipient.
   "glance/waqi-token.age".publicKeys = [nixmachine password-manager];
+  # Caddy's ACME DNS-01 token (Cloudflare, scoped to DNS edits on jiezhu.me).
+  # Only nixmachine runs caddy; password-manager is the editing/recovery recipient.
+  "caddy/cloudflare-token.age".publicKeys = [nixmachine password-manager];
 }
