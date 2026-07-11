@@ -50,6 +50,14 @@ in {
     IdentityFile = "/run/agenix/lab-ssh-key";
     IdentitiesOnly = true;
   };
+  # nixmachine over the tailnet (MagicDNS name) — same home key as the LAN
+  # block below, but works from anywhere the tailnet is up.
+  programs.ssh.settings."nixmachine" = {
+    HostName = "nixmachine.taile3de9d.ts.net";
+    User = "jie";
+    IdentityFile = "/run/agenix/home-ssh-key";
+    IdentitiesOnly = true;
+  };
   programs.ssh.settings."192.168.86.*" = {
     User = "jie";
     IdentityFile = "/run/agenix/home-ssh-key";
