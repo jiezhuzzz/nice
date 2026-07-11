@@ -30,6 +30,11 @@ _: {
       # This box is declaratively managed, so silence the in-app upgrade nag.
       DISABLE_NEW_RELEASE_CHECK = "true";
 
+      # Auth callbacks/redirects must match how the app is reached from
+      # outside — the HTTPS name served by caddy.nix. LAN-direct
+      # http://nixmachine.local:8084 may redirect logins to this URL.
+      NEXTAUTH_URL = "https://karakeep.jiezhu.me";
+
       # ---- AI features via the local LiteLLM gateway (llm/litellm.nix, :4000) ----
       # Karakeep speaks the OpenAI API; point it at LiteLLM, which fronts Claude
       # and OpenAI. LiteLLM has no master key (localhost-only), so any non-empty
