@@ -13,9 +13,9 @@
 #
 # The Next.js server binds 0.0.0.0; its default port 3000 is moved to 8084 to
 # sit alongside the other homelab web UIs (stirling 8082, glance 8083).
-# Reachable at
-# http://nixmachine.local:8084 — on the first visit, create the admin account
-# (sign-ups stay open until you add DISABLE_SIGNUPS = "true" below).
+# Use https://karakeep.jiezhu.me — NEXTAUTH_URL below makes auth cookies
+# Secure-only, so logging in over plain http://nixmachine.local:8084 fails.
+# The admin account exists; sign-ups are disabled (DISABLE_SIGNUPS below).
 _: {
   # pnpm 9.15.9 is karakeep's build-time tool (used by karakeep-init to build the
   # Next.js frontend); nixpkgs marked it insecure. The vuln is build-time only, so
@@ -29,6 +29,9 @@ _: {
       PORT = "8084";
       # This box is declaratively managed, so silence the in-app upgrade nag.
       DISABLE_NEW_RELEASE_CHECK = "true";
+      # Single-user instance and the admin account exists — don't let anyone
+      # on the LAN/tailnet register more accounts.
+      DISABLE_SIGNUPS = "true";
 
       # Auth callbacks/redirects must match how the app is reached from
       # outside — the HTTPS name served by caddy.nix. LAN-direct
