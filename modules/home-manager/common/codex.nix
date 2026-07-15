@@ -100,7 +100,7 @@ in {
       ];
       # Always use the highest reasoning effort.
       # Valid: minimal | low | medium | high | xhigh.
-      model_reasoning_effort = "xhigh";
+      model_reasoning_effort = "high";
       # model = "gpt-5.5";
       #
       # The US-region API profile is intentionally NOT defined here: Codex

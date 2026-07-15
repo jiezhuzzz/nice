@@ -33,6 +33,8 @@
   home.preferXdgDirectories = true;
   xdg.enable = true;
   home.sessionVariables.CARGO_HOME = "${config.xdg.dataHome}/cargo";
+  # Generic user-bin dir (npm --prefix, pipx, ad-hoc scripts) ahead of the profile.
+  home.sessionPath = ["${config.home.homeDirectory}/.local/bin"];
   programs.man.generateCaches = false;
   programs.home-manager.enable = true;
   home.stateVersion = "26.05";

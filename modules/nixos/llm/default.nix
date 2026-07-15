@@ -3,7 +3,6 @@
 {...}: {
   imports = [
     ./langgraph-testfix.nix # nixpkgs workaround so open-webui's langgraph dep builds
-    ./ctranslate2-hashfix.nix # nixpkgs workaround: ctranslate2 stale src hash
     ./litellm.nix
     ./open-webui.nix
   ];

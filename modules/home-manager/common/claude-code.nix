@@ -130,7 +130,7 @@ in {
         # and ignores the persisted effortLevel until effort is changed interactively
         # once — which never happens here because settings.json is a read-only Nix
         # symlink (/effort writes fail with EACCES). The env var bypasses the pin.
-        CLAUDE_CODE_EFFORT_LEVEL = "xhigh";
+        # CLAUDE_CODE_EFFORT_LEVEL = "xhigh";
         CLAUDE_CODE_PLUGIN_CACHE_DIR = "${config.xdg.cacheHome}/claude/plugins";
         CLAUDE_CODE_DEBUG_LOGS_DIR = "${config.xdg.stateHome}/claude/logs";
         CLAUDE_CODE_TMPDIR = "/tmp/claude-code-${config.home.username}";

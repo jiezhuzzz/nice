@@ -1,12 +1,19 @@
 # Stirling PDF — self-hosted PDF toolkit (merge/split/OCR/convert/sign, etc.).
 # Native NixOS service (DynamicUser); the module bundles the full PDF toolchain
 # (libreoffice, ocrmypdf, tesseract, ghostscript, qpdf, ...). Configured via env
-# vars. Default port 8080 clashes with metatube, so use 8082. No login/secrets —
-# a stateless tool; advanced-ops/Calibre left off to keep the closure lean.
+# vars. Default port 8080 clashes with metatube, so use 8082. Stateless tool;
+# advanced-ops/Calibre left off to keep the closure lean.
+#
+# v2 ships with security.enableLogin=true by default (login/account subsystem is
+# compiled in), so we disable it via SECURITY_ENABLELOGIN — single-user tool
+# behind the firewall/tailnet, no auth needed.
 _: {
   services.stirling-pdf = {
     enable = true;
-    environment.SERVER_PORT = 8082;
+    environment = {
+      SERVER_PORT = 8082;
+      SECURITY_ENABLELOGIN = "false";
+    };
   };
 
   # Upstream has no openFirewall option (the port is an opaque env var, so the

@@ -44,17 +44,10 @@
 
     # Declarative Homebrew install (complements nix-darwin's `homebrew` state mgmt).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    # Override brew-src (nix-homebrew's own pin lags behind the homebrew-cask/
-    # core taps, causing DSL incompatibilities) — but PIN it instead of tracking
-    # HEAD. Homebrew commit f0858cca0 ("utils/path: trust symlinked cellar
-    # roots") wrapped the allowed Taps root in `.realpath`. With mutableTaps =
-    # false, nix-homebrew points /opt/homebrew/Library/Taps at a `taps-env`
-    # store path while each tap symlinks to its own per-tap source store path,
-    # so the realpath'd root no longer prefix-matches the casks and
-    # `brew bundle` rejects every cask ("Homebrew requires casks to be in a
-    # tap"). 28d1032 is the last rev before that change; bump past it only once
-    # upstream fixes the regression (HEAD still carries it as of 2026-06).
-    nix-homebrew.inputs.brew-src.url = "github:Homebrew/brew/28d1032df297777442cf84e97af72c87d3d98ac3";
+    # brew-src follows nix-homebrew's own default. It was previously pinned to
+    # brew 28d1032 to dodge a symlinked-taps regression (casks rejected as "not
+    # in a tap"); nix-homebrew fixed that in PR #150 and now defaults to brew
+    # 6.x, so the override is gone. Re-pin here only if the default regresses.
 
     # Brew taps pinned via flake.lock (mutableTaps = false).
     homebrew-core = {

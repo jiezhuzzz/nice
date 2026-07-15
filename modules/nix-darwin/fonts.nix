@@ -15,8 +15,9 @@
     source-han-serif
 
     # Emoji
-    # Disabled: pulls in afdko, whose test suite crashes on aarch64-darwin
-    # and fails the build (upstream adobe-type-tools/afdko#1216).
-    # noto-fonts-color-emoji
+    # afdko#1216 (the aarch64 test crash that blocked this) is fixed upstream;
+    # nixpkgs afdko 5.0.1 handles arch-specific tests. Re-pin/disable only if a
+    # darwin-rebuild build starts failing in the afdko dependency again.
+    noto-fonts-color-emoji
   ];
 }
