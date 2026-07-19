@@ -73,6 +73,13 @@
     wants = ["generate-sb-keys.service"];
   };
 
+  # Unlock cryptroot from the TPM2 keyslot sealed to PCR 7, which measures
+  # Secure Boot state and so survives kernel and generation updates without
+  # re-enrolling. Enrolled imperatively (systemd-cryptenroll writes to the
+  # LUKS header, not to Nix): keyslot 0 keeps the passphrase as the fallback,
+  # keyslot 1 holds the TPM2 token.
+  boot.initrd.luks.devices."cryptroot".crypttabExtraOpts = ["tpm2-device=auto"];
+
   # sbctl inspects/verifies Secure Boot state. efibootmgr edits the firmware
   # boot entries that bootctl can only report on — the repair tool if
   # enrollment leaves the machine booting the wrong entry.
