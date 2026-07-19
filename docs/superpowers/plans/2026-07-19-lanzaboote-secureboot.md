@@ -54,9 +54,9 @@ Record the current generation number. You may need it to roll back.
 
 ---
 
-### Task 1: Switch to the systemd initrd
+### Task 1: Pin the systemd initrd explicitly
 
-This is the riskiest change in the plan and it is deliberately isolated. It swaps the entire initrd implementation on a LUKS-rooted machine. Plymouth renders the LUKS prompt differently under systemd initrd, so expect a possible cosmetic change; a functional failure is possible and is exactly why this ships alone.
+> **Revised 2026-07-19 during execution — this task is a no-op.** It was written as "the riskiest change in the plan," on the assumption that it swapped the initrd implementation. Verification showed otherwise: nixpkgs 26.11 already defaults `boot.initrd.systemd.enable` to `true` (`nixos/modules/system/boot/systemd/initrd.nix:196`), nothing in this repo overrides it, and `systemd-analyze` on the running `nixps` reports an initrd phase — so the machine is already there. The line is still worth setting, as an explicit pin of a prerequisite that TPM2 unlock depends on, but it changes no behavior. **Steps 5 and 6 below (the reboot checkpoint) are therefore unnecessary and were skipped.**
 
 **Files:**
 - Create: `modules/nixos/secureboot.nix`

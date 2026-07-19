@@ -110,7 +110,7 @@ Enrollment and TPM sealing are separate commits rather than one, because they fa
 
 ## Risks
 
-- **`boot.initrd.systemd.enable = true` is the riskiest line**, not Lanzaboote. It swaps the entire initrd implementation on a LUKS-rooted machine. Plymouth handles the LUKS prompt differently under systemd initrd, so a cosmetic regression is likely and a functional one is possible. Land and reboot on this by itself first.
+- ~~**`boot.initrd.systemd.enable = true` is the riskiest line.**~~ **Retracted 2026-07-19 after verification.** nixpkgs 26.11 defaults this option to `true` (`nixos/modules/system/boot/systemd/initrd.nix:196`), nothing in this repo overrides it, and `systemd-analyze` on the running `nixps` already reports an initrd phase. The machine is *already* on the systemd initrd, so there is no initrd swap and no associated reboot risk. The option is still set explicitly, as a deliberate pin: TPM2 unlock depends on it, and a future nixpkgs default flip would otherwise break unlock silently.
 - **Old generations become unbootable once Secure Boot is on.** Generations built before Lanzaboote are unsigned, so the boot-menu rollback escape hatch does not cover them. Recovery is disabling Secure Boot in BIOS, or a NixOS installer USB — have one made before step 7.
 - **`sbctl enroll-keys` in setup mode is the hardest step to undo.** Clearing factory keys is reversible via "Restore Factory Keys" on most MSI/Dell firmware; confirm this machine's BIOS exposes it before step 5.
 

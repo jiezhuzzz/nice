@@ -5,6 +5,7 @@
 }: {
   imports = [
     ../../../profiles/nixos-desktop.nix
+    ../../../modules/nixos/secureboot.nix
     ./hardware.nix
   ];
 
