@@ -2,7 +2,7 @@
   imports = [inputs.xremap-flake.nixosModules.default];
 
   services.xremap = {
-    enable = true;
+    enable = false;
     withWlroots = true;
     deviceNames = ["kanata"];
     config.keymap = [
