@@ -3,11 +3,18 @@
 # Imported by hosts/nixos/nixps/default.nix only — nixmachine has no LUKS
 # root and stays on plain systemd-boot.
 #
-# One-time firmware step, not expressible in Nix:
-#   BIOS (Del) -> Settings -> Security -> Secure Boot -> Custom mode
-#   -> Delete All Secure Boot Variables   (puts the firmware in setup mode)
-# systemd-boot can only auto-enroll our keys while the firmware is in setup
-# mode. `Restore Factory Keys` in the same menu is the way back.
+# One-time firmware step, not expressible in Nix. On this Dell the relevant
+# menu is Secure Boot -> Enable Custom Mode -> Custom Mode Key Management.
+# Clearing the enrolled PK there puts the firmware in setup mode, which is
+# the only state in which systemd-boot will auto-enroll our keys.
+#
+# As shipped the machine has builtin-PK/KEK/db plus microsoft (`sbctl status`),
+# and clearing them destroys Dell's OEM certificates — hence
+# includeFirmwareBuiltinKeys below, so enrollment puts them back.
+#
+# Recovery is disabling Secure Boot in the firmware, which is always
+# available and does not depend on restoring the factory keys. Note the NixOS
+# install medium is unsigned and will NOT boot while Secure Boot is active.
 {
   config,
   inputs,
