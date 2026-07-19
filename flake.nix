@@ -42,9 +42,15 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Signed boot (UEFI Secure Boot) for nixps. v1.1.0 provides
-    # autoGenerateKeys/autoEnrollKeys; see modules/nixos/secureboot.nix.
-    lanzaboote.url = "github:nix-community/lanzaboote/v1.1.0";
+    # Signed boot (UEFI Secure Boot) for nixps; see modules/nixos/secureboot.nix.
+    #
+    # Pinned past v1.1.0 to an explicit master rev, not a branch: only master
+    # has autoEnrollKeys.includeFirmwareBuiltinKeys, which this Dell needs to
+    # retain its OEM certificates through enrollment so fwupd firmware updates
+    # keep working. An exact rev keeps `nix flake update` from silently moving
+    # unreleased code in the boot path. Move back to a tag once one ships with
+    # that option.
+    lanzaboote.url = "github:nix-community/lanzaboote/6183ac79eadb079a1e72fa2c60915601be669100";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
 
     # Declarative Homebrew install (complements nix-darwin's `homebrew` state mgmt).
