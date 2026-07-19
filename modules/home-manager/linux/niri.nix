@@ -49,6 +49,20 @@
     }
     screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
     prefer-no-csd
+    // noctalia-shell provides the bar, notifications and control centre.
+    // Upstream deprecated the systemd user service in favour of this.
+    // https://docs.noctalia.dev/getting-started/compositor-settings/niri/
+    spawn-at-startup "noctalia-shell"
+    // Required by noctalia: lets it act on notification buttons and raise
+    // windows, which otherwise fail the xdg-activation serial check.
+    debug {
+        honor-xdg-activation-with-invalid-serial
+    }
+    // Draws the overview wallpaper behind noctalia's overview layer.
+    layer-rule {
+        match namespace="^noctalia-overview*"
+        place-within-backdrop true
+    }
     layout {
         gaps 8
         struts {
