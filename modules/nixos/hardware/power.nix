@@ -1,9 +1,8 @@
 _: {
   # Lid close behavior
-  # TODO: revert to suspend when s2idle works on Panther Lake (kernel 7.0+)
   services.logind.settings.Login = {
-    HandleLidSwitch = "lock";
-    HandleLidSwitchExternalPower = "lock";
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "suspend";
     HandleLidSwitchDocked = "ignore";
   };
 
