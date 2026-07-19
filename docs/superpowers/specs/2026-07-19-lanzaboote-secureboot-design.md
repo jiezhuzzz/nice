@@ -92,8 +92,13 @@ Ordering is load-bearing. PCR 7 measures Secure Boot state, so TPM enrollment mu
 4. BIOS → Secure Boot → Custom mode → *Delete All Secure Boot Variables* (setup mode)
 5. Enable `autoEnrollKeys.enable = true`, rebuild, reboot — systemd-boot enrolls the keys during that boot
 6. `bootctl status` → confirm `Secure Boot: enabled (user)`; enable Secure Boot in BIOS if the firmware left it off
-7. **Only now:** `sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-uuid/567ccf9f-ee66-4985-aa2c-e9850a0198e9`
-8. Reboot; confirm passphrase-less unlock, then test the fallback by declining the TPM
+7. **Reboot again before sealing.** This step is not optional and is easy to miss. PCR 7 is measured by firmware early in boot and then frozen for that boot. In the boot where systemd-boot performs enrolment, firmware has *already* measured PCR 7 against the pre-enrolment state — so `sbctl status` will correctly report `Secure Boot: enabled` (it reads EFI variables, which did change) while PCR 7 still holds the old value. Sealing there binds a stale measurement, and the next boot fails with `TPM policy does not match current system state`. A reboot forces firmware to re-measure PCR 7 against the enrolled state.
+8. **Only now:** `sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-uuid/567ccf9f-ee66-4985-aa2c-e9850a0198e9`
+9. Reboot; confirm passphrase-less unlock, then test the fallback by declining the TPM
+
+**Outcome (2026-07-19): implemented and verified.** Secure Boot reports `enabled (deployed)` — enrolling a PK from Audit Mode transitions this Dell straight to Deployed Mode, so re-enrolment requires the BIOS key-clear path rather than anything from the OS. `--firmware-builtin` successfully restored `builtin-db`/`builtin-KEK`. TPM unlock cut the initrd from 14.6s to 4.3s with zero policy-mismatch errors, and PCR 7 proved stable across reboots.
+
+The PCR 7 timing trap in step 7 was hit during implementation, exactly as described: sealing happened in the enrolment boot, and the following boot failed with `TPM policy does not match current system state`. The fix was re-sealing with `--wipe-slot=tpm2` once the system had rebooted into its steady state. Note `systemd-cryptenroll` refuses to re-enrol an identical PCR set ("This PCR set is already enrolled, executing no operation"), so changing an existing enrolment means wiping first.
 
 Splitting `autoGenerateKeys` (step 2) from `autoEnrollKeys` (step 5) is deliberate: it puts `sbctl verify` between key creation and any firmware modification, so signing is proven correct while the machine is still trivially recoverable.
 

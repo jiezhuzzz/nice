@@ -299,6 +299,19 @@ Ordering is load-bearing: PCR 7 measures Secure Boot state, so this must happen 
 Run: `systemd-analyze has-tpm2`
 Expected: `yes`. If not, stop — the rest of this task is impossible on this hardware.
 
+- [ ] **Step 1b: 🧑 HUMAN — Reboot before sealing (do not skip)**
+
+If Task 3's enrolment reboot is the boot you are currently in, reboot once more before sealing.
+
+PCR 7 is measured by firmware early in boot and frozen for that boot. The boot in which systemd-boot enrols keys had PCR 7 measured against the *pre*-enrolment state, so `sbctl status` reports `Secure Boot: enabled` (EFI variables did change) while PCR 7 still holds the old value. Sealing there binds a stale measurement and the next boot fails with:
+
+```
+systemd-cryptsetup: TPM policy does not match current system state.
+Either system has been tempered with or policy out-of-date: Operation not permitted
+```
+
+Recovery if you hit this: re-seal from the steady state with `--wipe-slot=tpm2` appended to the Step 2 command. Note `systemd-cryptenroll` no-ops on an identical PCR set, so an existing enrolment must be wiped rather than overwritten.
+
 - [ ] **Step 2: 🧑 HUMAN — Seal the LUKS key to PCR 7**
 
 ```bash
