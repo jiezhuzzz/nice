@@ -49,6 +49,13 @@
     }
     screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
     prefer-no-csd
+    // Rounded window corners, to match noctalia's shell surfaces.
+    // clip-to-geometry is required as well: without it the window contents
+    // still paint square corners underneath the rounded geometry.
+    window-rule {
+        geometry-corner-radius 12
+        clip-to-geometry true
+    }
     // noctalia-shell provides the bar, notifications and control centre.
     // Upstream deprecated the systemd user service in favour of this.
     // https://docs.noctalia.dev/getting-started/compositor-settings/niri/
