@@ -73,7 +73,7 @@
       "Alt+Q".action.close-window = {};
       "Alt+Shift+E".action.quit = {};
       "Alt+Shift+P".action.power-off-monitors = {};
-      "Alt+Shift+L".action.spawn = ["loginctl" "lock-session"];
+      "Alt+Shift+L".action.spawn = "swaylock";
 
       # Focus (arrow + vim keys share actions)
       "Alt+Left" = focusColLeft;

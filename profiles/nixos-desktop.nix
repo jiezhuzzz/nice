@@ -38,6 +38,7 @@
       ../modules/home-manager/linux/niri.nix
       ../modules/home-manager/linux/ghostty.nix
       ../modules/home-manager/linux/shpool.nix
+      ../modules/home-manager/linux/swaylock.nix
     ];
 
     home.pointerCursor = {
