@@ -78,6 +78,22 @@
   # re-enrolling. Enrolled imperatively (systemd-cryptenroll writes to the
   # LUKS header, not to Nix): keyslot 0 keeps the passphrase as the fallback,
   # keyslot 1 holds the TPM2 token.
+  #
+  # Anything that changes Secure Boot state — a firmware update, toggling
+  # Secure Boot, re-enrolling keys — changes PCR 7 and breaks the seal. The
+  # symptom is the passphrase prompt returning, with this in the journal:
+  #
+  #   systemd-cryptsetup: TPM policy does not match current system state.
+  #
+  # To re-seal, boot once into the new steady state (PCR 7 is measured early
+  # in boot and frozen, so sealing in the same boot as the change binds a
+  # stale value), then:
+  #
+  #   systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 \
+  #     --wipe-slot=tpm2 /dev/disk/by-uuid/567ccf9f-ee66-4985-aa2c-e9850a0198e9
+  #
+  # --wipe-slot is required: systemd-cryptenroll no-ops on an already
+  # enrolled PCR set rather than replacing it.
   boot.initrd.luks.devices."cryptroot".crypttabExtraOpts = ["tpm2-device=auto"];
 
   # sbctl inspects/verifies Secure Boot state. efibootmgr edits the firmware
