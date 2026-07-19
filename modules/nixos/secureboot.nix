@@ -9,6 +9,7 @@
 # systemd-boot can only auto-enroll our keys while the firmware is in setup
 # mode. `Restore Factory Keys` in the same menu is the way back.
 {
+  config,
   inputs,
   pkgs,
   lib,
@@ -35,6 +36,19 @@
   # already the nixpkgs default, so setting it changes nothing today — it is
   # pinned explicitly so a future default flip cannot silently break unlock.
   boot.initrd.systemd.enable = true;
+
+  # Workaround for a lanzaboote v1.1.0 ordering bug. Lanzaboote defines both
+  # `generate-sb-keys` (runs `sbctl create-keys`) and `fwupd-efi` (signs the
+  # fwupd EFI app with the key that unit produces), but orders `fwupd-efi`
+  # only `before = ["fwupd.service"]` — never after key generation. On a first
+  # activation both start in the same transaction, `sbctl create-keys` takes a
+  # few seconds, and `fwupd-efi` fails on the not-yet-existent db.key.
+  # Harmless once keys exist; needed on first activation and after any key
+  # regeneration. Remove if lanzaboote gains this dependency upstream.
+  systemd.services.fwupd-efi = lib.mkIf config.services.fwupd.enable {
+    after = ["generate-sb-keys.service"];
+    wants = ["generate-sb-keys.service"];
+  };
 
   # For inspecting and verifying Secure Boot state.
   environment.systemPackages = [pkgs.sbctl];
