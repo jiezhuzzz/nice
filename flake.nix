@@ -21,9 +21,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    zen-browser.url = "github:youwen5/zen-browser-flake";
-    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-
     xremap-flake.url = "github:xremap/nix-flake";
     xremap-flake.inputs.nixpkgs.follows = "nixpkgs";
 

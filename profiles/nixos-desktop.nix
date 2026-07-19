@@ -36,6 +36,7 @@
       ./home/desktop.nix
       ../modules/home-manager/linux/packages.nix
       ../modules/home-manager/linux/niri.nix
+      ../modules/home-manager/linux/chromium.nix
       ../modules/home-manager/linux/ghostty.nix
       ../modules/home-manager/linux/shpool.nix
       ../modules/home-manager/linux/swaylock.nix

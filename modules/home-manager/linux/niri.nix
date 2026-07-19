@@ -80,7 +80,7 @@
         Alt+3 { focus-workspace 3; }
         Alt+4 { focus-workspace 4; }
         // Apps
-        Alt+B hotkey-overlay-title="Browser: zen" { spawn "zen"; }
+        Alt+B hotkey-overlay-title="Browser: chromium" { spawn "chromium"; }
         Alt+D hotkey-overlay-title="App launcher: fuzzel" { spawn "fuzzel"; }
         Alt+T hotkey-overlay-title="Terminal: ghostty" { spawn "ghostty"; }
         // Focus (arrow + vim keys share actions)

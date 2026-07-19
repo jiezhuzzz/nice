@@ -1,8 +1,4 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ../../../profiles/nixos-desktop.nix
     ../../../modules/nixos/secureboot.nix
@@ -15,7 +11,6 @@
 
   environment.systemPackages = with pkgs; [
     wifitui
-    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   swapDevices = [

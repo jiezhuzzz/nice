@@ -7,8 +7,8 @@
     deviceNames = ["kanata"];
     config.keymap = [
       {
-        name = "Super-to-Ctrl for Zen";
-        application.only = ["zen"];
+        name = "Super-to-Ctrl for the browser";
+        application.only = ["chromium"];
         remap = {
           "Super_L-a" = "C-a";
           "Super_L-c" = "C-c";
