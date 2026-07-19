@@ -42,6 +42,11 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
 
+    # Signed boot (UEFI Secure Boot) for nixps. v1.1.0 provides
+    # autoGenerateKeys/autoEnrollKeys; see modules/nixos/secureboot.nix.
+    lanzaboote.url = "github:nix-community/lanzaboote/v1.1.0";
+    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
+
     # Declarative Homebrew install (complements nix-darwin's `homebrew` state mgmt).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     # brew-src follows nix-homebrew's own default. It was previously pinned to
