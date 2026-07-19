@@ -6,6 +6,11 @@
   imports = [inputs.niri-flake.homeModules.config];
 
   programs.niri.settings = {
+    cursor = {
+      theme = "Banana";
+      size = 32;
+    };
+
     input = {
       keyboard.xkb.layout = "us";
       touchpad = {

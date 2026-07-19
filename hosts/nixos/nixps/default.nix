@@ -14,7 +14,6 @@
 
   environment.systemPackages = with pkgs; [
     wifitui
-    banana-cursor
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 

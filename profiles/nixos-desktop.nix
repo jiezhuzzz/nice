@@ -44,7 +44,7 @@
     home.pointerCursor = {
       name = "Banana";
       package = pkgs.banana-cursor;
-      size = 32;
+      size = 64;
       gtk.enable = true;
     };
   };
