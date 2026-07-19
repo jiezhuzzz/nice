@@ -111,7 +111,8 @@ Enrollment and TPM sealing are separate commits rather than one, because they fa
 ## Risks
 
 - ~~**`boot.initrd.systemd.enable = true` is the riskiest line.**~~ **Retracted 2026-07-19 after verification.** nixpkgs 26.11 defaults this option to `true` (`nixos/modules/system/boot/systemd/initrd.nix:196`), nothing in this repo overrides it, and `systemd-analyze` on the running `nixps` already reports an initrd phase. The machine is *already* on the systemd initrd, so there is no initrd swap and no associated reboot risk. The option is still set explicitly, as a deliberate pin: TPM2 unlock depends on it, and a future nixpkgs default flip would otherwise break unlock silently.
-- **Old generations become unbootable once Secure Boot is on.** Generations built before Lanzaboote are unsigned, so the boot-menu rollback escape hatch does not cover them. Recovery is disabling Secure Boot in BIOS, or a NixOS installer USB — have one made before step 7.
+- **Old generations become unbootable once Secure Boot is on.** Generations built before Lanzaboote are unsigned, so the boot-menu rollback escape hatch does not cover them.
+- **Corrected 2026-07-19: the installer USB is not a rescue path under Secure Boot.** Lanzaboote's `docs/explanation/troubleshooting.md:52` states the NixOS install medium is unsigned and therefore cannot boot while Secure Boot is active. Earlier drafts of this spec listed it as a recovery option alongside disabling Secure Boot; that was wrong. **Disabling Secure Boot in firmware is the primary recovery mechanism**, and the USB is only usable after doing so. This raises the importance of confirming the BIOS exposes *Restore Factory Keys* before enrollment.
 - **`sbctl enroll-keys` in setup mode is the hardest step to undo.** Clearing factory keys is reversible via "Restore Factory Keys" on most MSI/Dell firmware; confirm this machine's BIOS exposes it before step 5.
 
 ## Verification

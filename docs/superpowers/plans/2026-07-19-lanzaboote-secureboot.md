@@ -39,7 +39,9 @@ Read this before starting. It is unlike a normal implementation plan:
 
 - [ ] **Step 1: Build a NixOS installer USB**
 
-Any recent NixOS ISO on a USB stick. This is the recovery path if Secure Boot rejects every generation.
+Any recent NixOS ISO on a USB stick.
+
+> **Corrected 2026-07-19.** This step originally called the USB "the recovery path if Secure Boot rejects every generation." That is wrong: Lanzaboote's `troubleshooting.md:52` notes the NixOS install medium is unsigned and **cannot boot while Secure Boot is active**. The USB is only usable *after* disabling Secure Boot in firmware, which makes **BIOS access the primary recovery mechanism** and the USB secondary. Step 2 below is therefore the more important half of this task.
 
 - [ ] **Step 2: Confirm the BIOS can restore factory keys**
 

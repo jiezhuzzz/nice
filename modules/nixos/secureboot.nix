@@ -50,6 +50,8 @@
     wants = ["generate-sb-keys.service"];
   };
 
-  # For inspecting and verifying Secure Boot state.
-  environment.systemPackages = [pkgs.sbctl];
+  # sbctl inspects/verifies Secure Boot state. efibootmgr edits the firmware
+  # boot entries that bootctl can only report on — the repair tool if
+  # enrollment leaves the machine booting the wrong entry.
+  environment.systemPackages = [pkgs.sbctl pkgs.efibootmgr];
 }
