@@ -1,137 +1,126 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: {
-  imports = [inputs.niri-flake.homeModules.config];
-
-  programs.niri.settings = {
-    cursor = {
-      theme = "Banana";
-      size = 32;
-    };
-
-    input = {
-      keyboard.xkb.layout = "us";
-      touchpad = {
-        tap = true;
-        natural-scroll = true;
-        # macOS-ish feel: adaptive accel, slightly slower base speed. Range -1.0 .. 1.0.
-        accel-profile = "adaptive";
-        accel-speed = -0.15;
-        scroll-factor = 0.5;
-      };
-      mouse = {
-        accel-profile = "adaptive";
-        accel-speed = -0.15;
-        scroll-factor = 0.5;
-      };
-    };
-
-    outputs."eDP-1" = {
-      # LG 14" 1920x1200 @ 120Hz, ~189 DPI
-      mode = {
-        width = 1920;
-        height = 1200;
-        refresh = 120.043;
-      };
-      scale = 1.25;
-      # variable-refresh-rate = true;  # causes cursor micro-stutter on this panel
-    };
-
-    layout = {
-      gaps = 8;
-      center-focused-column = "never";
-      preset-column-widths = [
-        {proportion = 0.33333;}
-        {proportion = 0.5;}
-        {proportion = 0.66667;}
-      ];
-      default-column-width = {proportion = 0.5;};
-      focus-ring.width = 2;
-    };
-
-    prefer-no-csd = true;
-    screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
-
-    binds = let
-      focusColLeft = {action.focus-column-left = {};};
-      focusColRight = {action.focus-column-right = {};};
-      focusWinUp = {action.focus-window-up = {};};
-      focusWinDown = {action.focus-window-down = {};};
-    in {
-      # Apps
-      "Alt+T" = {
-        action.spawn = "ghostty";
-        hotkey-overlay.title = "Terminal: ghostty";
-      };
-      "Alt+D" = {
-        action.spawn = "fuzzel";
-        hotkey-overlay.title = "App launcher: fuzzel";
-      };
-      "Alt+B" = {
-        action.spawn = "zen";
-        hotkey-overlay.title = "Browser: zen";
-      };
-
-      # Session
-      "Alt+Q".action.close-window = {};
-      "Alt+Shift+E".action.quit = {};
-      "Alt+Shift+P".action.power-off-monitors = {};
-      "Alt+Shift+L".action.spawn = "swaylock";
-
-      # Focus (arrow + vim keys share actions)
-      "Alt+Left" = focusColLeft;
-      "Alt+H" = focusColLeft;
-      "Alt+Right" = focusColRight;
-      "Alt+L" = focusColRight;
-      "Alt+Up" = focusWinUp;
-      "Alt+K" = focusWinUp;
-      "Alt+Down" = focusWinDown;
-      "Alt+J" = focusWinDown;
-
-      # Move
-      "Alt+Shift+Left".action.move-column-left = {};
-      "Alt+Shift+Right".action.move-column-right = {};
-      "Alt+Shift+Up".action.move-window-up = {};
-      "Alt+Shift+Down".action.move-window-down = {};
-
-      # Workspaces
-      "Alt+1".action.focus-workspace = 1;
-      "Alt+2".action.focus-workspace = 2;
-      "Alt+3".action.focus-workspace = 3;
-      "Alt+4".action.focus-workspace = 4;
-      "Alt+Shift+1".action.move-column-to-workspace = 1;
-      "Alt+Shift+2".action.move-column-to-workspace = 2;
-      "Alt+Shift+3".action.move-column-to-workspace = 3;
-      "Alt+Shift+4".action.move-column-to-workspace = 4;
-
-      # Column widths
-      "Alt+R".action.switch-preset-column-width = {};
-      "Alt+F".action.maximize-column = {};
-      "Alt+Shift+F".action.fullscreen-window = {};
-
-      # Screenshot
-      "Print".action.screenshot = {};
-      "Alt+Print".action.screenshot-window = {};
-
-      # Volume / brightness (laptop keys)
-      "XF86AudioRaiseVolume" = {
-        action.spawn = ["wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"];
-        allow-when-locked = true;
-      };
-      "XF86AudioLowerVolume" = {
-        action.spawn = ["wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"];
-        allow-when-locked = true;
-      };
-      "XF86AudioMute" = {
-        action.spawn = ["wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"];
-        allow-when-locked = true;
-      };
-      "XF86MonBrightnessUp".action.spawn = ["brightnessctl" "set" "10%+"];
-      "XF86MonBrightnessDown".action.spawn = ["brightnessctl" "set" "10%-"];
-    };
-  };
+{pkgs, ...}: {
+  # niri is enabled system-side by modules/nixos/desktop/niri.nix, which uses
+  # the nixpkgs module (programs.niri.enable). That module offers enable,
+  # package and useNautilus only — it has no config generator, and
+  # home-manager has no niri module upstream, so the compositor config is
+  # written here as literal KDL.
+  #
+  # This file previously used niri-flake's `programs.niri.settings`, which
+  # generated the KDL from typed Nix. Dropping that input removed four
+  # transitive lock entries and a version skew: niri-flake's home-manager
+  # module defaulted to niri 25.08 while the system actually runs the nixpkgs
+  # niri (26.04 at the time of the change). The cost is that this KDL is
+  # hand-maintained and unvalidated at eval time — `niri validate` is the
+  # check, and it runs in the flake's checks.
+  xdg.configFile."niri/config.kdl".text = ''
+    input {
+        keyboard {
+            xkb {
+                layout "us"
+                model ""
+                rules ""
+                variant ""
+            }
+            repeat-delay 600
+            repeat-rate 25
+            track-layout "global"
+        }
+        // macOS-ish feel: adaptive accel, slightly slower base speed.
+        // accel-speed range is -1.0 .. 1.0.
+        touchpad {
+            tap
+            natural-scroll
+            accel-speed -0.150000
+            accel-profile "adaptive"
+            scroll-factor 0.500000
+        }
+        mouse {
+            accel-speed -0.150000
+            accel-profile "adaptive"
+            scroll-factor 0.500000
+        }
+    }
+    // LG 14" 1920x1200 @ 120Hz, ~189 DPI.
+    // variable-refresh-rate causes cursor micro-stutter on this panel.
+    output "eDP-1" {
+        scale 1.250000
+        transform "normal"
+        mode "1920x1200@120.043000"
+    }
+    screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+    prefer-no-csd
+    layout {
+        gaps 8
+        struts {
+            left 0
+            right 0
+            top 0
+            bottom 0
+        }
+        focus-ring { width 2; }
+        border { off; }
+        default-column-width { proportion 0.500000; }
+        preset-column-widths {
+            proportion 0.333330
+            proportion 0.500000
+            proportion 0.666670
+        }
+        center-focused-column "never"
+    }
+    // Theme/size are kept in step with home.pointerCursor in
+    // profiles/nixos-desktop.nix; niri reads its own cursor setting.
+    cursor {
+        xcursor-theme "Banana"
+        xcursor-size 32
+    }
+    binds {
+        // Workspaces
+        Alt+1 { focus-workspace 1; }
+        Alt+2 { focus-workspace 2; }
+        Alt+3 { focus-workspace 3; }
+        Alt+4 { focus-workspace 4; }
+        // Apps
+        Alt+B hotkey-overlay-title="Browser: zen" { spawn "zen"; }
+        Alt+D hotkey-overlay-title="App launcher: fuzzel" { spawn "fuzzel"; }
+        Alt+T hotkey-overlay-title="Terminal: ghostty" { spawn "ghostty"; }
+        // Focus (arrow + vim keys share actions)
+        Alt+Down { focus-window-down; }
+        Alt+H { focus-column-left; }
+        Alt+J { focus-window-down; }
+        Alt+K { focus-window-up; }
+        Alt+L { focus-column-right; }
+        Alt+Left { focus-column-left; }
+        Alt+Right { focus-column-right; }
+        Alt+Up { focus-window-up; }
+        // Column widths
+        Alt+F { maximize-column; }
+        Alt+R { switch-preset-column-width; }
+        Alt+Shift+F { fullscreen-window; }
+        // Session
+        Alt+Q { close-window; }
+        Alt+Shift+E { quit; }
+        Alt+Shift+L { spawn "swaylock"; }
+        Alt+Shift+P { power-off-monitors; }
+        // Move
+        Alt+Shift+1 { move-column-to-workspace 1; }
+        Alt+Shift+2 { move-column-to-workspace 2; }
+        Alt+Shift+3 { move-column-to-workspace 3; }
+        Alt+Shift+4 { move-column-to-workspace 4; }
+        Alt+Shift+Down { move-window-down; }
+        Alt+Shift+Left { move-column-left; }
+        Alt+Shift+Right { move-column-right; }
+        Alt+Shift+Up { move-window-up; }
+        // Screenshot
+        Alt+Print { screenshot-window; }
+        Print { screenshot; }
+        // Volume / brightness (laptop keys)
+        XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+        XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+        XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+        XF86MonBrightnessDown { spawn "brightnessctl" "set" "10%-"; }
+        XF86MonBrightnessUp { spawn "brightnessctl" "set" "10%+"; }
+    }
+  '';
 
   # niri tools & niri's ecosystem companions.
   home.packages = with pkgs; [

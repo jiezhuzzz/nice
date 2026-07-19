@@ -27,10 +27,6 @@
     xremap-flake.url = "github:xremap/nix-flake";
     xremap-flake.inputs.nixpkgs.follows = "nixpkgs";
 
-    niri-flake.url = "github:sodiboo/niri-flake";
-    niri-flake.inputs.nixpkgs.follows = "nixpkgs";
-    niri-flake.inputs.nixpkgs-stable.follows = "nixpkgs";
-
     catppuccin.url = "github:catppuccin/nix";
 
     agenix.url = "github:ryantm/agenix";
