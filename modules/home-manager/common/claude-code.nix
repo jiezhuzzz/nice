@@ -21,6 +21,16 @@
     rev = "577f4d4507678f2c8cee150fae25e6ce309f70b1";
     sha256 = "2e0185b4f89ec8ab68aeedb60211d6f21be427c9021ced82afcac13961aec6f6";
   };
+  # Matt Pocock's skills, packaged as a plugin whose manifest sits at the repo
+  # root (marketplace.json source "./"), so the plugin path is the store root.
+  # Imperative equivalent: claude plugin marketplace add mattpocock/skills
+  #                        claude plugin install mattpocock-skills@mattpocock
+  mattpocock-skills = pkgs.fetchFromGitHub {
+    owner = "mattpocock";
+    repo = "skills";
+    rev = "9603c1cc8118d08bc1b3bf34cf714f62178dea3b";
+    sha256 = "4baa4044af7da061928ba5dd166eb360a1d3e208ce08dd3020f645725d614441";
+  };
   statusline = pkgs.writeShellScript "claude-statusline" ''
     input=$(cat)
     jq() { ${pkgs.jq}/bin/jq "$@"; }
@@ -188,20 +198,21 @@ in {
         automatically — but do not create or commit the file.
     '';
     plugins = [
-      (pkgs.fetchFromGitHub {
-        owner = "jiezhuzzz";
-        repo = "superpowers";
-        # feat/modern branch, pinned to a commit for reproducibility
-        rev = "ebfb33ff491e3b7cb3ce257f99e00c0645ec8b17";
-        sha256 = "20021101d89002e891a03ba4bd661ba5a0113bb99c2b30d919e2d10366d4565c";
-        name = "superpowers";
-      })
+      # (pkgs.fetchFromGitHub {
+      #   owner = "jiezhuzzz";
+      #   repo = "superpowers";
+      #   # feat/modern branch, pinned to a commit for reproducibility
+      #   rev = "ebfb33ff491e3b7cb3ce257f99e00c0645ec8b17";
+      #   sha256 = "20021101d89002e891a03ba4bd661ba5a0113bb99c2b30d919e2d10366d4565c";
+      #   name = "superpowers";
+      # })
       "${claude-plugins-official}/plugins/skill-creator"
       "${claude-plugins-official}/plugins/code-review"
       "${claude-plugins-official}/plugins/claude-code-setup"
       "${claude-plugins-official}/plugins/code-simplifier"
       "${claude-plugins-official}/plugins/ralph-loop"
       "${codex-plugin-cc}/plugins/codex"
+      "${mattpocock-skills}"
       # "${ast-grep-skill}/ast-grep"
       # ../../../agents/plugins/research-writing
     ];
