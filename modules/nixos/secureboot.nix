@@ -37,6 +37,22 @@
     # `generate-sb-keys` runs `sbctl create-keys` once, guarded on the
     # absence of /var/lib/sbctl/keys.
     autoGenerateKeys.enable = true;
+
+    # Writes PK/KEK/db .auth files to the ESP; systemd-boot performs the
+    # actual firmware enrollment on the next boot, and only while the
+    # firmware is in setup mode.
+    autoEnrollKeys = {
+      enable = true;
+      # Re-enrol Dell's OEM certificates. Deleting the PK to reach setup mode
+      # left builtin-db and builtin-KEK intact (`sbctl status`), and dropping
+      # them can break vendor firmware updates via fwupd.
+      includeFirmwareBuiltinKeys = true;
+      # includeMicrosoftKeys defaults to true and stays true — option ROMs on
+      # this machine may be signed with them.
+      #
+      # autoReboot stays off: the reboot that enrols is worth doing
+      # deliberately, not as a side effect of `nixos-rebuild switch`.
+    };
   };
 
   # The systemd-based initrd is a prerequisite for TPM2 LUKS unlock. This is
