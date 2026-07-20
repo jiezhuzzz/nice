@@ -105,7 +105,7 @@
         // Must match home.pointerCursor.size in profiles/nixos-desktop.nix:
         // niri stamps XCURSOR_SIZE onto every client it spawns, so this value
         // wins over the one home-manager exports.
-        xcursor-size 64
+        xcursor-size 40
     }
     binds {
         // Workspaces
