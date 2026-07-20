@@ -5,5 +5,6 @@
     ./bluetooth.nix
     ./firmware.nix
     ./kanata.nix
+    ./touchpad.nix
   ];
 }
