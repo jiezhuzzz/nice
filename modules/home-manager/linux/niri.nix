@@ -29,6 +29,14 @@
         // accel-speed range is -1.0 .. 1.0.
         touchpad {
             tap
+            // Tap-and-drag: tap, then hold on the second tap to drag. Needed
+            // for text selection without holding the pad down.
+            drag true
+            // clickfinger over libinput's button-areas default: press anywhere
+            // with one finger for left click, two fingers for right click,
+            // as on macOS. button-areas instead reserves the bottom-right
+            // corner for right click, which is easy to miss.
+            click-method "clickfinger"
             natural-scroll
             accel-speed -0.150000
             accel-profile "adaptive"
