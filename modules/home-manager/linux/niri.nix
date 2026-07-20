@@ -102,7 +102,10 @@
     // profiles/nixos-desktop.nix; niri reads its own cursor setting.
     cursor {
         xcursor-theme "Banana"
-        xcursor-size 32
+        // Must match home.pointerCursor.size in profiles/nixos-desktop.nix:
+        // niri stamps XCURSOR_SIZE onto every client it spawns, so this value
+        // wins over the one home-manager exports.
+        xcursor-size 64
     }
     binds {
         // Workspaces
