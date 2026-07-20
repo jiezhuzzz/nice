@@ -43,7 +43,11 @@
     // LG 14" 1920x1200 @ 120Hz, ~189 DPI.
     // variable-refresh-rate causes cursor micro-stutter on this panel.
     output "eDP-1" {
-        scale 1.250000
+        // scale 1.0: render at the panel's native 1920x1200 rather than the
+        // 1536x960 logical size 1.25 produced. Apps size in logical points,
+        // so 1.25 inflated everything by 25% — most visibly ghostty, whose
+        // font-size 16 comes from the shared module and is tuned for macOS.
+        scale 1.0
         transform "normal"
         mode "1920x1200@120.043000"
     }
