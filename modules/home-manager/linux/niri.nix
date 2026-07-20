@@ -29,9 +29,18 @@
         // accel-speed range is -1.0 .. 1.0.
         touchpad {
             tap
-            // Tap-and-drag: tap, then hold on the second tap to drag. Needed
-            // for text selection without holding the pad down.
+            // The physical press produces no button event on this machine:
+            // libinput debug-events shows only GESTURE_HOLD on the touchpad
+            // node, and the Mouse node that advertises BTN_LEFT/BTN_RIGHT
+            // never fires. Consistent with a haptic pad whose force-sensing
+            // collection (a third, ABS-only input device) has no kernel
+            // driver. So tap has to do everything a click would.
+            //
+            // drag: tap, then hold on the second tap to drag.
+            // drag-lock: after that, lifting keeps the button held until the
+            // next tap — needed for selections longer than one swipe.
             drag true
+            drag-lock
             // clickfinger over libinput's button-areas default: press anywhere
             // with one finger for left click, two fingers for right click,
             // as on macOS. button-areas instead reserves the bottom-right
