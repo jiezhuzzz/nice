@@ -82,7 +82,13 @@
             top 0
             bottom 0
         }
-        focus-ring { width 2; }
+        // niri's default active colour is a bright sky blue. Catppuccin
+        // frappé: mauve for the focused window, surface1 for unfocused.
+        focus-ring {
+            width 2
+            active-color "#ca9ee6"
+            inactive-color "#51576d"
+        }
         border { off; }
         default-column-width { proportion 0.500000; }
         preset-column-widths {
