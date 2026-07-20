@@ -44,6 +44,9 @@
     ];
 
     home.pointerCursor = {
+      # Explicit since home-manager deprecated inferring this from the
+      # presence of the other options.
+      enable = true;
       name = "Banana";
       package = pkgs.banana-cursor;
       size = 64;
