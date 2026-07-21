@@ -69,14 +69,23 @@
     // Rounded window corners, to match noctalia's shell surfaces.
     // clip-to-geometry is required as well: without it the window contents
     // still paint square corners underneath the rounded geometry.
+    // 20 is the radius upstream recommends for v5.
     window-rule {
-        geometry-corner-radius 12
+        geometry-corner-radius 20
         clip-to-geometry true
     }
-    // noctalia-shell provides the bar, notifications and control centre.
-    // Upstream deprecated the systemd user service in favour of this.
-    // https://docs.noctalia.dev/getting-started/compositor-settings/niri/
-    spawn-at-startup "noctalia-shell"
+    // noctalia's own settings window: float it at a usable size instead of
+    // letting it tile into the column layout.
+    window-rule {
+        match app-id="dev.noctalia.Noctalia"
+        open-floating true
+        default-column-width { fixed 1080; }
+        default-window-height { fixed 920; }
+    }
+    // noctalia provides the bar, notifications and control centre. It is
+    // started by its systemd user service (programs.noctalia.systemd.enable in
+    // noctalia.nix), NOT spawn-at-startup — doing both would run two copies.
+    // https://docs.noctalia.dev/v5/compositor-settings/niri/
     // Required by noctalia: lets it act on notification buttons and raise
     // windows, which otherwise fail the xdg-activation serial check.
     debug {
@@ -131,7 +140,6 @@
         Alt+4 { focus-workspace 4; }
         // Apps
         Alt+B hotkey-overlay-title="Browser: chromium" { spawn "chromium"; }
-        Alt+D hotkey-overlay-title="App launcher: fuzzel" { spawn "fuzzel"; }
         Alt+T hotkey-overlay-title="Terminal: ghostty" { spawn "ghostty"; }
         // Focus (arrow + vim keys share actions)
         Alt+Down { focus-window-down; }
@@ -163,21 +171,28 @@
         // Screenshot
         Alt+Print { screenshot-window; }
         Print { screenshot; }
+        // noctalia panels
+        Alt+Space { spawn-sh "noctalia msg panel-toggle launcher"; }
+        Alt+S { spawn-sh "noctalia msg panel-toggle control-center"; }
+        Alt+Comma { spawn-sh "noctalia msg settings-toggle"; }
+        Alt+Tab { spawn-sh "noctalia msg window-switcher"; }
         // Volume / brightness (laptop keys)
-        XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
-        XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-        XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
-        XF86MonBrightnessDown { spawn "brightnessctl" "set" "10%-"; }
-        XF86MonBrightnessUp { spawn "brightnessctl" "set" "10%+"; }
+        //
+        // Routed through noctalia rather than wpctl/brightnessctl directly so
+        // its OSD actually appears — [osd.kinds] volume/brightness only fire
+        // for changes noctalia itself makes. The trade-off is that these keys
+        // do nothing if noctalia is not running.
+        XF86AudioLowerVolume allow-when-locked=true { spawn-sh "noctalia msg volume-down"; }
+        XF86AudioMute allow-when-locked=true { spawn-sh "noctalia msg volume-mute"; }
+        XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "noctalia msg volume-up"; }
+        XF86MonBrightnessDown { spawn-sh "noctalia msg brightness-down"; }
+        XF86MonBrightnessUp { spawn-sh "noctalia msg brightness-up"; }
     }
   '';
 
   # niri tools & niri's ecosystem companions.
   home.packages = with pkgs; [
-    fuzzel # app launcher (Alt+D)
-    brightnessctl # brightness keys
-    wl-clipboard # wayland clipboard
-    grim # screenshot backend (used by niri's built-in screenshot)
-    slurp # region selection
+    brightnessctl # CLI backlight control; the keys go through noctalia now
+    wl-clipboard # wl-copy/wl-paste; no CLI equivalent in noctalia's clipboard panel
   ];
 }
