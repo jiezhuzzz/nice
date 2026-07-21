@@ -14,6 +14,7 @@
     ../../modules/home-manager/common/eza.nix
     ../../modules/home-manager/common/fzf.nix
     ../../modules/home-manager/common/zellij.nix
+    ../../modules/home-manager/common/herdr.nix
     ../../modules/home-manager/common/zoxide.nix
     ../../modules/home-manager/common/fd.nix
     ../../modules/home-manager/common/fastfetch.nix
