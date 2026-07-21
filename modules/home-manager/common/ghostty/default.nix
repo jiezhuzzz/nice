@@ -12,7 +12,10 @@
       else pkgs.ghostty;
     settings =
       {
-        font-family = "JetBrainsMono Nerd Font";
+        font-family = [
+          "JetBrainsMono Nerd Font"
+          "Noto Sans Mono CJK SC"
+        ];
         font-size = 16;
         window-padding-x = 8;
         window-padding-y = 8;
