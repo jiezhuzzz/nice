@@ -98,11 +98,6 @@
     ];
   };
 
-  # Run-time linker shim so unpatched, dynamically-linked binaries (e.g. tools
-  # fetched by language toolchains) can find an ld.so and the usual libraries
-  # under /run/current-system/sw/share/nix-ld/lib.
-  programs.nix-ld.enable = true;
-
   # ----------------------------------------------------------------------
   # Podman — rootless-capable container runtime. dockerCompat installs a
   # `docker` shim so docker-cli/compose invocations transparently drive

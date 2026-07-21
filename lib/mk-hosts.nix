@@ -45,6 +45,7 @@
           inputs.home-manager.nixosModules.home-manager
           inputs.catppuccin.nixosModules.catppuccin
           inputs.agenix.nixosModules.default
+          ../modules/nixos/nix-ld.nix
           hmSystemWiring
           {
             nixpkgs.config.allowUnfree = true;
