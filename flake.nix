@@ -23,6 +23,18 @@
 
     catppuccin.url = "github:catppuccin/nix";
 
+    # noctalia-shell: the Quickshell desktop shell for niri on nixps.
+    #
+    # `follows` keeps a single nixpkgs across the flake, consistent with every
+    # other input here. The trade-off is that it also defeats upstream's
+    # binary cache — rebuilding against our nixpkgs changes the derivation
+    # hashes, so noctalia.cachix.org never matches and Quickshell/Qt are built
+    # from source. Drop the follows if that build cost stops being acceptable.
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.inputs.home-manager.follows = "home-manager";

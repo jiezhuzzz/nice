@@ -16,6 +16,21 @@
 
   programs.fish.enable = true;
 
+  # Binary cache for noctalia-shell (imported into home-manager below), whose
+  # Quickshell/Qt closure is expensive to build from source.
+  #
+  # Deliberately set here rather than as `nixConfig` in flake.nix: that
+  # attribute is honoured only for a trusted user, and `trusted-users` is just
+  # `root`, so it would apply under `sudo nixos-rebuild switch` but be silently
+  # ignored for an unprivileged `nix build` — falling back to a source build.
+  # Baking it into the system's nix.conf applies it regardless of invoker.
+  nix.settings = {
+    extra-substituters = ["https://noctalia.cachix.org"];
+    extra-trusted-public-keys = [
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+    ];
+  };
+
   environment.systemPackages = with pkgs; [
     git
     jq
