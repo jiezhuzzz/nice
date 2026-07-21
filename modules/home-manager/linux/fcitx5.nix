@@ -1,4 +1,4 @@
-{...}: {
+_: {
   # Fcitx5's Classic UI draws Rime's candidate window. Pin both its font and
   # theme: the defaults use Sans 10 and the plain built-in theme, which are
   # too small and visually inconsistent on the laptop's scale-1 display.
