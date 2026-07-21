@@ -1,9 +1,10 @@
 _: {
   # Lid close behavior
   services.logind.settings.Login = {
-    HandleLidSwitch = "suspend";
-    HandleLidSwitchExternalPower = "suspend";
+    HandleLidSwitch = "lock";
+    HandleLidSwitchExternalPower = "lock";
     HandleLidSwitchDocked = "ignore";
+    HandleSuspendKey = "lock";
   };
 
   powerManagement.enable = true;

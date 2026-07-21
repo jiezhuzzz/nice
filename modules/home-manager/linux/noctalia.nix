@@ -1,8 +1,40 @@
 {
+  config,
   inputs,
   pkgs,
   ...
-}: {
+}: let
+  sleepGuardUnit = "noctalia-sleep-guard.service";
+  lockMarker = "$XDG_RUNTIME_DIR/noctalia-session-locked";
+  systemctl = "${pkgs.systemd}/bin/systemctl";
+
+  secureSuspend = pkgs.writeShellScript "noctalia-secure-suspend" ''
+    set -euo pipefail
+
+    lock_marker="$XDG_RUNTIME_DIR/noctalia-session-locked"
+    for _ in {1..20}; do
+      if [[ -e "$lock_marker" ]]; then
+        break
+      fi
+      ${pkgs.coreutils}/bin/sleep 0.1
+    done
+
+    if [[ ! -e "$lock_marker" ]]; then
+      echo "refusing to suspend without an acknowledged Noctalia lock" >&2
+      exit 1
+    fi
+
+    ${systemctl} --user stop ${sleepGuardUnit}
+    exec ${systemctl} suspend
+  '';
+
+  startGuard =
+    "${pkgs.coreutils}/bin/rm -f \"${lockMarker}\""
+    + " && ${systemctl} --user start ${sleepGuardUnit}";
+  stopGuard =
+    "${pkgs.coreutils}/bin/touch \"${lockMarker}\""
+    + " && ${systemctl} --user stop ${sleepGuardUnit}";
+in {
   # noctalia v5: a Wayland shell (bar, notifications, launcher, control centre,
   # lock screen) for niri. Upstream ships its own home-manager module, so the
   # package and config file are wired through that rather than by hand.
@@ -56,6 +88,69 @@
         # of asking. That includes 1Password's system-auth, which
         # modules/nixos/desktop/1password.nix grants via polkitPolicyOwners.
         polkit_agent = true;
+
+        # Pin the power menu to lock-aware actions. In particular, omit the
+        # plain suspend action and route lock-and-suspend through the guarded
+        # command below.
+        session = {
+          actions = [
+            {
+              action = "lock";
+              shortcut = "1";
+            }
+            {
+              action = "logout";
+              shortcut = "2";
+            }
+            {
+              action = "lock_and_suspend";
+              shortcut = "3";
+            }
+            {
+              action = "reboot";
+              shortcut = "4";
+            }
+            {
+              action = "shutdown";
+              shortcut = "5";
+              variant = "destructive";
+            }
+          ];
+          power.suspend = "${secureSuspend}";
+        };
+      };
+
+      # Noctalia owns the visual lock screen and idle flow. The user sleep
+      # guard below covers suspend attempts that originate outside Noctalia.
+      lockscreen.enabled = true;
+
+      idle = {
+        pre_action_fade_seconds = 2.0;
+        behavior = {
+          lock = {
+            enabled = true;
+            timeout = 300;
+            action = "lock";
+          };
+          "screen-off" = {
+            enabled = true;
+            timeout = 330;
+            action = "screen_off";
+          };
+          "lock-and-suspend" = {
+            enabled = true;
+            timeout = 600;
+            action = "lock_and_suspend";
+          };
+        };
+      };
+
+      # Track the compositor-acknowledged lock state. The guard blocks sleep
+      # while unlocked and is released only after session_locked fires.
+      hooks = {
+        started = startGuard;
+        session_locked = stopGuard;
+        session_unlocked = startGuard;
       };
 
       theme = {
@@ -83,6 +178,29 @@
         templates.builtin_ids = [];
       };
     };
+  };
+
+  systemd.user.services.noctalia-sleep-guard = {
+    Unit = {
+      Description = "Block sleep until Noctalia has locked the session";
+      PartOf = [config.wayland.systemd.target];
+      Before = ["noctalia.service"];
+    };
+
+    Service = {
+      Type = "simple";
+      ExecStart =
+        "${pkgs.systemd}/bin/systemd-inhibit"
+        + " --what=sleep"
+        + " --who=Noctalia"
+        + " --why=\"Session is not locked\""
+        + " --mode=block"
+        + " ${pkgs.coreutils}/bin/sleep infinity";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+
+    Install.WantedBy = [config.wayland.systemd.target];
   };
 
   # Icon theme for the launcher and dock, which resolve application icons via

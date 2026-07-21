@@ -1,4 +1,23 @@
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: let
+  noctalia = "${config.programs.noctalia.package}/bin/noctalia";
+  handleLidClose = pkgs.writeShellScript "noctalia-handle-lid-close" ''
+    set -euo pipefail
+
+    outputs="$(${pkgs.niri}/bin/niri msg --json outputs)"
+    if ${pkgs.jq}/bin/jq -e '
+      [to_entries[] | select(.key != "eDP-1" and .value.logical != null)]
+      | length > 0
+    ' <<<"$outputs" >/dev/null; then
+      exit 0
+    fi
+
+    exec ${noctalia} msg session lock-and-suspend
+  '';
+in {
   # niri is enabled system-side by modules/nixos/desktop/niri.nix, which uses
   # the nixpkgs module (programs.niri.enable). That module offers enable,
   # package and useNautilus only — it has no config generator, and
@@ -132,6 +151,9 @@
         // wins over the one home-manager exports.
         xcursor-size 40
     }
+    switch-events {
+        lid-close { spawn "${handleLidClose}"; }
+    }
     binds {
         // Workspaces
         Alt+1 { focus-workspace 1; }
@@ -157,8 +179,9 @@
         // Session
         Alt+Q { close-window; }
         Alt+Shift+E { quit; }
-        Alt+Shift+L { spawn "swaylock"; }
+        Alt+Shift+L { spawn-sh "noctalia msg session lock"; }
         Alt+Shift+P { power-off-monitors; }
+        XF86Sleep allow-when-locked=true { spawn "${noctalia}" "msg" "session" "lock-and-suspend"; }
         // Move
         Alt+Shift+1 { move-column-to-workspace 1; }
         Alt+Shift+2 { move-column-to-workspace 2; }
