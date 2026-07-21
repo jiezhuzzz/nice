@@ -56,6 +56,7 @@
       ../modules/home-manager/linux/ghostty.nix
       ../modules/home-manager/linux/shpool.nix
       ../modules/home-manager/linux/swaylock.nix
+      ../modules/home-manager/linux/zathura.nix
     ];
 
     home.pointerCursor = {
