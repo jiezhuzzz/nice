@@ -18,6 +18,21 @@
       useUserPackages = true;
       extraSpecialArgs = {inherit inputs user;};
       sharedModules = hmSharedModules;
+
+      # Move a conflicting file to <name>.bak instead of aborting activation.
+      # Without this, any app that rewrites a home-manager-managed config in
+      # place fails the whole switch with "would be clobbered" — noctalia's
+      # theme templates did exactly that to ~/.config/ghostty/config by running
+      # `sed -i` over the store symlink.
+      #
+      # Note this trades a loud failure for a silent one: the file is replaced
+      # and the old copy left as .bak, so a config being fought over is no
+      # longer obvious from the switch output. Activation also still fails if
+      # the .bak name is itself taken, so stale backups need clearing.
+      #
+      # Only applies to the system builders; standalone home-manager (mkHome
+      # below) has no such option and needs `home-manager switch -b bak`.
+      backupFileExtension = "bak";
     };
   };
 
