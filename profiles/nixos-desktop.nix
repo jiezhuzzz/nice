@@ -16,6 +16,10 @@
 
   programs.fish.enable = true;
 
+  # xremap runs as a Home Manager user service. It reads physical keyboards
+  # through /dev/input and emits its virtual keyboard through /dev/uinput.
+  hardware.uinput.enable = true;
+
   # Binary cache for noctalia-shell (imported into home-manager below), whose
   # Quickshell/Qt closure is expensive to build from source.
   #
@@ -42,7 +46,12 @@
 
   users.users.${user.me.username} = {
     isNormalUser = true;
-    extraGroups = ["wheel" "networkmanager"];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "input"
+      "uinput"
+    ];
     shell = pkgs.fish;
   };
 
@@ -51,6 +60,7 @@
       ./home/desktop.nix
       ../modules/home-manager/linux/packages.nix
       ../modules/home-manager/linux/niri.nix
+      ../modules/home-manager/linux/xremap.nix
       ../modules/home-manager/linux/noctalia.nix
       ../modules/home-manager/linux/chromium.nix
       ../modules/home-manager/linux/fcitx5.nix
