@@ -89,7 +89,7 @@
 
   users.users.${user.me.username} = {
     isNormalUser = true;
-    extraGroups = ["wheel" "audio"];
+    extraGroups = ["wheel" "audio" "media"];
     # Password "hhkb", hashed with `mkpasswd -m sha-512`. Declaratively
     # enforced on every activation (so it overrides any prior password).
     hashedPassword = "$6$NaYrMFkyg/51ai9u$SN4xf/HNtsfg9SqcovSm1jgghFBfozkmHDZ5EEalN0/r1r9pI.qLKpTlMgQk5/h6UkpfKSS0tatv5UEmUFHAb.";

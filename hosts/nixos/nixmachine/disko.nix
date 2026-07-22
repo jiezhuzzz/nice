@@ -16,6 +16,14 @@
     sdi = "ata-ST12000VN0008-3MH101_ZZ30E2PZ";
   };
 
+  # mount(8) applies these after mounting shared datasets. setgid makes new
+  # children inherit the dataset's collaboration group.
+  mkSharedMountOptions = group: [
+    "X-mount.owner=root"
+    "X-mount.group=${group}"
+    "X-mount.mode=2775"
+  ];
+
   # Each HDD: GPT with one ZFS partition that joins `tank`'s raidz2 vdev.
   mkHdd = id: {
     type = "disk";
@@ -214,6 +222,7 @@ in {
           "media" = {
             type = "zfs_fs";
             mountpoint = "/tank/media";
+            mountOptions = mkSharedMountOptions "media";
             options = {
               mountpoint = "legacy";
               recordsize = "1M";
@@ -244,7 +253,10 @@ in {
           # thumbnails) go to SSD for fast browsing.
           "photos" = {
             type = "zfs_fs";
-            mountpoint = "/tank/photos";
+            # Keep `tank/photos` as an independently tunable dataset, but
+            # present it inside the shared media hierarchy.
+            mountpoint = "/tank/media/photos";
+            mountOptions = mkSharedMountOptions "media";
             options = {
               mountpoint = "legacy";
               recordsize = "1M";
