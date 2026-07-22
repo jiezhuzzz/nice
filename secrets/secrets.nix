@@ -34,4 +34,7 @@ in {
   # Caddy's ACME DNS-01 token (Cloudflare, scoped to DNS edits on jiezhu.me).
   # Only nixmachine runs caddy; password-manager is the editing/recovery recipient.
   "caddy/cloudflare-token.age".publicKeys = [nixmachine password-manager];
+  # Anthropic and OpenAI provider keys consumed by the local LiteLLM gateway.
+  # Only nixmachine needs to decrypt them at runtime.
+  "llm/provider-keys.age".publicKeys = [nixmachine password-manager];
 }

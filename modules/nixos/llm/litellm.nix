@@ -3,12 +3,19 @@
 # provider keys live in one place. Localhost-only; the keys come from a
 # root-only env file (out of the Nix store), referenced as os.environ/... in the
 # model list. Default port 8080 would clash with metatube, so use 4000.
-_: {
+{config, ...}: {
+  # Decrypted at activation to /run/agenix/litellm-provider-keys. systemd reads
+  # the root-only env file before starting LiteLLM's DynamicUser process.
+  age.secrets.litellm-provider-keys = {
+    file = ../../../secrets/llm/provider-keys.age;
+    mode = "0400";
+  };
+
   services.litellm = {
     enable = true;
     host = "127.0.0.1";
     port = 4000;
-    environmentFile = "/var/lib/litellm-secrets/env"; # ANTHROPIC_API_KEY + OPENAI_API_KEY
+    environmentFile = config.age.secrets.litellm-provider-keys.path;
     settings.model_list = [
       {
         model_name = "Claude Opus 4.8 (high)";
@@ -45,7 +52,4 @@ _: {
       }
     ];
   };
-
-  # Root-only dir for the shared provider-key env file.
-  systemd.tmpfiles.rules = ["d /var/lib/litellm-secrets 0700 root root -"];
 }
