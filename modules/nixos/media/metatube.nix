@@ -27,7 +27,11 @@ _: {
     };
   };
 
-  # SQLite DB + engine cache live here. The container runs as root, so a
-  # root-owned dir is correct.
-  systemd.tmpfiles.rules = ["d /var/lib/metatube 0750 root root -"];
+  # SQLite DB + engine cache live here. The generated container unit runs as
+  # root, so StateDirectory creates /var/lib/metatube as persistent root-owned
+  # storage before Podman resolves the bind mount.
+  systemd.services.podman-metatube.serviceConfig = {
+    StateDirectory = "metatube";
+    StateDirectoryMode = "0750";
+  };
 }
