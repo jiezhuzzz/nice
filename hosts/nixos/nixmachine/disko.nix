@@ -281,6 +281,7 @@ in {
           autotrim = "on";
         };
         mountpoint = "/gpool";
+        mountOptions = mkSharedMountOptions "games";
         rootFsOptions = {
           compression = "lz4";
           atime = "off";

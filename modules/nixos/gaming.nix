@@ -113,15 +113,11 @@ in {
 
   # Game-library storage. gpool is a single ~4.8 TiB NVMe dataset mounted at
   # /gpool (see disko.nix); the Steam/Lutris libraries live as subdirectories. It
-  # mounts root-owned, so give the shared `games` group ownership + setgid (2775)
-  # on the dataset root — one rule, and every subdir/file created underneath
-  # inherits group `games`, so ownership never drifts. jie is a member (takes
-  # effect on next login). Add /gpool (or a subdir) as a Steam library.
+  # mounts as root:games with setgid (2775), so every subdirectory/file created
+  # underneath inherits the shared group. jie is a member (takes effect on next
+  # login). Add /gpool (or a subdir) as a Steam library.
   users.groups.games = {};
   users.users.${user.me.username}.extraGroups = ["games"];
-  systemd.tmpfiles.rules = [
-    "d /gpool 2775 root games - -"
-  ];
 
   # greetd: a minimal login daemon (no graphical greeter). It opens a logind
   # seat session so gamescope can reach the GPU (DRM/KMS) and input devices.
