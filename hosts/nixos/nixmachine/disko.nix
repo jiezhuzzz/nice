@@ -1,4 +1,8 @@
-{lib, ...}: let
+{
+  lib,
+  user,
+  ...
+}: let
   # ------------------------------------------------------------------
   # Disk identifiers (by-id, stable across reboots / controller swaps).
   # ------------------------------------------------------------------
@@ -16,13 +20,14 @@
     sdi = "ata-ST12000VN0008-3MH101_ZZ30E2PZ";
   };
 
-  # mount(8) applies these after mounting shared datasets. setgid makes new
-  # children inherit the dataset's collaboration group.
-  mkSharedMountOptions = group: [
-    "X-mount.owner=root"
+  # mount(8) applies ownership and mode after mounting a dataset.
+  mkMountOptions = owner: group: mode: [
+    "X-mount.owner=${owner}"
     "X-mount.group=${group}"
-    "X-mount.mode=2775"
+    "X-mount.mode=${mode}"
   ];
+  mkSharedMountOptions = group: mkMountOptions "root" group "2775";
+  mkUserMountOptions = mode: mkMountOptions user.me.username "users" mode;
 
   # Each HDD: GPT with one ZFS partition that joins `tank`'s raidz2 vdev.
   mkHdd = id: {
@@ -237,6 +242,44 @@ in {
               mountpoint = "legacy";
               recordsize = "1M";
               special_small_blocks = "0";
+            };
+          };
+          # Rebuildable, high-volume caches. The parent is organizational only;
+          # each workload gets its own independently tuned child dataset.
+          "cache" = {
+            type = "zfs_fs";
+            options = {
+              mountpoint = "none";
+              canmount = "off";
+              "com.sun:auto-snapshot" = "false";
+            };
+          };
+          # OCI/Podman graphroot: many layer files with mixed random access.
+          "cache/containers" = {
+            type = "zfs_fs";
+            mountpoint = "/tank/cache/containers";
+            mountOptions = mkUserMountOptions "0700";
+            options = {
+              mountpoint = "legacy";
+              recordsize = "128K";
+              special_small_blocks = "0";
+              compression = "zstd-fast";
+              atime = "off";
+              "com.sun:auto-snapshot" = "false";
+            };
+          };
+          # Downloaded checkpoints/model weights: huge, mostly immutable files.
+          "cache/models" = {
+            type = "zfs_fs";
+            mountpoint = "/tank/cache/models";
+            mountOptions = mkUserMountOptions "0755";
+            options = {
+              mountpoint = "legacy";
+              recordsize = "1M";
+              special_small_blocks = "0";
+              compression = "zstd-fast";
+              atime = "off";
+              "com.sun:auto-snapshot" = "false";
             };
           };
           # Source code / docs / configs: mostly small files → SSD.
