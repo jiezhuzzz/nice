@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   inherit (pkgs.stdenv) isDarwin;
   rimeDir =
     if isDarwin
@@ -47,4 +51,22 @@ in {
         style/inline_preedit: true
     '';
   };
+
+  # Rime's deployer only recompiles when a source file is newer than the
+  # compiled output in build/. Our source data is symlinked from the Nix
+  # store, where every file has a fixed 1970 mtime, so Rime always thinks
+  # nothing changed and serves a stale build/ — config edits appear to do
+  # nothing until build/ is wiped. Clear it on every activation, then kick a
+  # redeploy on Darwin so the new config takes effect without manual steps.
+  home.activation.rimeRedeploy = lib.hm.dag.entryAfter ["writeBoundary"] (
+    ''
+      run rm -rf $VERBOSE_ARG "$HOME/${rimeDir}/build"
+    ''
+    + lib.optionalString isDarwin ''
+      squirrel="/Library/Input Methods/Squirrel.app/Contents/MacOS/Squirrel"
+      if [ -x "$squirrel" ]; then
+        run "$squirrel" --reload || true
+      fi
+    ''
+  );
 }
