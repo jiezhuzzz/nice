@@ -99,14 +99,13 @@
   };
 
   # ----------------------------------------------------------------------
-  # Podman — rootless-capable container runtime. dockerCompat installs a
-  # `docker` shim so docker-cli/compose invocations transparently drive
-  # podman. DNS in the default network lets containers resolve each other
-  # by name (needed by most compose stacks).
+  # Podman — rootless-capable container runtime. Keep the Docker CLI shim
+  # disabled so callers explicitly select Podman. DNS in the default network
+  # lets containers resolve each other by name (needed by most compose stacks).
   # ----------------------------------------------------------------------
   virtualisation.podman = {
     enable = true;
-    dockerCompat = true;
+    dockerCompat = false;
     defaultNetwork.settings.dns_enabled = true;
   };
 
