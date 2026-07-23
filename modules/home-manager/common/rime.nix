@@ -11,6 +11,15 @@ in {
       # frontend's base data. Include it before applying local overrides.
       __include = "rime_ice_suggestion:/";
       schema_list = [{schema = "double_pinyin_flypy";}];
+      # Only left Shift toggles EN/中; right Shift is inert. The default
+      # binds both Shift keys — this replaces the whole switch_key map.
+      "ascii_composer/switch_key" = {
+        Shift_L = "inline_ascii";
+        Shift_R = "noop";
+        Control_L = "noop";
+        Control_R = "noop";
+        Caps_Lock = "clear";
+      };
     };
   };
 
