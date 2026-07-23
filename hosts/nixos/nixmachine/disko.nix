@@ -45,7 +45,7 @@
     };
   };
 
-  # Each NVMe: ESP, tank-special partition, rpool partition, gpool partition.
+  # Each NVMe: ESP, tank-special partition, rpool partition, fast partition.
   # No disk swap — zram is configured in zfs.nix instead.
   # Partition names matter: disko derives partlabels `disk-<diskname>-<partname>`
   # from them, and tank's special-vdev members reference those labels by literal
@@ -80,11 +80,11 @@
             pool = "rpool";
           };
         };
-        gpool = {
+        fast = {
           size = "100%";
           content = {
             type = "zfs";
-            pool = "gpool";
+            pool = "fast";
           };
         };
       };
@@ -155,16 +155,6 @@ in {
               mountpoint = "legacy";
               recordsize = "16K";
               "com.sun:auto-snapshot" = "false";
-            };
-          };
-          # Mirrored, redundant location for precious game saves.
-          # Symlink gpool/steam/.../userdata or per-game save dirs into here.
-          "gamesaves" = {
-            type = "zfs_fs";
-            mountpoint = "/var/lib/gamesaves";
-            options = {
-              mountpoint = "legacy";
-              recordsize = "16K";
             };
           };
           # Safety reserve so a 100%-full pool doesn't brick.
@@ -254,16 +244,17 @@ in {
               "com.sun:auto-snapshot" = "false";
             };
           };
-          # OCI/Podman graphroot: many layer files with mixed random access.
-          "cache/containers" = {
+          # Local OCI registry: compressed, content-addressed image blobs.
+          # Active Podman storage lives on the NVMe fast pool below.
+          "cache/registry" = {
             type = "zfs_fs";
-            mountpoint = "/tank/cache/containers";
+            mountpoint = "/tank/cache/registry";
             mountOptions = mkUserMountOptions "0700";
             options = {
               mountpoint = "legacy";
-              recordsize = "128K";
+              recordsize = "1M";
               special_small_blocks = "0";
-              compression = "zstd-fast";
+              compression = "lz4";
               atime = "off";
               "com.sun:auto-snapshot" = "false";
             };
@@ -310,30 +301,52 @@ in {
       };
 
       # ----------------------------------------------------------------
-      # gpool — games, 2-way NVMe stripe, ~4.8 TiB. NO REDUNDANCY.
-      # If either NVMe dies, all game installs are gone. Saves live on rpool.
-      # A single dataset mounted (legacy) at /gpool; game libraries (steam,
-      # lutris, …) are plain subdirectories, group-owned by `games` via setgid
-      # (see modules/nixos/gaming.nix).
+      # fast — rebuildable high-performance data, 2-way NVMe stripe, ~4.8 TiB.
+      # NO REDUNDANCY: losing either NVMe loses the entire pool. Keep canonical
+      # copies of anything important on rpool, tank, or remote storage.
       # ----------------------------------------------------------------
-      gpool = {
+      fast = {
         type = "zpool";
         mode = ""; # empty mode = stripe
         options = {
           ashift = "12";
           autotrim = "on";
         };
-        mountpoint = "/gpool";
-        mountOptions = mkSharedMountOptions "games";
         rootFsOptions = {
           compression = "lz4";
           atime = "off";
           xattr = "sa";
           acltype = "posixacl";
-          mountpoint = "legacy";
-          recordsize = "1M";
+          dnodesize = "auto";
+          mountpoint = "none";
+          canmount = "off";
+          "com.sun:auto-snapshot" = "false";
         };
-        datasets = {};
+        datasets = {
+          # Re-downloadable game libraries. The setgid directory keeps all
+          # launchers and gaming-session processes in the shared games group.
+          "games" = {
+            type = "zfs_fs";
+            mountpoint = "/fast/games";
+            mountOptions = mkSharedMountOptions "games";
+            options = {
+              mountpoint = "legacy";
+              recordsize = "1M";
+            };
+          };
+          # Rebuildable active working sets. Podman storage and benchmark data
+          # are ordinary subdirectories sharing one capacity limit.
+          "cache" = {
+            type = "zfs_fs";
+            mountpoint = "/fast/cache";
+            mountOptions = mkUserMountOptions "0700";
+            options = {
+              mountpoint = "legacy";
+              recordsize = "128K";
+              refquota = "3T";
+            };
+          };
+        };
       };
     };
   };

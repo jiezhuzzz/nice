@@ -111,11 +111,10 @@ in {
   # Performance CPU governor while a game is running.
   programs.gamemode.enable = true;
 
-  # Game-library storage. gpool is a single ~4.8 TiB NVMe dataset mounted at
-  # /gpool (see disko.nix); the Steam/Lutris libraries live as subdirectories. It
-  # mounts as root:games with setgid (2775), so every subdirectory/file created
-  # underneath inherits the shared group. jie is a member (takes effect on next
-  # login). Add /gpool (or a subdir) as a Steam library.
+  # Re-downloadable game libraries live on fast/games (see disko.nix). The
+  # dataset mounts as root:games with setgid (2775), so every child inherits the
+  # shared group. jie is a member (takes effect on next login). Add /fast/games
+  # as a Steam/Lutris library.
   users.groups.games = {};
   users.users.${user.me.username}.extraGroups = ["games"];
 
