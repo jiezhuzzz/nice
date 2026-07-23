@@ -65,6 +65,7 @@
       "stats"
       "tailscale-app"
       "tor-browser"
+      "typeless"
       "zoom"
       "zotero"
     ];

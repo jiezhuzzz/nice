@@ -200,6 +200,7 @@ in {
         commit = "";
         pr = "";
       };
+      disableAgentView = true;
     };
     context = ''
       # Python
