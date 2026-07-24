@@ -6,8 +6,8 @@
   claude-plugins-official = pkgs.fetchFromGitHub {
     owner = "anthropics";
     repo = "claude-plugins-official";
-    rev = "1a2f18b05cf5652fd25403e8d229fc884fb84103";
-    sha256 = "2e332eb2e7eff87f3eb763bd0c98114bd40eb877a57a9216b9616a88ae72dd44";
+    rev = "66799ffb4611b7e0c3af391c7569823a4d6b4246";
+    sha256 = "39d0315d39d3537710efacf8b2f95ccb1c8b6b453eb8c14ba6c5221497f6a5f0";
   };
   codex-plugin-cc = pkgs.fetchFromGitHub {
     owner = "openai";
@@ -115,7 +115,7 @@ in {
   programs.claude-code = {
     enable = true;
     configDir = "${config.xdg.configHome}/claude";
-    skills = ../../../agents/skills;
+    # skills = ../../../agents/skills;
     settings = {
       model = "opus[1m]";
       # effortLevel = "xhigh";
@@ -206,12 +206,13 @@ in {
       #   sha256 = "20021101d89002e891a03ba4bd661ba5a0113bb99c2b30d919e2d10366d4565c";
       #   name = "superpowers";
       # })
-      "${claude-plugins-official}/plugins/skill-creator"
-      "${claude-plugins-official}/plugins/code-review"
+      # "${claude-plugins-official}/plugins/skill-creator"
       "${claude-plugins-official}/plugins/claude-code-setup"
       "${claude-plugins-official}/plugins/code-simplifier"
-      "${claude-plugins-official}/plugins/ralph-loop"
-      "${codex-plugin-cc}/plugins/codex"
+      "${claude-plugins-official}/plugins/commit-commands"
+      "${claude-plugins-official}/plugins/feature-dev"
+      # "${claude-plugins-official}/plugins/ralph-loop"
+      # "${codex-plugin-cc}/plugins/codex"
       "${mattpocock-skills}"
       # "${ast-grep-skill}/ast-grep"
       # ../../../agents/plugins/research-writing
