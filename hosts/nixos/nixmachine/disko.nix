@@ -224,16 +224,6 @@ in {
               special_small_blocks = "0";
             };
           };
-          # Backups: large append-mostly archives, metadata-only.
-          "backups" = {
-            type = "zfs_fs";
-            mountpoint = "/tank/backups";
-            options = {
-              mountpoint = "legacy";
-              recordsize = "1M";
-              special_small_blocks = "0";
-            };
-          };
           # Rebuildable, high-volume caches. The parent is organizational only;
           # each workload gets its own independently tuned child dataset.
           "cache" = {
