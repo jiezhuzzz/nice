@@ -273,16 +273,6 @@ in {
               "com.sun:auto-snapshot" = "false";
             };
           };
-          # Source code / docs / configs: mostly small files → SSD.
-          "projects" = {
-            type = "zfs_fs";
-            mountpoint = "/tank/projects";
-            options = {
-              mountpoint = "legacy";
-              recordsize = "128K";
-              special_small_blocks = "16K";
-            };
-          };
           # Photos: full-res raws stay on HDD; sidecars (.xmp, small JPEGs,
           # thumbnails) go to SSD for fast browsing.
           "photos" = {

@@ -46,13 +46,6 @@
   services.zfs.autoScrub.enable = true; # monthly scrub
   services.zfs.trim.enable = true; # periodic TRIM for the NVMe-backed pools
 
-  # The tank/projects dataset (source/docs/configs) mounts root:root, so give
-  # it to jie as a writable personal workspace. tmpfiles re-asserts owner+mode
-  # on every activation, after the ZFS mount. 0755: jie rwx, everyone else ro.
-  systemd.tmpfiles.rules = [
-    "d /tank/projects 0755 ${user.me.username} users -"
-  ];
-
   # No swap partition in the disko layout — use zram instead.
   zramSwap.enable = true;
 
