@@ -116,6 +116,7 @@
     tmux
     jq
     wget
+    skopeo # inspect/copy container images (e.g. resolve pinned digests for podman)
     alsa-utils # aplay -l / speaker-test to enumerate and test outputs
   ];
 
