@@ -74,7 +74,11 @@ in {
       # Unrelated to the greeter's [output].scale, which only affects noctalia's
       # own greeter session — this machine logs in via greetd + tuigreet
       # (modules/nixos/desktop/login.nix), so that setting does not apply.
-      bar.main.scale = 1.25;
+      bar.main = {
+        scale = 1.5;
+        smart_auto_hide = true;
+        reserve_space = false;
+      };
 
       shell = {
         # Required companion to systemd.enable above: without it, apps launched
