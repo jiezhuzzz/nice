@@ -31,6 +31,17 @@
     rev = "9603c1cc8118d08bc1b3bf34cf714f62178dea3b";
     sha256 = "4baa4044af7da061928ba5dd166eb360a1d3e208ce08dd3020f645725d614441";
   };
+  # feature-dev and commit-commands are command/agent plugins with no SKILL.md,
+  # so the `plugins` (skills-dir) mechanism can't surface their commands. Merge
+  # their commands/ dirs into one tree for commandsDir (a single-directory
+  # option). Only feature-dev ships agents/, so agentsDir points straight at it.
+  claude-commands = pkgs.symlinkJoin {
+    name = "claude-commands";
+    paths = [
+      "${claude-plugins-official}/plugins/feature-dev/commands"
+      "${claude-plugins-official}/plugins/commit-commands/commands"
+    ];
+  };
   statusline = pkgs.writeShellScript "claude-statusline" ''
     input=$(cat)
     jq() { ${pkgs.jq}/bin/jq "$@"; }
@@ -116,6 +127,14 @@ in {
     enable = true;
     configDir = "${config.xdg.configHome}/claude";
     # skills = ../../../agents/skills;
+    # Load the command/agent plugins natively (see the note in `plugins` below
+    # for why they can't go through the skills-dir plugin mechanism). These link
+    # into ~/.config/claude/{commands,agents}/, which Claude Code loads directly
+    # — giving `/feature-dev` (+ its code-explorer / code-architect / code-
+    # reviewer agents) and commit-commands' `/commit`, `/commit-push-pr`,
+    # `/clean_gone`.
+    commandsDir = claude-commands;
+    agentsDir = "${claude-plugins-official}/plugins/feature-dev/agents";
     settings = {
       model = "opus[1m]";
       # effortLevel = "xhigh";
@@ -209,8 +228,13 @@ in {
       # "${claude-plugins-official}/plugins/skill-creator"
       "${claude-plugins-official}/plugins/claude-code-setup"
       "${claude-plugins-official}/plugins/code-simplifier"
-      "${claude-plugins-official}/plugins/commit-commands"
-      "${claude-plugins-official}/plugins/feature-dev"
+      # feature-dev and commit-commands are NOT loadable via `plugins`: that
+      # mechanism links plugins into ~/.config/claude/skills/, which Claude Code
+      # treats as a skills-only source (it registers a plugin's SKILL.md skills
+      # but ignores its commands/ and agents/). Both ship commands (feature-dev
+      # also agents) and no skill, so via `plugins` they contribute nothing and
+      # their slash commands stay unknown. They are instead loaded natively
+      # through commandsDir/agentsDir above.
       # "${claude-plugins-official}/plugins/ralph-loop"
       # "${codex-plugin-cc}/plugins/codex"
       "${mattpocock-skills}"
