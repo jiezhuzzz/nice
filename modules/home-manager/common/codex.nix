@@ -1,9 +1,13 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
 }: let
+  # codex from llm-agents.nix (upstream tracks it faster than nixpkgs), built
+  # from source per host so the trust patch below can be layered on.
+  llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
   # Codex now rejects legacy `[profiles.<name>]` tables inside config.toml;
   # each profile must be its own CODEX_HOME/<name>.config.toml using top-level
   # keys (no `[profiles.x]` wrapper), overlaid on the base config when invoked
@@ -43,9 +47,9 @@ in {
     # "Do you trust the contents of this directory?" prompt every time. With
     # this patch, trusting $HOME recursively trusts everything beneath it.
     # See https://github.com/openai/codex/issues/14601 (workaround comment).
-    # Verified to apply against codex 0.142.2 (tag rust-v0.142.2); revisit on
-    # nixpkgs bumps if the patchPhase fails.
-    package = pkgs.codex.overrideAttrs (old: {
+    # Verified to apply against codex 0.145.0 (tag rust-v0.145.0), the version
+    # llm-agents currently ships; revisit if the patchPhase fails after a bump.
+    package = llmAgents.codex.overrideAttrs (old: {
       patches = (old.patches or []) ++ [./recursive-project-trust.patch];
     });
     skills = {

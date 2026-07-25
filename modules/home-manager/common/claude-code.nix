@@ -1,8 +1,12 @@
 {
   config,
+  inputs,
   pkgs,
   ...
 }: let
+  # claude-code from llm-agents.nix (upstream tracks it faster than nixpkgs).
+  # A prebuilt per-platform binary, so this resolves per host via the system.
+  llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
   claude-plugins-official = pkgs.fetchFromGitHub {
     owner = "anthropics";
     repo = "claude-plugins-official";
@@ -125,6 +129,7 @@
 in {
   programs.claude-code = {
     enable = true;
+    package = llmAgents.claude-code;
     configDir = "${config.xdg.configHome}/claude";
     # skills = ../../../agents/skills;
     # Load the command/agent plugins natively (see the note in `plugins` below
