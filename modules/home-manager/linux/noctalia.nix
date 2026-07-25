@@ -71,9 +71,9 @@ in {
       # shell via accessibility.ui_scale, which was tried and backed out.
       # Range is 0.5-4.0.
       #
-      # Unrelated to the greeter's [output].scale, which only affects noctalia's
-      # own greeter session — this machine logs in via greetd + tuigreet
-      # (modules/nixos/desktop/login.nix), so that setting does not apply.
+      # Unrelated to the login greeter's scale: this machine logs in via
+      # noctalia-greeter (modules/nixos/desktop/login.nix), which reads its own
+      # [output].scale from /var/lib/noctalia-greeter/greeter.toml, not this key.
       bar.main = {
         scale = 1.5;
         smart_auto_hide = true;

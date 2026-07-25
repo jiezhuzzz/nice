@@ -39,6 +39,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # noctalia-greeter: the greetd login screen matching noctalia-shell, used on
+    # nixps (see modules/nixos/desktop/login.nix).
+    #
+    # `follows` for the same reason as `noctalia` above, and with the same
+    # trade-off: it defeats the project's own binary cache, so the bundled
+    # wlroots compositor is built from source against our nixpkgs. That build is
+    # far cheaper than noctalia's Qt/Quickshell closure, so it is accepted here
+    # rather than carrying a second nixpkgs to keep the cache match.
+    noctalia-greeter = {
+      url = "github:noctalia-dev/noctalia-greeter";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.inputs.home-manager.follows = "home-manager";
