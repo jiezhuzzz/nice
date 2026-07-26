@@ -3,6 +3,7 @@
 {...}: {
   imports = [
     ./langgraph-testfix.nix # nixpkgs workaround so open-webui's langgraph dep builds
+    ./langfuse-wrapt-fix.nix # nixpkgs workaround so litellm's langfuse dep builds
     ./litellm.nix
     ./open-webui.nix
   ];
