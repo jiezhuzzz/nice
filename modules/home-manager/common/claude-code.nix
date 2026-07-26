@@ -35,15 +35,34 @@
     rev = "9603c1cc8118d08bc1b3bf34cf714f62178dea3b";
     sha256 = "4baa4044af7da061928ba5dd166eb360a1d3e208ce08dd3020f645725d614441";
   };
-  # feature-dev and commit-commands are command/agent plugins with no SKILL.md,
-  # so the `plugins` (skills-dir) mechanism can't surface their commands. Merge
-  # their commands/ dirs into one tree for commandsDir (a single-directory
-  # option). Only feature-dev ships agents/, so agentsDir points straight at it.
+  # feature-dev and the local conventional-git plugin are command/agent plugins
+  # with no SKILL.md, so the `plugins` (skills-dir) mechanism can't surface
+  # their commands. Merge their commands/ dirs into one tree for commandsDir (a
+  # single-directory option).
+  #
+  # commit-commands is deliberately absent: agents/plugins/conventional-git
+  # supersedes it. Its clean_gone.md is carried over verbatim, its commit.md is
+  # replaced by a subagent-delegating version, and symlinkJoin resolves
+  # duplicate basenames first-path-wins — so keeping both would silently shadow
+  # one of the two `commit.md`s. Only commit-push-pr.md is dropped outright;
+  # the local plugin commits but never pushes.
   claude-commands = pkgs.symlinkJoin {
     name = "claude-commands";
     paths = [
       "${claude-plugins-official}/plugins/feature-dev/commands"
-      "${claude-plugins-official}/plugins/commit-commands/commands"
+      ../../../agents/plugins/conventional-git/commands
+    ];
+  };
+  # Same single-directory constraint for agentsDir, and the module asserts
+  # `agents` and `agentsDir` are mutually exclusive — so the local plugin's
+  # agent gets joined with feature-dev's rather than declared inline. This is
+  # what makes `subagent_type: conventional-git` resolvable for the /commit
+  # command, which the skills-dir plugin mechanism could not do.
+  claude-agents = pkgs.symlinkJoin {
+    name = "claude-agents";
+    paths = [
+      "${claude-plugins-official}/plugins/feature-dev/agents"
+      ../../../agents/plugins/conventional-git/agents
     ];
   };
   statusline = pkgs.writeShellScript "claude-statusline" ''
@@ -136,10 +155,12 @@ in {
     # for why they can't go through the skills-dir plugin mechanism). These link
     # into ~/.config/claude/{commands,agents}/, which Claude Code loads directly
     # — giving `/feature-dev` (+ its code-explorer / code-architect / code-
-    # reviewer agents) and commit-commands' `/commit`, `/commit-push-pr`,
-    # `/clean_gone`.
+    # reviewer agents) and the local conventional-git plugin's `/commit`,
+    # `/worktree`, `/clean_gone` (+ its conventional-git subagent).
+    # Commands land unnamespaced here, so it is `/commit`, not
+    # `/conventional-git:commit`.
     commandsDir = claude-commands;
-    agentsDir = "${claude-plugins-official}/plugins/feature-dev/agents";
+    agentsDir = claude-agents;
     settings = {
       model = "opus[1m]";
       # effortLevel = "xhigh";
