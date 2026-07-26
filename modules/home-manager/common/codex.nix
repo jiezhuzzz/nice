@@ -52,13 +52,11 @@ in {
     package = llmAgents.codex.overrideAttrs (old: {
       patches = (old.patches or []) ++ [./recursive-project-trust.patch];
     });
-    skills = {
-      # Conventional Commits + Conventional Branch enforcement, sourced from
-      # this repo so Claude Code and Codex share one skill definition.
-      # Symlinked into Codex's skills dir (~/.agents/skills/ on Codex >=
-      # 0.94.0, else ~/.config/codex/skills/).
-      conventional-git = ../../../agents/skills/conventional-git;
-    };
+    # No `skills` here: the conventional-git skill that used to be shared with
+    # Claude Code became a Claude-Code-only plugin (agents/plugins/
+    # conventional-git), whose /commit dispatches a subagent — a mechanism Codex
+    # has no equivalent for. Codex therefore carries no commit-convention
+    # guidance; re-add a SKILL.md here if that becomes a problem.
     settings = {
       # Auto-review: route approval requests to Codex's Guardian reviewer
       # agent instead of pausing for the user. Only takes effect with
