@@ -108,6 +108,11 @@
       url = "github:homebrew/homebrew-bundle";
       flake = false;
     };
+    # Third-party tap: neru (keyboard-driven screen navigation).
+    homebrew-y3owk1n-tap = {
+      url = "github:y3owk1n/homebrew-tap";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {flake-parts, ...}:

@@ -287,6 +287,22 @@
         "type": "github"
       }
     },
+    "homebrew-y3owk1n-tap": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785167644,
+        "narHash": "sha256-bnIcP2mjOqnewMm/G28Rh8Zh7V9ZHh4sLe5qX95DYH4=",
+        "owner": "y3owk1n",
+        "repo": "homebrew-tap",
+        "rev": "d58a003bf77844a6a9102be2915a7c28a9ac13be",
+        "type": "github"
+      },
+      "original": {
+        "owner": "y3owk1n",
+        "repo": "homebrew-tap",
+        "type": "github"
+      }
+    },
     "lanzaboote": {
       "inputs": {
         "crane": "crane",
@@ -489,6 +505,7 @@
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "homebrew-y3owk1n-tap": "homebrew-y3owk1n-tap",
         "lanzaboote": "lanzaboote",
         "llm-agents": "llm-agents",
         "nix-darwin": "nix-darwin",
