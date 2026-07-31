@@ -243,18 +243,21 @@ in {
         adding one containing `use flake` (then `direnv allow`) so it loads
         automatically — but do not create or commit the file.
     '';
-    plugins = [
-      # (pkgs.fetchFromGitHub {
+    # Attribute set rather than a list: the attribute name becomes the plugin's
+    # directory name. Deriving it from a store path (as the list form does)
+    # yields unstable names like `bxa1s0m3h4sh-source`.
+    plugins = {
+      # superpowers = pkgs.fetchFromGitHub {
       #   owner = "jiezhuzzz";
       #   repo = "superpowers";
       #   # feat/modern branch, pinned to a commit for reproducibility
       #   rev = "ebfb33ff491e3b7cb3ce257f99e00c0645ec8b17";
       #   sha256 = "20021101d89002e891a03ba4bd661ba5a0113bb99c2b30d919e2d10366d4565c";
       #   name = "superpowers";
-      # })
-      # "${claude-plugins-official}/plugins/skill-creator"
-      "${claude-plugins-official}/plugins/claude-code-setup"
-      "${claude-plugins-official}/plugins/code-simplifier"
+      # };
+      # skill-creator = "${claude-plugins-official}/plugins/skill-creator";
+      claude-code-setup = "${claude-plugins-official}/plugins/claude-code-setup";
+      code-simplifier = "${claude-plugins-official}/plugins/code-simplifier";
       # feature-dev and commit-commands are NOT loadable via `plugins`: that
       # mechanism links plugins into ~/.config/claude/skills/, which Claude Code
       # treats as a skills-only source (it registers a plugin's SKILL.md skills
@@ -262,11 +265,11 @@ in {
       # also agents) and no skill, so via `plugins` they contribute nothing and
       # their slash commands stay unknown. They are instead loaded natively
       # through commandsDir/agentsDir above.
-      # "${claude-plugins-official}/plugins/ralph-loop"
-      # "${codex-plugin-cc}/plugins/codex"
-      "${mattpocock-skills}"
-      # "${ast-grep-skill}/ast-grep"
-      # ../../../agents/plugins/research-writing
-    ];
+      # ralph-loop = "${claude-plugins-official}/plugins/ralph-loop";
+      # codex = "${codex-plugin-cc}/plugins/codex";
+      mattpocock-skills = "${mattpocock-skills}";
+      # ast-grep = "${ast-grep-skill}/ast-grep";
+      # research-writing = ../../../agents/plugins/research-writing;
+    };
   };
 }
