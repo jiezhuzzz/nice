@@ -88,10 +88,12 @@
 
     # Declarative Homebrew install (complements nix-darwin's `homebrew` state mgmt).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    # brew-src follows nix-homebrew's own default. It was previously pinned to
-    # brew 28d1032 to dodge a symlinked-taps regression (casks rejected as "not
-    # in a tap"); nix-homebrew fixed that in PR #150 and now defaults to brew
-    # 6.x, so the override is gone. Re-pin here only if the default regresses.
+    # Track Homebrew/brew HEAD instead of nix-homebrew's own brew-src pin: the
+    # tap inputs below follow HEAD (CI bumps flake.lock), so a lagging brew
+    # eventually fails to parse casks that use newer DSL. That happened with
+    # nix-homebrew's brew 6.0.12 pin vs. betterdisplay's `command_wrapper`
+    # (added in brew 6.0.13). Tracking HEAD keeps brew and the taps in step.
+    nix-homebrew.inputs.brew-src.url = "github:Homebrew/brew";
 
     # Brew taps pinned via flake.lock (mutableTaps = false).
     homebrew-core = {
