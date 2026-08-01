@@ -25,6 +25,7 @@
     ../../modules/home-manager/common/ripgrep.nix
     ../../modules/home-manager/common/claude-code.nix
     ../../modules/home-manager/common/codex.nix
+    ../../modules/home-manager/common/pi.nix
     ../../modules/home-manager/common/uv.nix
     ../../modules/home-manager/common/npm.nix
     ../../modules/home-manager/common/delta.nix
