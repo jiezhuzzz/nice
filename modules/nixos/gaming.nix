@@ -113,8 +113,19 @@ in {
 
   # Re-downloadable game libraries live on fast/games (see disko.nix). The
   # dataset mounts as root:games with setgid (2775), so every child inherits the
-  # shared group. jie is a member (takes effect on next login). Add /fast/games
-  # as a Steam/Lutris library.
+  # shared group. jie is a member (takes effect on next login).
+  #
+  # ⚠️  Registering /fast/games as a Steam library is NOT declarable here: the
+  #     library list is Steam client state in
+  #     ~/.local/share/Steam/{config,steamapps}/libraryfolders.vdf, and Steam
+  #     only auto-detects removable/SD media — never an internal mountpoint. It
+  #     has been added by hand; if it ever goes missing, re-add it with Steam
+  #     STOPPED (Steam rewrites the file on exit, clobbering live edits):
+  #       game-stop  →  add an entry with "path" "/fast/games" to BOTH vdfs
+  #                  →  mkdir -p /fast/games/steamapps
+  #                  →  sudo systemctl restart greetd
+  #     Big Picture's Storage page has no folder browser (desktop-mode only),
+  #     so the vdf edit is the only route on this box.
   users.groups.games = {};
   users.users.${user.me.username}.extraGroups = ["games"];
 
