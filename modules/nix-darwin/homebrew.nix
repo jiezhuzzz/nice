@@ -25,7 +25,6 @@
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
-      "y3owk1n/homebrew-tap" = inputs.homebrew-y3owk1n-tap;
     };
   };
 
@@ -44,7 +43,6 @@
       "homebrew/homebrew-core"
       "homebrew/homebrew-cask"
       "homebrew/homebrew-bundle"
-      "y3owk1n/homebrew-tap"
     ];
     brews = [];
     casks = [
@@ -61,7 +59,6 @@
       "iina"
       "karabiner-elements"
       "keka"
-      "y3owk1n/tap/neru"
       "raycast"
       "skim"
       "squirrel-app"
