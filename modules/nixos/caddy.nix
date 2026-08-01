@@ -62,6 +62,11 @@
         reverse_proxy 127.0.0.1:9091
       }
 
+      @searx host searx.jiezhu.me
+      handle @searx {
+        reverse_proxy 127.0.0.1:8085
+      }
+
       # Unmatched subdomain: close the connection, don't serve a default page.
       handle {
         abort

@@ -14,6 +14,7 @@
     ../../../modules/nixos/karakeep.nix # self-hosted bookmark-everything app
     ../../../modules/nixos/mdns.nix # Avahi mDNS — nixmachine.local resolves on the LAN
     ../../../modules/nixos/glance.nix # homelab dashboard at nixmachine.local:8083
+    ../../../modules/nixos/searxng.nix # self-hosted metasearch — pi's web_search backend
     ../../../modules/nixos/tailscale.nix # mesh VPN — remote access path (SSH + caddy.nix)
     ../../../modules/nixos/caddy.nix # HTTPS names on *.jiezhu.me over the tailnet
     ../../../modules/nixos/gaming.nix # console-like Steam gamescope session (local play)

@@ -66,6 +66,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Catppuccin themes for pi — catppuccin/nix ships no pi module, so
+    # catppuccin.autoEnable cannot reach it (see the theme note in
+    # modules/home-manager/common/pi.nix).
+    #
+    # Only `packages.<system>.default` is consumed: a trivial derivation that
+    # copies four theme JSONs into share/pi/themes. Upstream's
+    # homeManagerModules.default is deliberately NOT imported — it hardcodes
+    # ~/.pi/agent/themes (pi runs with an XDG configDir here) and jq-rewrites
+    # settings.json in an activation script, which would fight the read-only
+    # store symlink home-manager generates from `settings`.
+    pi-catppuccin = {
+      url = "github:otahontas/pi-coding-agent-catppuccin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
     agenix.inputs.home-manager.follows = "home-manager";

@@ -37,4 +37,7 @@ in {
   # Anthropic and OpenAI provider keys consumed by the local LiteLLM gateway.
   # Only nixmachine needs to decrypt them at runtime.
   "llm/provider-keys.age".publicKeys = [nixmachine password-manager];
+  # SearXNG's server.secret_key. Only nixmachine runs searxng; password-manager
+  # is the editing/recovery recipient.
+  "searxng/secret-key.age".publicKeys = [nixmachine password-manager];
 }

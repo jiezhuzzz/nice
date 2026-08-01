@@ -26,6 +26,19 @@ in {
       # Focus events — lets helix detect pane switches
       set -g focus-events on
 
+      # Extended (modified) key reporting. By default tmux flattens chords like
+      # shift+enter and ctrl+enter down to a bare \r, so a TUI inside tmux can't
+      # tell them apart from plain Enter. `on` makes tmux forward the real chord
+      # once the application asks for it (pi does so automatically when the
+      # Kitty keyboard protocol isn't available), and `csi-u` picks the modern
+      # CSI-u encoding — shift+enter as \x1b[13;2u — over tmux's default xterm
+      # modifyOtherKeys form (\x1b[27;2;13~). Recommended by pi's docs
+      # (libexec/pi/docs/tmux.md); needs tmux >= 3.5 for extended-keys-format
+      # (nixpkgs ships 3.7b). Takes effect only on a fresh server:
+      # `tmux kill-server`.
+      set -g extended-keys on
+      set -g extended-keys-format csi-u
+
       # Pane index from 1 (matches window baseIndex)
       set -g pane-base-index 1
 
