@@ -59,6 +59,7 @@
       "iina"
       "karabiner-elements"
       "keka"
+      "moonlight"
       "raycast"
       "skim"
       "squirrel-app"

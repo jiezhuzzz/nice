@@ -45,9 +45,28 @@
   # NOT work here — it triggers a Steam self-shutdown that hangs in the gamescope
   # session — so this is the intended exit. SIGTERM first, then SIGKILL.
   game-stop = pkgs.writeShellScriptBin "game-stop" ''
+    export PATH="/run/wrappers/bin:/run/current-system/sw/bin:$PATH"
+
+    # 1. Graceful: ask Steam to quit. It closes any running game first (so the
+    #    game gets to save), then exits, and gamescope follows since Steam is
+    #    its child. Nothing to kill in the common case.
+    steam -shutdown &> /dev/null || true
+    for _ in $(${pkgs.coreutils}/bin/seq 1 30); do
+      ${pkgs.procps}/bin/pgrep -x gamescope-wl > /dev/null || break
+      ${pkgs.coreutils}/bin/sleep 1
+    done
+
+    # 2. Steam ignored us (or was wedged): ask gamescope itself to go.
     ${pkgs.procps}/bin/pkill -TERM -f 'gamescope --steam'
     ${pkgs.coreutils}/bin/sleep 3
+
+    # 3. Last resort. A SIGKILLed gamescope cannot reap its own children: the
+    #    gamescopereaper holding the game gets reparented to init and the game
+    #    (proton/wine) keeps running with no window — audible background music
+    #    long after the session "ended". Kill the reapers explicitly, or every
+    #    forced stop leaks a headless game.
     ${pkgs.procps}/bin/pkill -KILL -f 'gamescope --steam'
+    ${pkgs.procps}/bin/pkill -KILL -x gamescopereaper
     exit 0
   '';
 in {
@@ -85,6 +104,9 @@ in {
       "-e"
       "--hdr-enabled"
       "--mangoapp"
+      # Deliberately NO --cursor-scale-height: it linearly upscales whatever
+      # bitmap the client supplies, so a 24px cursor blown up 3× is just blurry.
+      # A natively-large cursor theme (XCURSOR_SIZE below) is sharp instead.
     ];
   };
 
@@ -105,8 +127,38 @@ in {
   # process mangoapp" errors).
   environment.systemPackages = [
     pkgs.mangohud
+    pkgs.banana-cursor # cursor theme, see XCURSOR_* below
     game-stop # end the gaming session from SSH/console (the intended exit)
   ];
+
+  # Cursor. This host had no cursor theme at all, so libXcursor fell back to a
+  # 24px default — invisible on a 2160p panel, and unfixable by scaling (see the
+  # --cursor-scale-height note above).
+  #
+  # Banana is the same theme nixps uses (profiles/nixos-desktop.nix), and it
+  # ships native bitmaps at 16/20/22/24/28/32/40/48/56/64/72/80/88/96, so 96
+  # is drawn 1:1 with no resampling. nixps sets 40 for a 1440p desktop; a 4K
+  # ten-foot UI wants roughly this much more.
+  #
+  # sessionVariables (not the wrapper) because these must apply however the
+  # session starts — greetd autologin or a bare `steam-gamescope` from a console
+  # login. Both go through PAM, which is what sets these.
+  environment.sessionVariables = {
+    XCURSOR_THEME = "Banana";
+    XCURSOR_SIZE = "96";
+  };
+
+  # MangoHud defaults to a 24px font, which is unreadable on a 2160p panel at
+  # couch distance. It resolves config in this order: $MANGOHUD_CONFIGFILE →
+  # ~/.config/MangoHud/{<app>,MangoHud}.conf → /etc/MangoHud.conf. Using the
+  # /etc fallback keeps this working no matter how the session is launched
+  # (greetd wrapper or a bare `steam-gamescope` from the console), and leaves
+  # the per-user paths free to override it.
+  # font_scale is a plain multiplier over every element, so the overlay box
+  # grows with the text. Bump it if 2.5× still reads small.
+  environment.etc."MangoHud.conf".text = ''
+    font_scale=5
+  '';
 
   # Performance CPU governor while a game is running.
   programs.gamemode.enable = true;
