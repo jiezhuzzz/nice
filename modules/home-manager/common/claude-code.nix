@@ -65,87 +65,132 @@
       ../../../agents/plugins/conventional-git/agents
     ];
   };
-  statusline = pkgs.writeShellScript "claude-statusline" ''
-    input=$(cat)
-    jq() { ${pkgs.jq}/bin/jq "$@"; }
-    git() { ${pkgs.git}/bin/git "$@"; }
+  # ccstatusline (also from llm-agents.nix) renders the status line from this
+  # JSON, replacing the hand-rolled shell script that used to live here — which
+  # forked jq nine times and git twice on every single render.
+  #
+  # Widgets read `rate_limits.five_hour` / `.seven_day` straight out of the
+  # status payload, so the 5h/7d numbers cost no API call. One thing is lost
+  # against the old script: ccstatusline has no value-driven colour, so nothing
+  # turns amber or red as the context fills.
+  seg = id: type: pair: extra:
+    {
+      inherit id type;
+      color = pair.fg;
+      backgroundColor = pair.bg;
+    }
+    // extra;
 
-    MODEL=$(printf '%s' "$input" | jq -r '.model.display_name')
-    EFFORT=$(printf '%s' "$input" | jq -r '.effort.level // empty')
-    DIR=$(printf '%s' "$input" | jq -r '.workspace.current_dir')
-    WORKTREE=$(printf '%s' "$input" | jq -r '.workspace.git_worktree // empty')
-    PCT=$(printf '%s' "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
-    RL_5H=$(printf '%s' "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty' | cut -d. -f1)
-    RL_7D=$(printf '%s' "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty' | cut -d. -f1)
-    COST=$(printf '%s' "$input" | jq -r '.cost.total_cost_usd // 0')
-    DURATION_MS=$(printf '%s' "$input" | jq -r '.cost.total_duration_ms // 0')
-
-    CYAN=$'\033[36m'
-    GREEN=$'\033[32m'
-    YELLOW=$'\033[33m'
-    RED=$'\033[31m'
-    DIM=$'\033[2m'
-    RESET=$'\033[0m'
-
-    ICON_DIR=$''
-    ICON_BRANCH=$'\xee\x9c\xa5'
-    ICON_WORKTREE=$'\xee\x97\xbb'
-    ICON_CLOCK=$''
-
-    CTX_LEFT=$((100 - PCT))
-    if [ "$CTX_LEFT" -le 10 ]; then BAR_COLOR="$RED"
-    elif [ "$CTX_LEFT" -le 30 ]; then BAR_COLOR="$YELLOW"
-    else BAR_COLOR="$GREEN"; fi
-
-    FILLED=$((CTX_LEFT / 20))
-    EMPTY=$((5 - FILLED))
-    BAR=""
-    [ "$FILLED" -gt 0 ] && printf -v FILL "%''${FILLED}s" && BAR="''${FILL// /█}"
-    [ "$EMPTY" -gt 0 ] && printf -v PAD "%''${EMPTY}s" && BAR="$BAR''${PAD// /░}"
-
-    TOTAL_S=$((DURATION_MS / 1000))
-    DAYS=$((TOTAL_S / 86400))
-    HOURS=$(((TOTAL_S % 86400) / 3600))
-    MINS=$(((TOTAL_S % 3600) / 60))
-    SECS=$((TOTAL_S % 60))
-    if [ "$DAYS" -gt 0 ]; then TIME_FMT="''${DAYS}d ''${HOURS}h ''${MINS}m ''${SECS}s"
-    elif [ "$HOURS" -gt 0 ]; then TIME_FMT="''${HOURS}h ''${MINS}m ''${SECS}s"
-    else TIME_FMT="''${MINS}m ''${SECS}s"; fi
-    COST_FMT=$(printf '$%.2f' "$COST")
-
-    BRANCH=""
-    if git -C "$DIR" rev-parse --git-dir >/dev/null 2>&1; then
-      B=$(git -C "$DIR" branch --show-current 2>/dev/null)
-      [ -n "$B" ] && BRANCH=" | $ICON_BRANCH $B"
-    fi
-    [ -n "$WORKTREE" ] && BRANCH="$BRANCH | $ICON_WORKTREE $WORKTREE"
-
-    EFFORT_TAG=""
-    [ -n "$EFFORT" ] && EFFORT_TAG=" ''${DIM}($EFFORT)''${RESET}"
-
-    LIMITS=""
-    if [ -n "$RL_5H" ] || [ -n "$RL_7D" ]; then
-      RL_MIN_LEFT=100
-      if [ -n "$RL_5H" ]; then
-        RL_5H_LEFT=$((100 - RL_5H))
-        [ "$RL_5H_LEFT" -lt "$RL_MIN_LEFT" ] && RL_MIN_LEFT=$RL_5H_LEFT
-      fi
-      if [ -n "$RL_7D" ]; then
-        RL_7D_LEFT=$((100 - RL_7D))
-        [ "$RL_7D_LEFT" -lt "$RL_MIN_LEFT" ] && RL_MIN_LEFT=$RL_7D_LEFT
-      fi
-      if [ "$RL_MIN_LEFT" -le 10 ]; then RL_COLOR="$RED"
-      elif [ "$RL_MIN_LEFT" -le 30 ]; then RL_COLOR="$YELLOW"
-      else RL_COLOR="$GREEN"; fi
-      LIMITS_TXT=""
-      [ -n "$RL_5H" ] && LIMITS_TXT="5h:$RL_5H_LEFT%"
-      [ -n "$RL_7D" ] && LIMITS_TXT="''${LIMITS_TXT:+$LIMITS_TXT }7d:$RL_7D_LEFT%"
-      LIMITS=" | ''${RL_COLOR}''${LIMITS_TXT} left''${RESET}"
-    fi
-
-    printf '%s\n' "''${CYAN}[$MODEL]''${RESET}$EFFORT_TAG $ICON_DIR ''${DIR##*/}$BRANCH | ''${BAR_COLOR}$BAR''${RESET} $CTX_LEFT% left$LIMITS | ''${YELLOW}$COST_FMT''${RESET} | $ICON_CLOCK ''${TIME_FMT}"
-  '';
+  # 月 "moonlight": powerline segments in dim, cold blue-violet with pale text
+  # over them. Every boundary alternates dark against light as well as shifting
+  # hue, which is what keeps neighbouring fills legible when the whole ramp
+  # sits this close together.
+  ccstatuslineSettings = {
+    version = 3;
+    colorLevel = 3; # truecolor
+    defaultPadding = " ";
+    defaultPaddingSide = "both";
+    flexMode = "full";
+    gitCacheTtlSeconds = 5;
+    powerline = {
+      enabled = true;
+      # Nix strings have no \uXXXX escape, so the Nerd Font glyphs sit here as
+      # literal characters: separator U+E0B0, caps U+E0B6 and U+E0B4.
+      separators = [""];
+      separatorInvertBackground = [false];
+      startCaps = [""];
+      endCaps = [""];
+      theme = "custom"; # colours come from each segment below
+      autoAlign = false;
+      continueThemeAcrossLines = false;
+    };
+    lines = [
+      [
+        # Model and effort share one fill. `merge` drops the arrow that would
+        # otherwise sit between them; it has to be the no-padding form, because
+        # every widget is padded on both sides and a plain merge would leave a
+        # double space — hence the explicit single space put back after it.
+        (seg "model" "model" {
+            fg = "hex:eef1ff";
+            bg = "hex:4c5b8a";
+          } {
+            bold = true;
+            rawValue = true;
+            merge = "no-padding";
+          })
+        {
+          id = "model-gap";
+          type = "custom-text";
+          customText = " ";
+          backgroundColor = "hex:4c5b8a";
+          merge = "no-padding";
+        }
+        (seg "effort" "thinking-effort" {
+          fg = "hex:a3aed0";
+          bg = "hex:4c5b8a";
+        } {rawValue = true;})
+        (seg "cwd" "current-working-dir" {
+            fg = "hex:d6e2ff";
+            bg = "hex:35507a";
+          } {
+            rawValue = true;
+            metadata.segments = "1";
+          })
+        (seg "branch" "git-branch" {
+            fg = "hex:e6f2ff";
+            bg = "hex:4a7fa6";
+          } {
+            rawValue = true;
+            metadata.hideNoGit = "true";
+          })
+        # Renders nothing outside a linked worktree, so it costs no width there.
+        (seg "worktree" "worktree-name" {
+          fg = "hex:d8f0f0";
+          bg = "hex:2f6b74";
+        } {rawValue = true;})
+        (seg "ctx" "context-percentage" {
+          fg = "hex:e4f6f5";
+          bg = "hex:4f8a8b";
+        } {metadata.inverse = "true";}) # percent remaining, not consumed
+        (seg "session" "session-usage" {
+          fg = "hex:d5e3f5";
+          bg = "hex:2e4a6b";
+        } {})
+        (seg "weekly" "weekly-usage" {
+          fg = "hex:eef2ff";
+          bg = "hex:6b7fa8";
+        } {})
+        # The one inverted segment: dark text on a light fill.
+        (seg "cost" "session-cost" {
+            fg = "hex:131a28";
+            bg = "hex:c3cfe8";
+          } {
+            bold = true;
+            rawValue = true;
+          })
+        # A step down from the cost, but neutral grey — a second periwinkle
+        # here would echo the weekly two segments back.
+        (seg "clock" "session-clock" {
+          fg = "hex:1a2130";
+          bg = "hex:a2a9b5";
+        } {rawValue = true;})
+      ]
+    ];
+  };
 in {
+  # On PATH so `ccstatusline` opens its TUI. Editing there is read-only: the
+  # settings file below is a store symlink, so saves fail — it is a preview of
+  # what this module declares, not a way to change it.
+  home.packages = [llmAgents.ccstatusline];
+
+  # ccstatusline reads ~/.config/ccstatusline/settings.json. Generating it keeps
+  # the status line declarative like everything else. A read-only store path is
+  # safe on the render path: ccstatusline only writes back when an
+  # `updatemessage` key is present, which a generated config never has, and its
+  # git/timer caches go to ~/.cache/ccstatusline regardless.
+  xdg.configFile."ccstatusline/settings.json".source =
+    (pkgs.formats.json {}).generate "ccstatusline-settings.json" ccstatuslineSettings;
+
   programs.claude-code = {
     enable = true;
     package = llmAgents.claude-code;
@@ -197,7 +242,11 @@ in {
       tui = "fullscreen";
       statusLine = {
         type = "command";
-        command = "${statusline}";
+        command = "${llmAgents.ccstatusline}/bin/ccstatusline";
+        padding = 0;
+        # Re-render between turns so the session clock stays live. Claude Code
+        # honours this from 2.1.97 on.
+        refreshInterval = 10;
       };
       attribution = {
         commit = "";
