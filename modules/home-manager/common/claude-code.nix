@@ -195,6 +195,9 @@ in {
     enable = true;
     package = llmAgents.claude-code;
     configDir = "${config.xdg.configHome}/claude";
+    # Local skills tree, linked into ~/.config/claude/skills/. Unlike the
+    # `plugins` mechanism these land unnamespaced, so it is `/tospec`, not
+    # `/tospec:tospec` — same as commandsDir below.
     # skills = ../../../agents/skills;
     # Load the command/agent plugins natively (see the note in `plugins` below
     # for why they can't go through the skills-dir plugin mechanism). These link
