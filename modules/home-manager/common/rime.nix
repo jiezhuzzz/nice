@@ -31,11 +31,11 @@ in {
   # Apply its Xiaohe-specific rule sets so English and radical lookup behave
   # consistently with the selected schema.
   home.file."${rimeDir}/melt_eng.custom.yaml".text = builtins.toJSON {
-    patch."speller/algebra".__include = "melt_eng.schema.yaml:/algebra_flypy";
+    patch."speller/algebra".__include = "melt_eng.schema.yaml:/algebra_double_pinyin_flypy";
   };
 
   home.file."${rimeDir}/radical_pinyin.custom.yaml".text = builtins.toJSON {
-    patch."speller/algebra".__include = "radical_pinyin.schema.yaml:/algebra_flypy";
+    patch."speller/algebra".__include = "radical_pinyin.schema.yaml:/algebra_double_pinyin_flypy";
   };
 
   home.file."${rimeDir}" = {
