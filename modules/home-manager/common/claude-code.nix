@@ -7,64 +7,12 @@
   # claude-code from llm-agents.nix (upstream tracks it faster than nixpkgs).
   # A prebuilt per-platform binary, so this resolves per host via the system.
   llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
-  claude-plugins-official = pkgs.fetchFromGitHub {
-    owner = "anthropics";
-    repo = "claude-plugins-official";
-    rev = "66799ffb4611b7e0c3af391c7569823a4d6b4246";
-    sha256 = "39d0315d39d3537710efacf8b2f95ccb1c8b6b453eb8c14ba6c5221497f6a5f0";
-  };
-  codex-plugin-cc = pkgs.fetchFromGitHub {
-    owner = "openai";
-    repo = "codex-plugin-cc";
-    rev = "v1.0.4";
-    sha256 = "cd675dcf5f1cdc4d794cfb84be3324064af088594add9a881b960fe715fa6482";
-  };
-  ast-grep-skill = pkgs.fetchFromGitHub {
-    owner = "ast-grep";
-    repo = "agent-skill";
-    rev = "577f4d4507678f2c8cee150fae25e6ce309f70b1";
-    sha256 = "2e0185b4f89ec8ab68aeedb60211d6f21be427c9021ced82afcac13961aec6f6";
-  };
-  # Matt Pocock's skills, packaged as a plugin whose manifest sits at the repo
-  # root (marketplace.json source "./"), so the plugin path is the store root.
-  # Imperative equivalent: claude plugin marketplace add mattpocock/skills
-  #                        claude plugin install mattpocock-skills@mattpocock
-  mattpocock-skills = pkgs.fetchFromGitHub {
-    owner = "mattpocock";
-    repo = "skills";
-    rev = "9603c1cc8118d08bc1b3bf34cf714f62178dea3b";
-    sha256 = "4baa4044af7da061928ba5dd166eb360a1d3e208ce08dd3020f645725d614441";
-  };
-  # feature-dev and the local conventional-git plugin are command/agent plugins
-  # with no SKILL.md, so the `plugins` (skills-dir) mechanism can't surface
-  # their commands. Merge their commands/ dirs into one tree for commandsDir (a
-  # single-directory option).
-  #
-  # commit-commands is deliberately absent: agents/plugins/conventional-git
-  # supersedes it. Its clean_gone.md is carried over verbatim, its commit.md is
-  # replaced by a subagent-delegating version, and symlinkJoin resolves
-  # duplicate basenames first-path-wins — so keeping both would silently shadow
-  # one of the two `commit.md`s. Only commit-push-pr.md is dropped outright;
-  # the local plugin commits but never pushes.
-  claude-commands = pkgs.symlinkJoin {
-    name = "claude-commands";
-    paths = [
-      "${claude-plugins-official}/plugins/feature-dev/commands"
-      ../../../agents/plugins/conventional-git/commands
-    ];
-  };
-  # Same single-directory constraint for agentsDir, and the module asserts
-  # `agents` and `agentsDir` are mutually exclusive — so the local plugin's
-  # agent gets joined with feature-dev's rather than declared inline. This is
-  # what makes `subagent_type: conventional-git` resolvable for the /commit
-  # command, which the skills-dir plugin mechanism could not do.
-  claude-agents = pkgs.symlinkJoin {
-    name = "claude-agents";
-    paths = [
-      "${claude-plugins-official}/plugins/feature-dev/agents"
-      ../../../agents/plugins/conventional-git/agents
-    ];
-  };
+
+  # Anthropic's marketplace, pinned in flake.lock (see flake.nix). One repo of
+  # ~35 plugins; everything below is a subdirectory of it, so there is exactly
+  # one thing to update.
+  officialPlugins = "${inputs.claude-plugins-official}/plugins";
+
   # ccstatusline (also from llm-agents.nix) renders the status line from this
   # JSON, replacing the hand-rolled shell script that used to live here — which
   # forked jq nine times and git twice on every single render.
@@ -195,20 +143,6 @@ in {
     enable = true;
     package = llmAgents.claude-code;
     configDir = "${config.xdg.configHome}/claude";
-    # Local skills tree, linked into ~/.config/claude/skills/. Unlike the
-    # `plugins` mechanism these land unnamespaced, so it is `/tospec`, not
-    # `/tospec:tospec` — same as commandsDir below.
-    # skills = ../../../agents/skills;
-    # Load the command/agent plugins natively (see the note in `plugins` below
-    # for why they can't go through the skills-dir plugin mechanism). These link
-    # into ~/.config/claude/{commands,agents}/, which Claude Code loads directly
-    # — giving `/feature-dev` (+ its code-explorer / code-architect / code-
-    # reviewer agents) and the local conventional-git plugin's `/commit`,
-    # `/worktree`, `/clean_gone` (+ its conventional-git subagent).
-    # Commands land unnamespaced here, so it is `/commit`, not
-    # `/conventional-git:commit`.
-    commandsDir = claude-commands;
-    agentsDir = claude-agents;
     settings = {
       model = "opus[1m]";
       # Default thinking/reasoning effort. Persisted here, but see the
@@ -298,33 +232,18 @@ in {
         adding one containing `use flake` (then `direnv allow`) so it loads
         automatically — but do not create or commit the file.
     '';
-    # Attribute set rather than a list: the attribute name becomes the plugin's
-    # directory name. Deriving it from a store path (as the list form does)
-    # yields unstable names like `bxa1s0m3h4sh-source`.
+    # Each entry is linked whole as ~/.config/claude/skills/<name> and loaded as
+    # a personal plugin, so its skills, agents, commands and hooks all register
+    # — namespaced under the attribute name. An attribute set rather than a
+    # list: the name becomes that directory, where the list form derives it from
+    # the store path and yields churn like `bxa1s0m3h4sh-source`.
+    #
+    # Anything else from the marketplace is a one-liner away; `ls
+    # ${officialPlugins}` lists all ~35.
     plugins = {
-      # superpowers = pkgs.fetchFromGitHub {
-      #   owner = "jiezhuzzz";
-      #   repo = "superpowers";
-      #   # feat/modern branch, pinned to a commit for reproducibility
-      #   rev = "ebfb33ff491e3b7cb3ce257f99e00c0645ec8b17";
-      #   sha256 = "20021101d89002e891a03ba4bd661ba5a0113bb99c2b30d919e2d10366d4565c";
-      #   name = "superpowers";
-      # };
-      # skill-creator = "${claude-plugins-official}/plugins/skill-creator";
-      claude-code-setup = "${claude-plugins-official}/plugins/claude-code-setup";
-      code-simplifier = "${claude-plugins-official}/plugins/code-simplifier";
-      # feature-dev and commit-commands are NOT loadable via `plugins`: that
-      # mechanism links plugins into ~/.config/claude/skills/, which Claude Code
-      # treats as a skills-only source (it registers a plugin's SKILL.md skills
-      # but ignores its commands/ and agents/). Both ship commands (feature-dev
-      # also agents) and no skill, so via `plugins` they contribute nothing and
-      # their slash commands stay unknown. They are instead loaded natively
-      # through commandsDir/agentsDir above.
-      # ralph-loop = "${claude-plugins-official}/plugins/ralph-loop";
-      # codex = "${codex-plugin-cc}/plugins/codex";
-      mattpocock-skills = "${mattpocock-skills}";
-      # ast-grep = "${ast-grep-skill}/ast-grep";
-      # research-writing = ../../../agents/plugins/research-writing;
+      claude-code-setup = "${officialPlugins}/claude-code-setup";
+      code-simplifier = "${officialPlugins}/code-simplifier";
+      feature-dev = "${officialPlugins}/feature-dev";
     };
   };
 }

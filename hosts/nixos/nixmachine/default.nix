@@ -8,6 +8,11 @@
   imports = [
     ../../../profiles/homelab.nix
     ../../../modules/nixos/hardware/audio.nix # PipeWire (ALSA + Pulse) for local playback
+    # fwupd, so the Framework Desktop's BIOS can be updated from LVFS rather
+    # than an EFI-shell USB stick. Imported as a leaf rather than through
+    # hardware/default.nix: that bundle also carries power/bluetooth/touchpad,
+    # which are laptop concerns. Also flips on hardware.enableAllFirmware.
+    ../../../modules/nixos/hardware/firmware.nix
     ../../../modules/nixos/media # media automation stack
     ../../../modules/nixos/llm # open-webui + litellm LLM gateway
     ../../../modules/nixos/stirling-pdf.nix # self-hosted PDF toolkit

@@ -53,10 +53,9 @@ in {
       patches = (old.patches or []) ++ [./recursive-project-trust.patch];
     });
     # No `skills` here: the conventional-git skill that used to be shared with
-    # Claude Code became a Claude-Code-only plugin (agents/plugins/
-    # conventional-git), whose /commit dispatches a subagent — a mechanism Codex
-    # has no equivalent for. Codex therefore carries no commit-convention
-    # guidance; re-add a SKILL.md here if that becomes a problem.
+    # Claude Code became a Claude-Code-only plugin and has since been dropped
+    # from that side too. Neither CLI carries commit-convention guidance now;
+    # add a SKILL.md here if that becomes a problem.
     settings = {
       # Auto-review: route approval requests to Codex's Guardian reviewer
       # agent instead of pausing for the user. Only takes effect with

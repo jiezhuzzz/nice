@@ -52,15 +52,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # llm-agents.nix: source for the claude-code and codex CLIs, which upstream
-    # tracks faster than nixpkgs (see modules/home-manager/common/{claude-code,
-    # codex}.nix). Both are pulled from its `packages.<system>` output.
-    #
-    # `follows` for consistency with every other input. The trade-off is muted
-    # here: claude-code is a prebuilt per-platform binary (a fixed-output fetch,
-    # so following costs only its tiny wrapper), and codex is rebuilt from source
-    # regardless because we patch it — so numtide's binary cache would miss it
-    # even without the follows. A single nixpkgs is the better default.
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -121,6 +112,12 @@
     };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+
+    # claude-plugins-official: the official plugin collection for the Claude Code.
+    claude-plugins-official = {
+      url = "github:anthropics/claude-plugins-official";
       flake = false;
     };
   };
