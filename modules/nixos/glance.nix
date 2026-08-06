@@ -1,10 +1,10 @@
 # Glance — lightweight self-hosted dashboard for the homelab. A single "glanceable"
 # landing page: news feeds (Hacker News, Lobsters, RSS) plus a monitor
-# widget that health-checks and links to the other web UIs on this box by their
-# mDNS names (nixmachine.local — see ./mdns.nix) rather than a DHCP-assigned IP.
+# widget that health-checks and links to the other web UIs on this box.
 # Native NixOS service; binds 0.0.0.0 with openFirewall (any-source — the box
 # is NAT'd (v4) and ULA-only (v6) and the tailnet interface is trusted), matching the other web UIs.
-# Reachable at http://nixmachine.local:8083. Feeds and links are plain data —
+# Reachable at https://glance.jiezhu.me over the tailnet, or
+# http://nixmachine.local:8083 on the LAN. Feeds and links are plain data —
 # edit freely.
 #
 # The air-quality widget (custom-api) hits the WAQI API; its free token is an
@@ -128,26 +128,41 @@
                   type = "monitor";
                   title = "Services";
                   cache = "1m";
+                  # `url` is what the tile links to, `check-url` is what glance
+                  # actually probes. Link to the caddy names so a tile opens the
+                  # same way the dashboard itself was reached, but probe
+                  # localhost: glance runs on this box, so the check needs no
+                  # DNS, no tailnet and no TLS handshake.
                   sites = [
                     {
                       title = "Jellyfin";
-                      url = "http://nixmachine.local:8096";
+                      url = "https://jellyfin.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:8096";
                       icon = "di:jellyfin";
                     }
                     {
                       title = "Transmission";
-                      url = "http://nixmachine.local:9091";
+                      url = "https://transmission.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:9091";
                       icon = "di:transmission";
                     }
                     {
                       title = "Stirling PDF";
-                      url = "http://nixmachine.local:8082";
+                      url = "https://pdf.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:8082";
                       icon = "di:stirling-pdf";
                     }
                     {
                       title = "Karakeep";
-                      url = "http://nixmachine.local:8084";
+                      url = "https://karakeep.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:8084";
                       icon = "di:karakeep";
+                    }
+                    {
+                      title = "SearXNG";
+                      url = "https://searx.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:8085";
+                      icon = "di:searxng";
                     }
                   ];
                 }
