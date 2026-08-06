@@ -72,10 +72,9 @@ in {
         # rpiv's /rpiv-setup actively prunes the old one). Supplies the Agent /
         # get_subagent_result / steer_subagent tools used by skills and advisors.
         "npm:@tintinweb/pi-subagents" # delegate tasks to subagents
+
+        "npm:pi-powerline-footer" # powerline-style status footer
       ];
-      # npm:pi-powerline-footer is deliberately absent: 0.9.0 (its newest) peers
-      # on @earendil-works/pi-ai ">=0.74.0 <0.81.0" and pi 0.83 wants ^0.83.0,
-      # so it is declared incompatible. Revisit once upstream widens the range.
 
       # Catppuccin. pi only ships `dark` and `light` built in, and catppuccin/
       # nix has no pi module for autoEnable to pick up, so the theme comes from

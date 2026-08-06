@@ -47,8 +47,8 @@ in {
     # "Do you trust the contents of this directory?" prompt every time. With
     # this patch, trusting $HOME recursively trusts everything beneath it.
     # See https://github.com/openai/codex/issues/14601 (workaround comment).
-    # Verified to apply against codex 0.145.0 (tag rust-v0.145.0), the version
-    # llm-agents currently ships; revisit if the patchPhase fails after a bump.
+    # Verified to apply against codex 0.146.0, the version llm-agents currently
+    # ships; revisit if the patchPhase fails after a bump.
     package = llmAgents.codex.overrideAttrs (old: {
       patches = (old.patches or []) ++ [./recursive-project-trust.patch];
     });
