@@ -16,11 +16,33 @@
 # Use https://karakeep.jiezhu.me — NEXTAUTH_URL below makes auth cookies
 # Secure-only, so logging in over plain http://nixmachine.local:8084 fails.
 # The admin account exists; sign-ups are disabled (DISABLE_SIGNUPS below).
-_: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   # pnpm 9.15.9 is karakeep's build-time tool (used by karakeep-init to build the
   # Next.js frontend); nixpkgs marked it insecure. The vuln is build-time only, so
   # allow it here until upstream karakeep bumps its pnpm. Remove this when it does.
   nixpkgs.config.permittedInsecurePackages = ["pnpm-9.15.9"];
+
+  # nixpkgs workaround (remove once fixed upstream): the karakeep module sets
+  # services.meilisearch.settings.experimental_dumpless_upgrade, but meilisearch
+  # 1.51 renamed that key to upgrade_db — which the meilisearch module already
+  # sets — so the stale one makes the daemon exit 1 on "unknown field" before it
+  # ever listens. Regenerate the config without it; every other key, including
+  # any future nixpkgs default, still flows through untouched.
+  systemd.services.meilisearch.serviceConfig.ExecStartPre = let
+    settings =
+      lib.filterAttrs
+      (name: value: value != null && name != "experimental_dumpless_upgrade")
+      config.services.meilisearch.settings;
+    configFile = (pkgs.formats.toml {}).generate "config.toml" settings;
+  in
+    lib.mkForce [
+      "${lib.getExe' pkgs.coreutils "install"} -m 700 '${configFile}' \"\${RUNTIME_DIRECTORY}/config.toml\""
+    ];
 
   services.karakeep = {
     enable = true;
