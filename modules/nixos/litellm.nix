@@ -1,13 +1,13 @@
 # LiteLLM — unified OpenAI-compatible gateway for cloud LLMs. Fronts both
-# Anthropic (Claude) and OpenAI so Open WebUI and Karakeep need one backend and both
-# provider keys live in one place. Localhost-only; the keys come from a
-# root-only env file (out of the Nix store), referenced as os.environ/... in the
-# model list. Default port 8080 would clash with metatube, so use 4000.
+# Anthropic (Claude) and OpenAI so Karakeep needs one backend and both provider
+# keys live in one place. Localhost-only; the keys come from a root-only env
+# file (out of the Nix store), referenced as os.environ/... in the model list.
+# Default port 8080 would clash with metatube, so use 4000.
 {config, ...}: {
   # Decrypted at activation to /run/agenix/litellm-provider-keys. systemd reads
   # the root-only env file before starting LiteLLM's DynamicUser process.
   age.secrets.litellm-provider-keys = {
-    file = ../../../secrets/llm/provider-keys.age;
+    file = ../../secrets/llm/provider-keys.age;
     mode = "0400";
   };
 

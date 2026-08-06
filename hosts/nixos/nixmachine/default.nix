@@ -14,7 +14,7 @@
     # which are laptop concerns. Also flips on hardware.enableAllFirmware.
     ../../../modules/nixos/hardware/firmware.nix
     ../../../modules/nixos/media # media automation stack
-    ../../../modules/nixos/llm # open-webui + litellm LLM gateway
+    ../../../modules/nixos/litellm.nix # LLM gateway holding the provider keys
     ../../../modules/nixos/stirling-pdf.nix # self-hosted PDF toolkit
     ../../../modules/nixos/karakeep.nix # self-hosted bookmark-everything app
     ../../../modules/nixos/mdns.nix # Avahi mDNS — nixmachine.local resolves on the LAN

@@ -140,11 +140,6 @@
                       icon = "di:transmission";
                     }
                     {
-                      title = "Open WebUI";
-                      url = "http://nixmachine.local:8081";
-                      icon = "di:open-webui";
-                    }
-                    {
                       title = "Stirling PDF";
                       url = "http://nixmachine.local:8082";
                       icon = "di:stirling-pdf";

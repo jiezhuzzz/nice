@@ -47,11 +47,6 @@
         reverse_proxy 127.0.0.1:8084
       }
 
-      @chat host chat.jiezhu.me
-      handle @chat {
-        reverse_proxy 127.0.0.1:8081
-      }
-
       @pdf host pdf.jiezhu.me
       handle @pdf {
         reverse_proxy 127.0.0.1:8082
