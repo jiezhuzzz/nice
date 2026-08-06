@@ -164,6 +164,12 @@
                       "check-url" = "http://127.0.0.1:8085";
                       icon = "di:searxng";
                     }
+                    {
+                      title = "Vaultwarden";
+                      url = "https://vault.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:8222";
+                      icon = "di:vaultwarden";
+                    }
                   ];
                 }
               ];

@@ -263,6 +263,25 @@ in {
               "com.sun:auto-snapshot" = "false";
             };
           };
+          # Service backups (vaultwarden's nightly sqlite dump, for now). The
+          # odd one out under `cache` — not rebuildable — but it belongs on
+          # tank rather than beside the data it protects on rpool.
+          # recordsize/compression/atime are inherited rather than pinned like
+          # the siblings above: this holds small files, not media blobs. Mode
+          # 0711 so a service user can traverse to its own subdirectory (which
+          # the service creates, owned by itself) without listing the rest.
+          "cache/backups" = {
+            type = "zfs_fs";
+            mountpoint = "/tank/cache/backups";
+            mountOptions = mkMountOptions "root" "root" "0711";
+            options = {
+              mountpoint = "legacy";
+              special_small_blocks = "0"; # keep backups off the NVMe special vdev
+              # Inert until a snapshot service exists; set so this doesn't
+              # inherit the cache parent's `false`.
+              "com.sun:auto-snapshot" = "true";
+            };
+          };
           # Photos: full-res raws stay on HDD; sidecars (.xmp, small JPEGs,
           # thumbnails) go to SSD for fast browsing.
           "photos" = {

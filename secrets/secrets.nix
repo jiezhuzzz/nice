@@ -40,4 +40,8 @@ in {
   # SearXNG's server.secret_key. Only nixmachine runs searxng; password-manager
   # is the editing/recovery recipient.
   "searxng/secret-key.age".publicKeys = [nixmachine password-manager];
+  # Vaultwarden's ADMIN_TOKEN (an Argon2 PHC hash, not a plaintext password).
+  # Only nixmachine runs vaultwarden; password-manager is the editing/recovery
+  # recipient.
+  "vaultwarden/admin-token.age".publicKeys = [nixmachine password-manager];
 }

@@ -62,6 +62,13 @@
         reverse_proxy 127.0.0.1:8085
       }
 
+      # Vaultwarden opens no firewall port, so this is its only reachable
+      # path — not merely a nicer name for one, as with the vhosts above.
+      @vault host vault.jiezhu.me
+      handle @vault {
+        reverse_proxy 127.0.0.1:8222
+      }
+
       # Unmatched subdomain: close the connection, don't serve a default page.
       handle {
         abort
