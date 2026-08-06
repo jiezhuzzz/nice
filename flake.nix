@@ -2,22 +2,14 @@
   description = "A nice configuration (laptop, mac, server, nas)";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # Flake foundation
+    nixpkgs = {
+      url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    };
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    xremap-flake = {
-      url = "github:xremap/nix-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-darwin = {
-      url = "github:LnL7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     treefmt-nix = {
@@ -25,97 +17,105 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    catppuccin.url = "github:catppuccin/nix";
+    # System builders (see lib/mk-hosts.nix)
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    # noctalia-shell: the Quickshell desktop shell for niri on nixps.
-    #
-    # `follows` keeps a single nixpkgs across the flake, consistent with every
-    # other input here. The trade-off is that it also defeats upstream's
-    # binary cache — rebuilding against our nixpkgs changes the derivation
-    # hashes, so noctalia.cachix.org never matches and Quickshell/Qt are built
-    # from source. Drop the follows if that build cost stops being acceptable.
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Secrets
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+        darwin.follows = "nix-darwin";
+      };
+    };
+
+    # NixOS machine-level
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Pinned to a master rev, not a tag: only master has
+    # autoEnrollKeys.includeFirmwareBuiltinKeys, which nixps needs to keep its
+    # OEM certificates (and thus fwupd) working through key enrollment. Move
+    # back to a tag once one ships with that option.
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/6183ac79eadb079a1e72fa2c60915601be669100";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    xremap-flake = {
+      url = "github:xremap/nix-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Linux desktop: niri shell + matching greetd login screen on nixps.
+    # `follows` keeps one nixpkgs flake-wide but defeats upstream's binary
+    # cache, so Quickshell/Qt and the greeter's wlroots build from source.
+    # Drop the follows if that build cost stops being acceptable.
     noctalia = {
       url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # noctalia-greeter: the greetd login screen matching noctalia-shell, used on
-    # nixps (see modules/nixos/desktop/login.nix).
-    #
-    # `follows` for the same reason as `noctalia` above, and with the same
-    # trade-off: it defeats the project's own binary cache, so the bundled
-    # wlroots compositor is built from source against our nixpkgs. That build is
-    # far cheaper than noctalia's Qt/Quickshell closure, so it is accepted here
-    # rather than carrying a second nixpkgs to keep the cache match.
     noctalia-greeter = {
       url = "github:noctalia-dev/noctalia-greeter";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+    # macOS: declarative Homebrew
+    nix-homebrew = {
+      url = "github:zhaofengli/nix-homebrew";
+      # Track brew HEAD instead of nix-homebrew's brew-src pin: the taps below
+      # follow HEAD, so a lagging brew fails to parse casks using newer DSL.
+      inputs.brew-src.url = "github:Homebrew/brew";
     };
 
-    # Catppuccin themes for pi — catppuccin/nix ships no pi module, so
-    # catppuccin.autoEnable cannot reach it (see the theme note in
-    # modules/home-manager/common/pi.nix).
-    #
-    # Only `packages.<system>.default` is consumed: a trivial derivation that
-    # copies four theme JSONs into share/pi/themes. Upstream's
-    # homeManagerModules.default is deliberately NOT imported — it hardcodes
-    # ~/.pi/agent/themes (pi runs with an XDG configDir here) and jq-rewrites
-    # settings.json in an activation script, which would fight the read-only
-    # store symlink home-manager generates from `settings`.
-    pi-catppuccin = {
-      url = "github:otahontas/pi-coding-agent-catppuccin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    agenix.url = "github:ryantm/agenix";
-    agenix.inputs.nixpkgs.follows = "nixpkgs";
-    agenix.inputs.home-manager.follows = "home-manager";
-    agenix.inputs.darwin.follows = "nix-darwin";
-
-    # Declarative disk partitioning / ZFS layout for the nixmachine NAS.
-    disko.url = "github:nix-community/disko";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
-
-    # Signed boot (UEFI Secure Boot) for nixps; see modules/nixos/secureboot.nix.
-    #
-    # Pinned past v1.1.0 to an explicit master rev, not a branch: only master
-    # has autoEnrollKeys.includeFirmwareBuiltinKeys, which this Dell needs to
-    # retain its OEM certificates through enrollment so fwupd firmware updates
-    # keep working. An exact rev keeps `nix flake update` from silently moving
-    # unreleased code in the boot path. Move back to a tag once one ships with
-    # that option.
-    lanzaboote.url = "github:nix-community/lanzaboote/6183ac79eadb079a1e72fa2c60915601be669100";
-    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
-
-    # Declarative Homebrew install (complements nix-darwin's `homebrew` state mgmt).
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    # Track Homebrew/brew HEAD instead of nix-homebrew's own brew-src pin: the
-    # tap inputs below follow HEAD (CI bumps flake.lock), so a lagging brew
-    # eventually fails to parse casks that use newer DSL. That happened with
-    # nix-homebrew's brew 6.0.12 pin vs. betterdisplay's `command_wrapper`
-    # (added in brew 6.0.13). Tracking HEAD keeps brew and the taps in step.
-    nix-homebrew.inputs.brew-src.url = "github:Homebrew/brew";
-
-    # Brew taps pinned via flake.lock (mutableTaps = false).
+    # Taps pinned via flake.lock (mutableTaps = false).
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
     };
+
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
       flake = false;
     };
 
-    # claude-plugins-official: the official plugin collection for the Claude Code.
+    # Theming
+    catppuccin = {
+      url = "github:catppuccin/nix";
+    };
+
+    # Only `packages.<system>.default` is consumed. Do NOT import upstream's
+    # homeManagerModules.default: it hardcodes ~/.pi/agent/themes and rewrites
+    # settings.json, fighting the read-only store symlink home-manager
+    # generates from `settings` (see modules/home-manager/common/pi.nix).
+    pi-catppuccin = {
+      url = "github:otahontas/pi-coding-agent-catppuccin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Coding agents
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     claude-plugins-official = {
       url = "github:anthropics/claude-plugins-official";
       flake = false;
