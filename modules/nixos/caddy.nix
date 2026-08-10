@@ -17,6 +17,18 @@
   ...
 }: let
   webServices = import ./web-services.nix;
+
+  # A service carrying `proxyDirectives` gets a reverse_proxy block instead of
+  # the bare one-liner. Indentation is irrelevant — the module runs `caddy fmt`.
+  proxyBlock = svc: let
+    target = "127.0.0.1:${toString svc.port}";
+  in
+    if svc ? proxyDirectives
+    then ''
+      reverse_proxy ${target} {
+        ${svc.proxyDirectives}
+      }''
+    else "reverse_proxy ${target}";
 in {
   services.caddy = {
     enable = true;
@@ -40,7 +52,7 @@ in {
       + lib.concatMapStrings (svc: ''
         @${svc.name} host ${svc.name}.jiezhu.me
         handle @${svc.name} {
-          reverse_proxy 127.0.0.1:${toString svc.port}
+          ${proxyBlock svc}
         }
 
       '')

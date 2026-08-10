@@ -2,6 +2,7 @@
 # per entry) and glance.nix (one dashboard tile per entry with a `title`).
 # Adding a service here gives it both in one step. The port must still match
 # what the service module itself binds. List order is glance's tile order.
+# An entry may also carry `proxyDirectives`: extra lines for its reverse_proxy block.
 [
   # The dashboard itself — a vhost but no tile of its own.
   {
@@ -38,8 +39,8 @@
     title = "SearXNG";
     icon = "di:searxng";
   }
-  # Vaultwarden and Memos open no firewall port — their caddy vhost is their
-  # only reachable path, not merely a nicer name for one.
+  # The rest open no firewall port — their caddy vhost is their only reachable
+  # path, not merely a nicer name for one.
   {
     name = "vault";
     port = 8222;
@@ -51,5 +52,21 @@
     port = 5230;
     title = "Memos";
     icon = "di:memos";
+  }
+  {
+    name = "miniflux";
+    port = 8086;
+    title = "Miniflux";
+    icon = "di:miniflux";
+    # Passwordless login (AUTH_PROXY_HEADER in miniflux.nix). No +/- prefix
+    # means *set*, so a client's own X-Auth-User is replaced, not appended.
+    proxyDirectives = "header_up X-Auth-User jie";
+  }
+  {
+    # dashboard-icons has no SVG for this one, and glance defaults to .svg.
+    name = "rsshub";
+    port = 1200;
+    title = "RSSHub";
+    icon = "di:rsshub.png";
   }
 ]

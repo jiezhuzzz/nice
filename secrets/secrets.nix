@@ -44,4 +44,6 @@ in {
   # Only nixmachine runs vaultwarden; password-manager is the editing/recovery
   # recipient.
   "vaultwarden/admin-token.age".publicKeys = [nixmachine password-manager];
+  # Miniflux's seed admin account (ADMIN_USERNAME/ADMIN_PASSWORD env file).
+  "miniflux/admin-credentials.age".publicKeys = [nixmachine password-manager];
 }
