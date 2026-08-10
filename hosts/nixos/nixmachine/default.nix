@@ -24,7 +24,7 @@
     ../../../modules/nixos/searxng.nix # self-hosted metasearch — pi's web_search backend
     ../../../modules/nixos/tailscale.nix # mesh VPN — remote access path (SSH + caddy.nix)
     ../../../modules/nixos/caddy.nix # HTTPS names on *.jiezhu.me over the tailnet
-    ../../../modules/nixos/gaming.nix # console-like Steam gamescope session (local play)
+    ../../../modules/nixos/gaming # console-like Steam gamescope session (local play)
     inputs.disko.nixosModules.disko
     ./disko.nix # ZFS layout — also generates fileSystems for the legacy mounts
     ./hardware.nix

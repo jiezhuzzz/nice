@@ -4,7 +4,7 @@
   ...
 }: {
   # noctalia-greeter: a graphical greetd login screen that matches noctalia-shell
-  # (the desktop, see modules/home-manager/linux/noctalia.nix). It runs inside a
+  # (the desktop, see modules/home-manager/linux/noctalia/). It runs inside a
   # bundled wlroots compositor and lets you pick user/session/scheme before niri
   # starts. Replaces the previous greetd + tuigreet setup.
   #

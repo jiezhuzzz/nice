@@ -1,0 +1,20 @@
+{inputs, ...}: let
+  # Anthropic's marketplace, pinned in flake.lock (see flake.nix). One repo of
+  # ~35 plugins; everything below is a subdirectory of it, so there is exactly
+  # one thing to update.
+  officialPlugins = "${inputs.claude-plugins-official}/plugins";
+in {
+  # Each entry is linked whole as ~/.config/claude/skills/<name> and loaded as
+  # a personal plugin, so its skills, agents, commands and hooks all register
+  # — namespaced under the attribute name. An attribute set rather than a
+  # list: the name becomes that directory, where the list form derives it from
+  # the store path and yields churn like `bxa1s0m3h4sh-source`.
+  #
+  # Anything else from the marketplace is a one-liner away; `ls
+  # ${officialPlugins}` lists all ~35.
+  programs.claude-code.plugins = {
+    claude-code-setup = "${officialPlugins}/claude-code-setup";
+    code-simplifier = "${officialPlugins}/code-simplifier";
+    feature-dev = "${officialPlugins}/feature-dev";
+  };
+}

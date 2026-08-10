@@ -60,7 +60,7 @@ The `mk-hosts.nix` builders own all cross-cutting plumbing: they inject `inputs`
    - `nixos/` — NixOS system modules (boot, hardware, desktop, secrets)
    - `nix-darwin/` — macOS system modules (fonts, homebrew, secrets, system)
 
-   Convention: leaf modules are single `.nix` files; directories only for composites (`nixos/desktop/`, `nixos/media/`, …) or modules with assets (`common/ghostty/`).
+   Convention: one concern per file. Single-concern leaf modules are single `.nix` files; directories hold composites (`nixos/desktop/`, `nixos/media/`, …) or a module split across concern files once it outgrows one (`nixos/gaming/`, `common/claude-code/`, `linux/noctalia/`) — each such directory's `default.nix` is a pure `imports` aggregator — or modules with assets (`common/ghostty/`, `linux/niri/`), where `default.nix` is the module itself referencing its sibling asset files.
 
 3. **Hosts** (`hosts/`) — per-machine hardware and overrides
 

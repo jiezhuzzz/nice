@@ -59,9 +59,9 @@
     imports = [
       ./home/desktop.nix
       ../modules/home-manager/linux/packages.nix
-      ../modules/home-manager/linux/niri.nix
+      ../modules/home-manager/linux/niri
       ../modules/home-manager/linux/xremap.nix
-      ../modules/home-manager/linux/noctalia.nix
+      ../modules/home-manager/linux/noctalia
       ../modules/home-manager/linux/chromium.nix
       ../modules/home-manager/linux/fcitx5.nix
       ../modules/home-manager/linux/ghostty.nix

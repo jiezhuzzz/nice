@@ -23,7 +23,7 @@
     ../../modules/home-manager/common/gitui.nix
     ../../modules/home-manager/common/bottom.nix
     ../../modules/home-manager/common/ripgrep.nix
-    ../../modules/home-manager/common/claude-code.nix
+    ../../modules/home-manager/common/claude-code
     ../../modules/home-manager/common/codex.nix
     ../../modules/home-manager/common/pi.nix
     ../../modules/home-manager/common/uv.nix

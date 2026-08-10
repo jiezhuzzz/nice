@@ -1,56 +1,5 @@
-{
-  config,
-  inputs,
-  pkgs,
-  ...
-}: let
-  sleepGuardUnit = "noctalia-sleep-guard.service";
-  lockMarker = "$XDG_RUNTIME_DIR/noctalia-session-locked";
-  systemctl = "${pkgs.systemd}/bin/systemctl";
-
-  secureSuspend = pkgs.writeShellScript "noctalia-secure-suspend" ''
-    set -euo pipefail
-
-    lock_marker="$XDG_RUNTIME_DIR/noctalia-session-locked"
-    for _ in {1..20}; do
-      if [[ -e "$lock_marker" ]]; then
-        break
-      fi
-      ${pkgs.coreutils}/bin/sleep 0.1
-    done
-
-    if [[ ! -e "$lock_marker" ]]; then
-      echo "refusing to suspend without an acknowledged Noctalia lock" >&2
-      exit 1
-    fi
-
-    ${systemctl} --user stop ${sleepGuardUnit}
-    exec ${systemctl} suspend
-  '';
-
-  startGuard =
-    "${pkgs.coreutils}/bin/rm -f \"${lockMarker}\""
-    + " && ${systemctl} --user start ${sleepGuardUnit}";
-  stopGuard =
-    "${pkgs.coreutils}/bin/touch \"${lockMarker}\""
-    + " && ${systemctl} --user stop ${sleepGuardUnit}";
-in {
-  # noctalia v5: a Wayland shell (bar, notifications, launcher, control centre,
-  # lock screen) for niri. Upstream ships its own home-manager module, so the
-  # package and config file are wired through that rather than by hand.
-  #
-  # v5 is a ground-up rewrite: v4 was Quickshell/QML reading a JSON
-  # settings.json, v5 is a native C++/meson binary reading TOML. No v4 settings
-  # carry over, and the Qt plumbing v4 needed (qt6ct, QT_QPA_PLATFORM) went with
-  # it — v5 links cairo/pango/librsvg, not Qt.
-  #
-  # Run as a systemd user service rather than niri's spawn-at-startup (the two
-  # are mutually exclusive — both would start a second instance). The unit is
-  # WantedBy the graphical-session target and carries X-Restart-Triggers on the
-  # config file, so editing settings here restarts the shell on switch instead
-  # of leaving a stale process serving its old view of the world.
-  imports = [inputs.noctalia.homeModules.default];
-
+# The shell itself: bar, launcher, lock screen, idle flow, theme.
+{pkgs, ...}: {
   programs.noctalia = {
     enable = true;
     systemd.enable = true;
@@ -95,7 +44,8 @@ in {
 
         # Pin the power menu to lock-aware actions. In particular, omit the
         # plain suspend action and route lock-and-suspend through the guarded
-        # command below.
+        # command in sleep-guard.nix (which sets power.suspend on this same
+        # shell.session tree).
         session = {
           actions = [
             {
@@ -120,12 +70,11 @@ in {
               variant = "destructive";
             }
           ];
-          power.suspend = "${secureSuspend}";
         };
       };
 
-      # Noctalia owns the visual lock screen and idle flow. The user sleep
-      # guard below covers suspend attempts that originate outside Noctalia.
+      # Noctalia owns the visual lock screen and idle flow. The sleep guard in
+      # sleep-guard.nix covers suspend attempts that originate outside Noctalia.
       lockscreen.enabled = true;
 
       idle = {
@@ -149,14 +98,6 @@ in {
         };
       };
 
-      # Track the compositor-acknowledged lock state. The guard blocks sleep
-      # while unlocked and is released only after session_locked fires.
-      hooks = {
-        started = startGuard;
-        session_locked = stopGuard;
-        session_unlocked = startGuard;
-      };
-
       theme = {
         mode = "dark";
         source = "builtin";
@@ -172,7 +113,7 @@ in {
         #
         # Left empty so no app is themed this way. Both are already covered
         # better elsewhere: ghostty by the catppuccin flake, and niri's colours
-        # are set explicitly in niri.nix (whose neutral focus-ring is a
+        # are set explicitly in niri/config.kdl (whose neutral focus-ring is a
         # deliberate choice the niri template would overwrite with mauve).
         #
         # NOTE: this is only the declarative base. noctalia's settings GUI
@@ -182,29 +123,6 @@ in {
         templates.builtin_ids = [];
       };
     };
-  };
-
-  systemd.user.services.noctalia-sleep-guard = {
-    Unit = {
-      Description = "Block sleep until Noctalia has locked the session";
-      PartOf = [config.wayland.systemd.target];
-      Before = ["noctalia.service"];
-    };
-
-    Service = {
-      Type = "simple";
-      ExecStart =
-        "${pkgs.systemd}/bin/systemd-inhibit"
-        + " --what=sleep"
-        + " --who=Noctalia"
-        + " --why=\"Session is not locked\""
-        + " --mode=block"
-        + " ${pkgs.coreutils}/bin/sleep infinity";
-      Restart = "on-failure";
-      RestartSec = 1;
-    };
-
-    Install.WantedBy = [config.wayland.systemd.target];
   };
 
   # Icon theme for the launcher and dock, which resolve application icons via
