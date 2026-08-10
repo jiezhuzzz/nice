@@ -16,8 +16,6 @@
   pkgs,
   ...
 }: let
-  # One vhost per web UI, generated from the shared registry — the name/port
-  # pairs live in web-services.nix, which glance.nix renders its tiles from.
   webServices = import ./web-services.nix;
 in {
   services.caddy = {

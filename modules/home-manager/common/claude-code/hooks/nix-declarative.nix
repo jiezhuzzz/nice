@@ -1,9 +1,8 @@
-# The Nix counterpart of the pip rule (uv-only.nix, which this snippet rides
-# the claude-bash-guard binary with), and it exists for the same reason: an
-# imperative install is the one thing that puts software on this machine
-# without a line in this flake describing it. It also hides — nothing in a
-# `git status` shows that `nix-env -i` ever ran, so the drift is only found
-# much later, on a host that was supposed to be reproducible.
+# The Nix counterpart of the pip rule, for the same reason: an imperative
+# install is the one thing that puts software on this machine without a line
+# in this flake describing it. It also hides — nothing in a `git status`
+# shows that `nix-env -i` ever ran, so the drift is only found much later, on
+# a host that was supposed to be reproducible.
 #
 # The corrected command depends on why the tool is wanted, so the reason names
 # both: `nix shell nixpkgs#pkg -c ...` for a one-off (the common case — the

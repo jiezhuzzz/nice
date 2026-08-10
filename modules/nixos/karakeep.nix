@@ -30,11 +30,9 @@
   # services.meilisearch.settings.experimental_dumpless_upgrade, but meilisearch
   # 1.51 renamed that key to upgrade_db — which the meilisearch module already
   # sets — so the stale one makes the daemon exit 1 on "unknown field" before it
-  # ever listens. Delete the key from the runtime copy of the config, appended
-  # (mkAfter) so the module's own ExecStartPre steps — the install, and the
-  # replace-secret templating should masterKeyFile ever be set — run first and
-  # survive intact, where a mkForce of a regenerated config would silently
-  # drop them.
+  # ever listens. Delete the key from the runtime copy of the config; mkAfter
+  # keeps the module's own ExecStartPre steps (install, and replace-secret
+  # should masterKeyFile ever be set) running first and intact.
   systemd.services.meilisearch.serviceConfig.ExecStartPre = lib.mkAfter [
     "${lib.getExe pkgs.gnused} -i '/^experimental_dumpless_upgrade/d' \"\${RUNTIME_DIRECTORY}/config.toml\""
   ];

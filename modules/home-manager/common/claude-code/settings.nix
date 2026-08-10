@@ -1,7 +1,6 @@
 # Claude Code itself: package, config location, and every settings key not
 # owned by a sibling (hooks/ owns settings.hooks, statusline.nix owns
-# settings.statusLine). `settings` is freeform JSON, so sibling files may set
-# disjoint keys of it — the same leaf in two files is an eval error.
+# settings.statusLine — the same leaf in two files is an eval error).
 {
   config,
   inputs,
@@ -31,14 +30,10 @@ in {
       # `context` in context.nix still apply (those are user-authored, not auto
       # memory).
       autoMemoryEnabled = false;
-      # Every guard rule is enforced twice — here and in hooks/ — and the
-      # order matters. The hooks run first and are what the agent actually
-      # reads — they refuse *and* print the corrected command to run instead.
-      # These deny rules only ever surface if a hook fails open (missing jq, a
-      # shell error), since a hook that errors is non-blocking; they refuse
-      # without explaining, which is exactly the behaviour the hooks exist to
-      # replace. Keep the list in step with the guards: one backstop entry set
-      # per guard file.
+      # Backstops for the guards in hooks/: the hooks run first and refuse
+      # with the corrected command; these deny rules only surface if a hook
+      # fails open (a hook that errors is non-blocking). One entry set per
+      # guard file — keep them in step.
       permissions = {
         defaultMode = "auto";
         deny = [

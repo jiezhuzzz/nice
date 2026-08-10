@@ -1,9 +1,6 @@
 # Block system sleep until Noctalia has actually locked the session: a
 # systemd-inhibit guard unit, a suspend wrapper that waits for the lock
-# acknowledgement, and the noctalia hooks that arm/release the guard. The keys
-# set under programs.noctalia.settings here (hooks.*, shell.session.power.suspend)
-# are disjoint from the leaves shell.nix sets, so the two files merge cleanly
-# into one settings tree.
+# acknowledgement, and the noctalia hooks that arm/release the guard.
 {
   config,
   pkgs,

@@ -12,10 +12,6 @@
 # WantedBy the graphical-session target and carries X-Restart-Triggers on the
 # config file, so editing settings here restarts the shell on switch instead
 # of leaving a stale process serving its old view of the world.
-#
-# Both leaves set keys inside the same `programs.noctalia.settings` tree; the
-# module system's recursive attrset merge combines them, which is safe as long
-# as no leaf key is set by both files.
 {inputs, ...}: {
   imports = [
     inputs.noctalia.homeModules.default

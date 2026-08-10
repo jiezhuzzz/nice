@@ -1,6 +1,5 @@
-# Wires the guard hooks into Claude Code's PreToolUse list. Each guard is a
-# shell snippet in its own file beside this one; the shared machinery and the
-# rationale for guarding at all live in lib.nix.
+# Wires the guard snippets beside this file into Claude Code's PreToolUse
+# list; machinery and rationale live in lib.nix.
 {
   lib,
   pkgs,
@@ -8,10 +7,8 @@
 }: let
   inherit (import ./lib.nix {inherit pkgs;}) mkGuardHook commandGuardPreamble;
 
-  # Both Bash guards ride one binary: hooks on the same matcher run as
-  # separate processes that each read and jq-parse the identical payload, so
-  # keeping them apart doubled the per-call cost of the hottest hook path for
-  # nothing. Concatenation keeps first-deny-wins semantics — `deny` exits.
+  # Both Bash guards ride one binary, so the payload is read and jq-parsed
+  # once per call. `deny` exits, so the first matching guard wins.
   bashGuard = mkGuardHook "claude-bash-guard" ["pip" "python" "nix-env" "profile"] (
     commandGuardPreamble
     + import ./uv-only.nix
@@ -21,10 +18,6 @@
 
   flakeLockGuard = mkGuardHook "claude-flake-lock-hook" ["flake.lock"] (import ./flake-lock.nix);
 in {
-  # lib.getExe rather than a hand-written "${hook}/bin/<name>": the binary
-  # name lives only in each mkGuardHook call above, so a rename cannot leave
-  # a dangling command here — which would not fail eval, just silently fail
-  # open at runtime.
   programs.claude-code.settings.hooks.PreToolUse = [
     {
       matcher = "Bash";

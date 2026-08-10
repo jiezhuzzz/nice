@@ -38,7 +38,6 @@
     then "${xdgConfigHome}/codex"
     else ".codex";
 
-  # Shared with claude-code/context.nix — one set of policies for both agents.
   contextSections = import ./agent-context.nix;
 in {
   programs.codex = {
@@ -112,8 +111,7 @@ in {
       # its own CODEX_HOME/api.config.toml (see `apiProfile` and the
       # `home.file` entry below). Run it with `codex --profile api`.
     };
-    # Soft guidance: Codex's equivalent of AGENTS.md. Same shared sections as
-    # claude-code (agent-context.nix), so the two agents' policies can't drift.
+    # Soft guidance: Codex's equivalent of AGENTS.md, shared with claude-code.
     context = contextSections.python + "\n" + contextSections.lineWrapping + "\n" + contextSections.nixDevEnvironments;
     # Hard enforcement: execpolicy rules that block these commands outright.
     # decision values are allow | prompt | forbidden (strictest wins);

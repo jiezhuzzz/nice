@@ -1,7 +1,4 @@
-# Guard: Python runs through uv, never a bare interpreter or pip. A shell
-# snippet (plain string) — default.nix concatenates it with nix-declarative.nix
-# into the single claude-bash-guard binary; `deny` exits, so whichever guard
-# matches first wins. See lib.nix for the machinery and wire format.
+# Guard: Python runs through uv, never a bare interpreter or pip.
 ''
   if [[ "$cmd" =~ $sep(uv[[:space:]]+pip|pip3?)([[:space:]]|$) ]]; then
     deny "Installing with pip is not how this machine does Python. For a standalone script, declare dependencies inline with PEP 723 script metadata and run it with 'uv run script.py' — 'uv add --script script.py <pkg>' edits that block for you. Inside a project, use 'uv add <pkg>'. Do not fall back to writing the task in shell instead; uv is installed and is the supported path."

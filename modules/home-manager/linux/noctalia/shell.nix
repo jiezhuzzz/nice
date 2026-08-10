@@ -44,8 +44,7 @@
 
         # Pin the power menu to lock-aware actions. In particular, omit the
         # plain suspend action and route lock-and-suspend through the guarded
-        # command in sleep-guard.nix (which sets power.suspend on this same
-        # shell.session tree).
+        # command in sleep-guard.nix.
         session = {
           actions = [
             {

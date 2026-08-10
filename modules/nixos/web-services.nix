@@ -1,16 +1,7 @@
-# The homelab's web UIs — plain data (the users/jie.nix pattern), imported by
-# caddy.nix (one HTTPS vhost per entry) and glance.nix (one dashboard tile per
-# entry with a `title`). One source of truth for each service's *.jiezhu.me
-# name and localhost port, which used to be hand-repeated in both files.
-#
-# Adding a service here gives it the HTTPS name and the tile in one step. The
-# port must still match what the service module itself binds — that setting
-# keeps its own shape per service (PORT env, ROCKET_PORT, settings.server.port,
-# …) and stays in the service's module.
-#
-# List, not attrset: the order is glance's tile order (and the vhost order in
-# the generated Caddyfile, where it carries no meaning — the host matchers are
-# disjoint).
+# The homelab's web UIs — plain data imported by caddy.nix (one HTTPS vhost
+# per entry) and glance.nix (one dashboard tile per entry with a `title`).
+# Adding a service here gives it both in one step. The port must still match
+# what the service module itself binds. List order is glance's tile order.
 [
   # The dashboard itself — a vhost but no tile of its own.
   {
@@ -47,9 +38,8 @@
     title = "SearXNG";
     icon = "di:searxng";
   }
-  # Vaultwarden and Memos open no firewall port, so the caddy vhost generated
-  # from these entries is their only reachable path — not merely a nicer name
-  # for one, as with the services above.
+  # Vaultwarden and Memos open no firewall port — their caddy vhost is their
+  # only reachable path, not merely a nicer name for one.
   {
     name = "vault";
     port = 8222;

@@ -1,9 +1,6 @@
-# Shared "soft guidance" sections for the coding agents — plain data (the
-# users/jie.nix pattern), imported by claude-code/context.nix and codex.nix so
-# both agents carry one set of policies. This prose used to be pasted into
-# each and had already drifted by the time it was factored out here. Each
-# section is a complete markdown block, `# heading` through trailing newline;
-# consumers join them with a blank line.
+# Shared "soft guidance" sections for the coding agents, imported by
+# claude-code/context.nix and codex.nix so both carry one set of policies.
+# Each section is a complete markdown block; consumers join them with "\n".
 {
   python = ''
     # Python

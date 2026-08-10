@@ -11,9 +11,6 @@
 # agenix secret (secrets/glance/waqi-token.age → WAQI_TOKEN), fed to the service
 # via EnvironmentFile and referenced as ${WAQI_TOKEN} in the widget URL.
 {config, ...}: let
-  # Tile per web UI, generated from the shared registry — the name/port pairs
-  # live in web-services.nix, which caddy.nix renders its vhosts from.
-  # Entries without a `title` (glance itself) get no tile.
   webServices = import ./web-services.nix;
 in {
   services.glance = {

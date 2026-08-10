@@ -1,6 +1,5 @@
 # Soft guidance injected into every session — Claude Code's user-level
-# CLAUDE.md equivalent. The prose lives in ../agent-context.nix, shared with
-# codex.nix so both agents carry the same policies.
+# CLAUDE.md equivalent. The prose is shared with codex.nix.
 let
   sections = import ../agent-context.nix;
 in {

@@ -33,9 +33,7 @@ in {
   # the check.
   #
   # replaceVars fills the two values only Nix can supply — @handleLidClose@
-  # and @noctalia@ in config.kdl — and fails the build if either placeholder
-  # goes stale (renamed here but not there, or vice versa), unlike a readFile
-  # + replaceStrings approach, which would silently leave the old text behind.
+  # and @noctalia@ — and fails the build if either placeholder goes stale.
   xdg.configFile."niri/config.kdl".source = pkgs.replaceVars ./config.kdl {
     inherit handleLidClose noctalia;
   };

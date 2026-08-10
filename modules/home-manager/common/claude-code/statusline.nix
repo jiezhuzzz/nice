@@ -34,10 +34,8 @@
     defaultPadding = " ";
     defaultPaddingSide = "both";
     flexMode = "full";
-    # Longer than statusLine.refreshInterval (set below): the timed
-    # re-renders exist for the session clock, and a TTL shorter than the
-    # interval would re-fork git on every single tick for branch/worktree
-    # names that change on human timescales.
+    # Longer than statusLine.refreshInterval below, or every timed re-render
+    # (which exists for the clock) would re-fork git.
     gitCacheTtlSeconds = 30;
     powerline = {
       enabled = true;

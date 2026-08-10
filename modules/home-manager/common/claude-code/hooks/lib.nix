@@ -1,6 +1,4 @@
-# Shared machinery for the guard hooks beside this file. A plain value file
-# (not a home-manager module), loaded with `import ./lib.nix {inherit pkgs;}`
-# — the users/jie.nix pattern.
+# Shared machinery for the guard hooks beside this file.
 {pkgs}: let
   inherit (pkgs) lib;
 in {
@@ -25,12 +23,10 @@ in {
   # that silence means "allow": any guard that errors fails open, which is the
   # reason the coarse `permissions.deny` list is kept alongside these.
   #
-  # `keywords` drives a fork-free prefilter: the payload is substring-matched
-  # before paying for jq. The keywords are a conservative superset of what the
-  # accurate checks in `text` can match (JSON escaping never touches these
-  # plain words), so a false positive only costs falling through to them —
-  # while the common case, a payload with no trigger word anywhere, exits
-  # without a single fork.
+  # `keywords` is a fork-free prefilter: a conservative superset of what the
+  # accurate checks in `text` can match, so a false positive only falls
+  # through to them, while the common no-trigger-word payload exits before
+  # the first fork.
   mkGuardHook = name: keywords: text:
     pkgs.writeShellApplication {
       inherit name;

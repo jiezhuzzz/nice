@@ -4,9 +4,8 @@
 # because a lock file *looks* like editable JSON, which is exactly why the
 # refusal has to name the regenerating command.
 #
-# A shell snippet like its siblings, but wired to Edit|Write rather than Bash
-# (default.nix), so it reads file_path instead of a command line and needs no
-# commandGuardPreamble.
+# Wired to Edit|Write rather than Bash, so it reads file_path instead of a
+# command line.
 ''
   path=$(jq -r '.tool_input.file_path // ""' <<<"$input")
 
