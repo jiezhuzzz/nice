@@ -31,21 +31,31 @@ in {
       # `context` in context.nix still apply (those are user-authored, not auto
       # memory).
       autoMemoryEnabled = false;
-      # The uv-only rule is enforced twice — here and in hooks/uv-only.nix —
-      # and the order matters. The hook runs first and is the one the agent
-      # actually reads — it refuses *and* prints the uv command to run instead.
-      # These deny rules only ever surface if the hook fails open (missing jq,
-      # a shell error), since a hook that errors is non-blocking; they refuse
-      # without explaining, which is exactly the behaviour the hook exists to
-      # replace.
+      # Every guard rule is enforced twice — here and in hooks/ — and the
+      # order matters. The hooks run first and are what the agent actually
+      # reads — they refuse *and* print the corrected command to run instead.
+      # These deny rules only ever surface if a hook fails open (missing jq, a
+      # shell error), since a hook that errors is non-blocking; they refuse
+      # without explaining, which is exactly the behaviour the hooks exist to
+      # replace. Keep the list in step with the guards: one backstop entry set
+      # per guard file.
       permissions = {
         defaultMode = "auto";
         deny = [
+          # hooks/uv-only.nix
           "Bash(python *)"
           "Bash(python3 *)"
           "Bash(pip *)"
           "Bash(pip3 *)"
           "Bash(uv pip *)"
+          # hooks/nix-declarative.nix
+          "Bash(nix-env -i*)"
+          "Bash(nix-env --install*)"
+          "Bash(nix profile install*)"
+          "Bash(nix profile add*)"
+          # hooks/flake-lock.nix
+          "Edit(**/flake.lock)"
+          "Write(**/flake.lock)"
         ];
       };
       skipDangerousModePermissionPrompt = true;

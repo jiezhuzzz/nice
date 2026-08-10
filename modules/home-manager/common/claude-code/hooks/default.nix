@@ -1,7 +1,11 @@
 # Wires the guard hooks into Claude Code's PreToolUse list. Each guard lives
 # in its own file beside this one; the shared mkGuardHook machinery and the
 # rationale for guarding at all are in lib.nix.
-{pkgs, ...}: let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   uvOnlyHook = import ./uv-only.nix {inherit pkgs;};
   nixDeclarativeHook = import ./nix-declarative.nix {inherit pkgs;};
   flakeLockHook = import ./flake-lock.nix {inherit pkgs;};
@@ -9,18 +13,23 @@ in {
   # Hooks matching the same tool run in parallel and cannot see each other,
   # so each guard has to stand alone — the first one to deny wins, and the
   # rest are wasted work rather than a conflict.
+  #
+  # lib.getExe rather than a hand-written "${hook}/bin/<name>": the binary
+  # name lives only in each guard's mkGuardHook call, so renaming one there
+  # cannot leave a dangling command here — which would not fail eval, just
+  # silently fail open at runtime.
   programs.claude-code.settings.hooks.PreToolUse = [
     {
       matcher = "Bash";
       hooks = [
         {
           type = "command";
-          command = "${uvOnlyHook}/bin/claude-uv-only-hook";
+          command = lib.getExe uvOnlyHook;
           timeout = 5;
         }
         {
           type = "command";
-          command = "${nixDeclarativeHook}/bin/claude-nix-declarative-hook";
+          command = lib.getExe nixDeclarativeHook;
           timeout = 5;
         }
       ];
@@ -30,7 +39,7 @@ in {
       hooks = [
         {
           type = "command";
-          command = "${flakeLockHook}/bin/claude-flake-lock-hook";
+          command = lib.getExe flakeLockHook;
           timeout = 5;
         }
       ];

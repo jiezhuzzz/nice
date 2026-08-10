@@ -1,4 +1,3 @@
-# modules/nixos/gaming/default.nix
 # Console-like Steam gaming session for nixmachine.
 #
 # Boots straight into gamescope → Steam Big Picture (SteamOS-style) via greetd

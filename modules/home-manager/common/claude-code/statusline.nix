@@ -6,7 +6,6 @@
   ...
 }: let
   # ccstatusline from llm-agents.nix (like claude-code itself in settings.nix).
-  # A prebuilt per-platform binary, so this resolves per host via the system.
   llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 
   # ccstatusline renders the status line from this JSON, replacing the
