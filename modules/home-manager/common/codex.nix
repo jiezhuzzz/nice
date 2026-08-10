@@ -37,6 +37,9 @@
     if config.home.preferXdgDirectories
     then "${xdgConfigHome}/codex"
     else ".codex";
+
+  # Shared with claude-code/context.nix — one set of policies for both agents.
+  contextSections = import ./agent-context.nix;
 in {
   programs.codex = {
     enable = true;
@@ -109,49 +112,9 @@ in {
       # its own CODEX_HOME/api.config.toml (see `apiProfile` and the
       # `home.file` entry below). Run it with `codex --profile api`.
     };
-    # Soft guidance: Codex's equivalent of AGENTS.md, mirrors the uv policy
-    # from the global CLAUDE.md so Codex prefers uv on its own.
-    context = ''
-      # Python
-
-      - Always use `uv` to run Python scripts, never `python` or `python3` directly.
-      - Run scripts with `uv run script.py`, never `python script.py`.
-      - When writing a standalone Python script, declare its dependencies inline
-        with PEP 723 (https://peps.python.org/pep-0723/) script metadata, then run
-        it with `uv run script.py`. uv reads the metadata block, builds an
-        ephemeral virtualenv with those deps, and runs the script — no separate
-        install step, no project files:
-        ```python
-        # /// script
-        # requires-python = ">=3.12"
-        # dependencies = [
-        #   "requests<3",
-        #   "rich",
-        # ]
-        # ///
-        ```
-        Add deps to an existing inline script with
-        `uv add --script script.py 'requests<3'` (uv edits the block for you).
-        For a self-executing script, use the shebang `#!/usr/bin/env -S uv run --script`.
-      - Do not use `pip install`, `pip3 install`, or `uv add` for standalone scripts. Inline the dependencies instead.
-      - For Python projects (not standalone scripts), use `uv init`, `uv add`, and `uv run`.
-      - Use `uv run` to execute any Python tooling (pytest, ruff, mypy, etc.).
-
-      # Nix dev environments
-
-      - Most projects here are Nix flakes. When the project root has a `flake.nix`
-        with a `devShell`, shell commands need that dev shell's tools.
-      - Treat the env as already active when `$IN_NIX_SHELL` or `$DIRENV_DIR` is
-        set (the usual case — the session is launched from a direnv-loaded
-        shell); run commands normally.
-      - When neither is set and a command fails with a missing tool, re-run it in
-        the dev shell instead of installing anything globally:
-        `nix develop -c '<command>'`. Each command runs in a fresh shell, so wrap
-        every command — entering the shell once does not persist.
-      - When a `flake.nix` devShell exists but there is no `.envrc`, suggest
-        adding one containing `use flake` (then `direnv allow`) so it loads
-        automatically — but do not create or commit the file.
-    '';
+    # Soft guidance: Codex's equivalent of AGENTS.md. Same shared sections as
+    # claude-code (agent-context.nix), so the two agents' policies can't drift.
+    context = contextSections.python + "\n" + contextSections.lineWrapping + "\n" + contextSections.nixDevEnvironments;
     # Hard enforcement: execpolicy rules that block these commands outright.
     # decision values are allow | prompt | forbidden (strictest wins);
     # written to CODEX_HOME/rules/deny-python.rules.
