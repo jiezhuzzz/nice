@@ -48,9 +48,9 @@ in {
           "Bash(nix-env --install*)"
           "Bash(nix profile install*)"
           "Bash(nix profile add*)"
-          # hooks/flake-lock.nix
+          # hooks/flake-lock.nix. Edit() alone — file rules match every editing
+          # tool, so a Write() entry is redundant and warns at startup.
           "Edit(**/flake.lock)"
-          "Write(**/flake.lock)"
         ];
       };
       skipDangerousModePermissionPrompt = true;
