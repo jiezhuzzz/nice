@@ -18,6 +18,7 @@
     ../../../modules/nixos/stirling-pdf.nix # self-hosted PDF toolkit
     ../../../modules/nixos/karakeep.nix # self-hosted bookmark-everything app
     ../../../modules/nixos/vaultwarden.nix # password vault — tailnet-only, no LAN port
+    ../../../modules/nixos/memos.nix # note-taking — tailnet-only, no LAN port
     ../../../modules/nixos/mdns.nix # Avahi mDNS — nixmachine.local resolves on the LAN
     ../../../modules/nixos/glance.nix # homelab dashboard at nixmachine.local:8083
     ../../../modules/nixos/searxng.nix # self-hosted metasearch — pi's web_search backend

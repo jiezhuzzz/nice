@@ -170,6 +170,12 @@
                       "check-url" = "http://127.0.0.1:8222";
                       icon = "di:vaultwarden";
                     }
+                    {
+                      title = "Memos";
+                      url = "https://memos.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:5230";
+                      icon = "di:memos";
+                    }
                   ];
                 }
               ];

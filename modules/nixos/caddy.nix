@@ -69,6 +69,13 @@
         reverse_proxy 127.0.0.1:8222
       }
 
+      # Memos, like vaultwarden above, opens no firewall port — this is its
+      # only reachable path.
+      @memos host memos.jiezhu.me
+      handle @memos {
+        reverse_proxy 127.0.0.1:5230
+      }
+
       # Unmatched subdomain: close the connection, don't serve a default page.
       handle {
         abort
