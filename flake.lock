@@ -30,11 +30,11 @@
     "brew-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1786299866,
-        "narHash": "sha256-aKxo2KUxt87/EMjAT0KRHi3a+yNCHrWNoAFA6yAFBvc=",
+        "lastModified": 1786369370,
+        "narHash": "sha256-EgDw+PF3vMzdxaq6v0c7JGBKXiGERb9VvcvPHHRikW8=",
         "owner": "Homebrew",
         "repo": "brew",
-        "rev": "4e6619a37079f955f3662fc988344de2b0c5a0d2",
+        "rev": "007333f25eeb61fcebed5e5eb5df1cee29dc2701",
         "type": "github"
       },
       "original": {
@@ -97,11 +97,11 @@
     "claude-plugins-official": {
       "flake": false,
       "locked": {
-        "lastModified": 1786320208,
-        "narHash": "sha256-OMA5XkdwpIL28OqoXMr/hB80E22gxRIf4lWwUHDI5ts=",
+        "lastModified": 1786387084,
+        "narHash": "sha256-IjOdiFSTmyXUjYcq74gfGcojXZ3QmNc4k/3mLIgdGts=",
         "owner": "anthropics",
         "repo": "claude-plugins-official",
-        "rev": "3da105324a27aa7b1f435a3925f8626092891d4e",
+        "rev": "920824c3e9509890fbec03ba6097014222393022",
         "type": "github"
       },
       "original": {
@@ -242,11 +242,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786286733,
-        "narHash": "sha256-7dN93WKkEERgutPtTjK7SY3ZarO2LAU33A1+vKu+7cc=",
+        "lastModified": 1786356609,
+        "narHash": "sha256-ou8fYz5w9yhXC8YbvvExybFIa19MyW5G/8dEPqa90hM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "367f7ef80856d18438953d54dda235d42a46ba31",
+        "rev": "c30c7955cec30d664a9baced6bc0112e263d4647",
         "type": "github"
       },
       "original": {
@@ -274,11 +274,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1786330248,
-        "narHash": "sha256-Cc6PlgklJ1G8Qv+mZmuDwHwYGGN6RrOlkFUnr6N3fQI=",
+        "lastModified": 1786394060,
+        "narHash": "sha256-gJiaDTQUud5GykDmaIrxbP6+GpuQcf2I9mkTBD+ay38=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "426fb6d043bb8d1562171f6c64e0e7306d5a94b4",
+        "rev": "b805fbf82032bcdf51c14ca9ef3e331376c5649b",
         "type": "github"
       },
       "original": {
@@ -290,11 +290,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1786333998,
-        "narHash": "sha256-OsNX47GMF33GUl6ODfkP+k9AvvcxTnm4HkEj2NzkMrc=",
+        "lastModified": 1786400208,
+        "narHash": "sha256-Bet7dJq2w8oezhTzJEz6M7GQxjwTmbyTxBuqEWEdOxk=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "878e578d4c85f4de99d79b0094ae096bc85de780",
+        "rev": "52aa69c9aa2b33fd14dc693261e2f1988ce12c26",
         "type": "github"
       },
       "original": {
@@ -338,11 +338,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1786323141,
-        "narHash": "sha256-IiNvo9rlL9ncnLOp70Mo1toobC2t9xHzsZIZayEv7dg=",
+        "lastModified": 1786398103,
+        "narHash": "sha256-1YE1xiDTvSuYAmuZdGXyMGYuqg7v7PEI1OxIohc4u8E=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "76f2e1f07e0435873d08e7f8a07dbe18f237ec5c",
+        "rev": "387989ee56d550d86d46d9458ad68a55b9e0ca3b",
         "type": "github"
       },
       "original": {
@@ -419,11 +419,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1785975029,
-        "narHash": "sha256-X44cn5rzytELc3NNoQsh0aLkjWA/QzPfc6HPQmsG3sU=",
+        "lastModified": 1786098110,
+        "narHash": "sha256-shi1tjDhCGGd0kIgVPNY03V8NBWSTzhMSFDb7IqSoec=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "70ce234312134a463ba7728e94da2486a1d237ac",
+        "rev": "afb4584a80bbf779ce0f691509ff902d188c2b3d",
         "type": "github"
       },
       "original": {
@@ -440,11 +440,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786328311,
-        "narHash": "sha256-3/Ln+NZU+VTeMw16Hw71tN0L2B8Rxea7VA2za5OAqJM=",
+        "lastModified": 1786388579,
+        "narHash": "sha256-PSfJXN6qwRkpWae6Ff6Wg5PyDniBRICOTYRA9F123Y4=",
         "owner": "noctalia-dev",
         "repo": "noctalia",
-        "rev": "b4dab8aa8a9d433f28e2d62fdb7ccaf629b43399",
+        "rev": "ec33edcddc296ba7c304adb0d5d8b0f6b43a0e9f",
         "type": "github"
       },
       "original": {
