@@ -33,8 +33,16 @@
   # ever listens. Delete the key from the runtime copy of the config; mkAfter
   # keeps the module's own ExecStartPre steps (install, and replace-secret
   # should masterKeyFile ever be set) running first and intact.
+  #
+  # Not `sed -i`: it fchowns its temp file, and chown is in @privileged, which
+  # this unit's SystemCallFilter denies — the prestart died on SIGSYS before
+  # editing anything. Reading into a variable needs no temp file, so no chown.
   systemd.services.meilisearch.serviceConfig.ExecStartPre = lib.mkAfter [
-    "${lib.getExe pkgs.gnused} -i '/^experimental_dumpless_upgrade/d' \"\${RUNTIME_DIRECTORY}/config.toml\""
+    "${pkgs.writeShellScript "meilisearch-drop-stale-dumpless-key" ''
+      set -eu
+      cleaned=$(${lib.getExe pkgs.gnused} '/^experimental_dumpless_upgrade/d' "$RUNTIME_DIRECTORY/config.toml")
+      printf '%s\n' "$cleaned" > "$RUNTIME_DIRECTORY/config.toml"
+    ''}"
   ];
 
   services.karakeep = {
