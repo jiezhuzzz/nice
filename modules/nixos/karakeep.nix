@@ -17,7 +17,6 @@
 # Secure-only, so logging in over plain http://nixmachine.local:8084 fails.
 # The admin account exists; sign-ups are disabled (DISABLE_SIGNUPS below).
 {
-  config,
   lib,
   pkgs,
   ...
@@ -31,18 +30,14 @@
   # services.meilisearch.settings.experimental_dumpless_upgrade, but meilisearch
   # 1.51 renamed that key to upgrade_db — which the meilisearch module already
   # sets — so the stale one makes the daemon exit 1 on "unknown field" before it
-  # ever listens. Regenerate the config without it; every other key, including
-  # any future nixpkgs default, still flows through untouched.
-  systemd.services.meilisearch.serviceConfig.ExecStartPre = let
-    settings =
-      lib.filterAttrs
-      (name: value: value != null && name != "experimental_dumpless_upgrade")
-      config.services.meilisearch.settings;
-    configFile = (pkgs.formats.toml {}).generate "config.toml" settings;
-  in
-    lib.mkForce [
-      "${lib.getExe' pkgs.coreutils "install"} -m 700 '${configFile}' \"\${RUNTIME_DIRECTORY}/config.toml\""
-    ];
+  # ever listens. Delete the key from the runtime copy of the config, appended
+  # (mkAfter) so the module's own ExecStartPre steps — the install, and the
+  # replace-secret templating should masterKeyFile ever be set — run first and
+  # survive intact, where a mkForce of a regenerated config would silently
+  # drop them.
+  systemd.services.meilisearch.serviceConfig.ExecStartPre = lib.mkAfter [
+    "${lib.getExe pkgs.gnused} -i '/^experimental_dumpless_upgrade/d' \"\${RUNTIME_DIRECTORY}/config.toml\""
+  ];
 
   services.karakeep = {
     enable = true;
