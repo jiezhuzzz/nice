@@ -12,9 +12,14 @@
 # via the module's environmentFile and referenced in the tls directive.
 {
   config,
+  lib,
   pkgs,
   ...
-}: {
+}: let
+  # One vhost per web UI, generated from the shared registry — the name/port
+  # pairs live in web-services.nix, which glance.nix renders its tiles from.
+  webServices = import ./web-services.nix;
+in {
   services.caddy = {
     enable = true;
     # Stock caddy can't do Cloudflare DNS-01; withPlugins rebuilds it with the
@@ -26,61 +31,28 @@
     };
     environmentFile = config.age.secrets.cloudflare-token.path;
 
-    virtualHosts."*.jiezhu.me".extraConfig = ''
-      tls {
-        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-        resolvers 1.1.1.1
-      }
+    virtualHosts."*.jiezhu.me".extraConfig =
+      ''
+        tls {
+          dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+          resolvers 1.1.1.1
+        }
 
-      @glance host glance.jiezhu.me
-      handle @glance {
-        reverse_proxy 127.0.0.1:8083
-      }
+      ''
+      + lib.concatMapStrings (svc: ''
+        @${svc.name} host ${svc.name}.jiezhu.me
+        handle @${svc.name} {
+          reverse_proxy 127.0.0.1:${toString svc.port}
+        }
 
-      @jellyfin host jellyfin.jiezhu.me
-      handle @jellyfin {
-        reverse_proxy 127.0.0.1:8096
-      }
-
-      @karakeep host karakeep.jiezhu.me
-      handle @karakeep {
-        reverse_proxy 127.0.0.1:8084
-      }
-
-      @pdf host pdf.jiezhu.me
-      handle @pdf {
-        reverse_proxy 127.0.0.1:8082
-      }
-
-      @transmission host transmission.jiezhu.me
-      handle @transmission {
-        reverse_proxy 127.0.0.1:9091
-      }
-
-      @searx host searx.jiezhu.me
-      handle @searx {
-        reverse_proxy 127.0.0.1:8085
-      }
-
-      # Vaultwarden opens no firewall port, so this is its only reachable
-      # path — not merely a nicer name for one, as with the vhosts above.
-      @vault host vault.jiezhu.me
-      handle @vault {
-        reverse_proxy 127.0.0.1:8222
-      }
-
-      # Memos, like vaultwarden above, opens no firewall port — this is its
-      # only reachable path.
-      @memos host memos.jiezhu.me
-      handle @memos {
-        reverse_proxy 127.0.0.1:5230
-      }
-
-      # Unmatched subdomain: close the connection, don't serve a default page.
-      handle {
-        abort
-      }
-    '';
+      '')
+      webServices
+      + ''
+        # Unmatched subdomain: close the connection, don't serve a default page.
+        handle {
+          abort
+        }
+      '';
   };
 
   # Cloudflare token as an env file (CLOUDFLARE_API_TOKEN=...). Scoped here

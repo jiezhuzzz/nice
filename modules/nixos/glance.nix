@@ -10,7 +10,12 @@
 # The air-quality widget (custom-api) hits the WAQI API; its free token is an
 # agenix secret (secrets/glance/waqi-token.age → WAQI_TOKEN), fed to the service
 # via EnvironmentFile and referenced as ${WAQI_TOKEN} in the widget URL.
-{config, ...}: {
+{config, ...}: let
+  # Tile per web UI, generated from the shared registry — the name/port pairs
+  # live in web-services.nix, which caddy.nix renders its vhosts from.
+  # Entries without a `title` (glance itself) get no tile.
+  webServices = import ./web-services.nix;
+in {
   services.glance = {
     enable = true;
     openFirewall = true;
@@ -133,50 +138,13 @@
                   # same way the dashboard itself was reached, but probe
                   # localhost: glance runs on this box, so the check needs no
                   # DNS, no tailnet and no TLS handshake.
-                  sites = [
-                    {
-                      title = "Jellyfin";
-                      url = "https://jellyfin.jiezhu.me";
-                      "check-url" = "http://127.0.0.1:8096";
-                      icon = "di:jellyfin";
-                    }
-                    {
-                      title = "Transmission";
-                      url = "https://transmission.jiezhu.me";
-                      "check-url" = "http://127.0.0.1:9091";
-                      icon = "di:transmission";
-                    }
-                    {
-                      title = "Stirling PDF";
-                      url = "https://pdf.jiezhu.me";
-                      "check-url" = "http://127.0.0.1:8082";
-                      icon = "di:stirling-pdf";
-                    }
-                    {
-                      title = "Karakeep";
-                      url = "https://karakeep.jiezhu.me";
-                      "check-url" = "http://127.0.0.1:8084";
-                      icon = "di:karakeep";
-                    }
-                    {
-                      title = "SearXNG";
-                      url = "https://searx.jiezhu.me";
-                      "check-url" = "http://127.0.0.1:8085";
-                      icon = "di:searxng";
-                    }
-                    {
-                      title = "Vaultwarden";
-                      url = "https://vault.jiezhu.me";
-                      "check-url" = "http://127.0.0.1:8222";
-                      icon = "di:vaultwarden";
-                    }
-                    {
-                      title = "Memos";
-                      url = "https://memos.jiezhu.me";
-                      "check-url" = "http://127.0.0.1:5230";
-                      icon = "di:memos";
-                    }
-                  ];
+                  sites =
+                    map (svc: {
+                      inherit (svc) title icon;
+                      url = "https://${svc.name}.jiezhu.me";
+                      "check-url" = "http://127.0.0.1:${toString svc.port}";
+                    })
+                    (builtins.filter (svc: svc ? title) webServices);
                 }
               ];
             }
