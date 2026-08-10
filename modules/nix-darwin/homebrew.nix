@@ -68,7 +68,6 @@
       "tor-browser"
       "typeless"
       "zoom"
-      "zotero"
     ];
     masApps = {
       Amphetamine = 937984704;
