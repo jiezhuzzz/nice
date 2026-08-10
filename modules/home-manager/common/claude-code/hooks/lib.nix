@@ -1,7 +1,9 @@
-# Shared machinery for the PreToolUse guard hooks beside this file. A plain
-# value file (not a home-manager module), loaded with `import ./lib.nix
-# {inherit pkgs;}` — the users/jie.nix pattern.
-{pkgs}: {
+# Shared machinery for the guard hooks beside this file. A plain value file
+# (not a home-manager module), loaded with `import ./lib.nix {inherit pkgs;}`
+# — the users/jie.nix pattern.
+{pkgs}: let
+  inherit (pkgs) lib;
+in {
   # A bare `permissions.deny` entry tells the agent only that something was
   # refused, never what to do instead — so it improvises, and the usual
   # improvisation is to rewrite the job in shell rather than to reach for the
@@ -22,13 +24,25 @@
   # The wire format is identical for all of them, so it lives here once. Note
   # that silence means "allow": any guard that errors fails open, which is the
   # reason the coarse `permissions.deny` list is kept alongside these.
-  mkGuardHook = name: text:
+  #
+  # `keywords` drives a fork-free prefilter: the payload is substring-matched
+  # before paying for jq. The keywords are a conservative superset of what the
+  # accurate checks in `text` can match (JSON escaping never touches these
+  # plain words), so a false positive only costs falling through to them —
+  # while the common case, a payload with no trigger word anywhere, exits
+  # without a single fork.
+  mkGuardHook = name: keywords: text:
     pkgs.writeShellApplication {
       inherit name;
       runtimeInputs = [pkgs.jq];
       text =
         ''
           input=$(cat)
+
+          case "$input" in
+            ${lib.concatMapStringsSep " | " (k: "*${lib.escapeShellArg k}*") keywords}) ;;
+            *) exit 0 ;;
+          esac
 
           deny() {
             jq -nc --arg reason "$1" \
