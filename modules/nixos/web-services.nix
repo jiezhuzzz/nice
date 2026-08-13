@@ -69,4 +69,12 @@
     title = "RSSHub";
     icon = "di:rsshub.png";
   }
+  {
+    # No icon library carries a one-user project, so point glance straight at
+    # the repo's own logo (served as image/svg+xml, so an <img> renders it).
+    name = "xuewen";
+    port = 8087;
+    title = "Xuewen";
+    icon = "https://raw.githubusercontent.com/jiezhuzzz/xuewen/main/assets/logo.svg";
+  }
 ]
