@@ -17,4 +17,13 @@ in {
     code-simplifier = "${officialPlugins}/code-simplifier";
     feature-dev = "${officialPlugins}/feature-dev";
   };
+
+  # Single skills, linked as ~/.config/claude/skills/<name> without their
+  # plugin: only the named directory comes along, so sibling skills the text
+  # mentions (`superpowers:test-driven-development`) are not installed.
+  programs.claude-code.skills = {
+    systematic-debugging = "${inputs.superpowers}/skills/systematic-debugging";
+    # Authored in this repo, under ./skills/<name> beside this file.
+    concretize = ./skills/concretize;
+  };
 }
