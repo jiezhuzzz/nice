@@ -389,6 +389,27 @@
         "type": "github"
       }
     },
+    "nix2container": {
+      "inputs": {
+        "nixpkgs": [
+          "xuewen",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775487831,
+        "narHash": "sha256-2lguQpLPQaxpQCJjXhmEEAfabwsAhkP29Z7fgLzHARA=",
+        "owner": "nlewo",
+        "repo": "nix2container",
+        "rev": "76be9608a7f4d6c985d28b0e7be903ae2547df3e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nlewo",
+        "repo": "nix2container",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1785747939,
@@ -534,8 +555,10 @@
         "noctalia": "noctalia",
         "noctalia-greeter": "noctalia-greeter",
         "pi-catppuccin": "pi-catppuccin",
+        "superpowers": "superpowers",
         "treefmt-nix": "treefmt-nix_2",
-        "xremap-flake": "xremap-flake"
+        "xremap-flake": "xremap-flake",
+        "xuewen": "xuewen"
       }
     },
     "rust-overlay": {
@@ -556,6 +579,22 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "superpowers": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786553601,
+        "narHash": "sha256-EsGNO0dULWf5Bx6bGrCv2kI2Z8aKH0kRvGiuN23wChQ=",
+        "owner": "obra",
+        "repo": "superpowers",
+        "rev": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "repo": "superpowers",
         "type": "github"
       }
     },
@@ -667,6 +706,27 @@
       "original": {
         "owner": "xremap",
         "repo": "nix-flake",
+        "type": "github"
+      }
+    },
+    "xuewen": {
+      "inputs": {
+        "nix2container": "nix2container",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786493005,
+        "narHash": "sha256-wElxbB5NOgfgJRtL8c4Sp4G3beEsuWajxmOfuG3NkFU=",
+        "owner": "jiezhuzzz",
+        "repo": "xuewen",
+        "rev": "fe1a630602704fb17eccf19e3c4fdf5fb5a2fce7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jiezhuzzz",
+        "repo": "xuewen",
         "type": "github"
       }
     }

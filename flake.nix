@@ -120,6 +120,20 @@
       url = "github:anthropics/claude-plugins-official";
       flake = false;
     };
+
+    # Source for individual skills, not the plugin: only the subdirectories
+    # named in modules/home-manager/common/claude-code/plugins.nix are linked.
+    superpowers = {
+      url = "github:obra/superpowers";
+      flake = false;
+    };
+
+    # Homelab services with no nixpkgs package — the flake carries the build
+    # and the NixOS module (see modules/nixos/xuewen.nix).
+    xuewen = {
+      url = "github:jiezhuzzz/xuewen";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {flake-parts, ...}:
