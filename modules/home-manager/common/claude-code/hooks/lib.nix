@@ -49,6 +49,31 @@ in {
         + text;
     };
 
+  # PostToolUse counterpart of mkGuardHook. The tool has already run, so
+  # nothing is denied — `remind` hands the model a nudge through
+  # `additionalContext`, which claude-code injects as plain context rather
+  # than as a blocking error, and the model decides what to do with it. No
+  # keyword prefilter: these run only on Edit/Write payloads, where no cheap
+  # literal separates the interesting calls from the rest. Silence and
+  # errors both mean "nothing to say", the same fail-open contract as the
+  # guards.
+  mkReminderHook = name: text:
+    pkgs.writeShellApplication {
+      inherit name;
+      runtimeInputs = [pkgs.coreutils pkgs.findutils pkgs.jq];
+      text =
+        ''
+          input=$(cat)
+
+          remind() {
+            jq -nc --arg ctx "$1" \
+              '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$ctx}}'
+            exit 0
+          }
+        ''
+        + text;
+    };
+
   # Prepended by the guards that read a command line rather than a file path.
   # `sep` matches a word only in *command position*: start of the line, or after
   # a ; & | or ( separator. This is what stops a guard tripping over its own
