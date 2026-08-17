@@ -27,6 +27,7 @@ in {
     settings = {
       # Use the highest reasoning effort by default.
       defaultThinkingLevel = "high";
+      quietStartup = true;
       # Don't override per-level token budgets (thinkingBudgets omitted).
       # Keep thinking blocks visible in the transcript.
       hideThinkingBlock = false;
