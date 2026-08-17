@@ -77,4 +77,12 @@
     title = "Xuewen";
     icon = "https://raw.githubusercontent.com/jiezhuzzz/xuewen/main/assets/logo.svg";
   }
+  {
+    # Served by a systemd user unit (modules/home-manager/linux/dsh.nix), which
+    # also passes this name to dsh as --trusted-host — rename both together.
+    name = "dsh";
+    port = 3080;
+    title = "dsh";
+    icon = "di:deepseek";
+  }
 ]
