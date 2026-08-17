@@ -4,8 +4,6 @@
 #   - nix-homebrew (zhaofengli/nix-homebrew) installs Homebrew itself and
 #     pins taps to flake inputs (no mutable taps, no network at activation).
 #   - nix-darwin's `homebrew` module manages which casks are installed.
-#
-# Manages casks and Mac App Store apps.
 {
   inputs,
   user,
@@ -32,7 +30,7 @@
     enable = true;
     onActivation = {
       autoUpdate = false; # don't hit network on every darwin-rebuild
-      upgrade = true; # upgrade installed casks on activation
+      upgrade = true;
       cleanup = "zap"; # remove anything not declared here
       # Homebrew 4.x added a confirmation gate on `brew bundle install --cleanup`;
       # unattended activation must opt in via --force-cleanup (or --force / $HOMEBREW_ASK).

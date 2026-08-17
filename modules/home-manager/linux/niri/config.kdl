@@ -121,15 +121,12 @@ switch-events {
     lid-close { spawn "@handleLidClose@"; }
 }
 binds {
-    // Workspaces
     Alt+1 { focus-workspace 1; }
     Alt+2 { focus-workspace 2; }
     Alt+3 { focus-workspace 3; }
     Alt+4 { focus-workspace 4; }
-    // Apps
     Alt+B hotkey-overlay-title="Browser: chromium" { spawn "chromium"; }
     Alt+T hotkey-overlay-title="Terminal: ghostty" { spawn "ghostty"; }
-    // Focus (arrow + vim keys share actions)
     Alt+Down { focus-window-down; }
     Alt+H { focus-column-left; }
     Alt+J { focus-window-down; }
@@ -138,17 +135,14 @@ binds {
     Alt+Left { focus-column-left; }
     Alt+Right { focus-column-right; }
     Alt+Up { focus-window-up; }
-    // Column widths
     Alt+F { maximize-column; }
     Alt+R { switch-preset-column-width; }
     Alt+Shift+F { fullscreen-window; }
-    // Session
     Alt+Q { close-window; }
     Alt+Shift+E { quit; }
     Alt+Shift+L { spawn-sh "noctalia msg session lock"; }
     Alt+Shift+P { power-off-monitors; }
     XF86Sleep allow-when-locked=true { spawn "@noctalia@" "msg" "session" "lock-and-suspend"; }
-    // Move
     Alt+Shift+1 { move-column-to-workspace 1; }
     Alt+Shift+2 { move-column-to-workspace 2; }
     Alt+Shift+3 { move-column-to-workspace 3; }
@@ -157,16 +151,12 @@ binds {
     Alt+Shift+Left { move-column-left; }
     Alt+Shift+Right { move-column-right; }
     Alt+Shift+Up { move-window-up; }
-    // Screenshot
     Alt+Print { screenshot-window; }
     Print { screenshot; }
-    // noctalia panels
     Alt+Space { spawn-sh "noctalia msg panel-toggle launcher"; }
     Alt+S { spawn-sh "noctalia msg panel-toggle control-center"; }
     Alt+Comma { spawn-sh "noctalia msg settings-toggle"; }
     Alt+Tab { spawn-sh "noctalia msg window-switcher"; }
-    // Volume / brightness (laptop keys)
-    //
     // Routed through noctalia rather than wpctl/brightnessctl directly so
     // its OSD actually appears — [osd.kinds] volume/brightness only fire
     // for changes noctalia itself makes. The trade-off is that these keys

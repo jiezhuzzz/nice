@@ -1,4 +1,3 @@
-# profiles/home/core.nix
 # CLI toolkit + home settings shared by every machine (desktop and server).
 {config, ...}: {
   imports = [

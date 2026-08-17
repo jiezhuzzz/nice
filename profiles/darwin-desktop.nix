@@ -1,4 +1,3 @@
-# profiles/darwin-desktop.nix
 # Shared darwin profile for all macOS desktop machines.
 {
   inputs,

@@ -2,7 +2,6 @@
   description = "A nice configuration (laptop, mac, server, nas)";
 
   inputs = {
-    # Flake foundation
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixpkgs-unstable";
     };
@@ -17,7 +16,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # System builders (see lib/mk-hosts.nix)
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -28,7 +26,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Secrets
     agenix = {
       url = "github:ryantm/agenix";
       inputs = {
@@ -38,7 +35,6 @@
       };
     };
 
-    # NixOS machine-level
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -72,7 +68,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # macOS: declarative Homebrew
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
       # Track brew HEAD instead of nix-homebrew's brew-src pin: the taps below
@@ -96,7 +91,6 @@
       flake = false;
     };
 
-    # Theming
     catppuccin = {
       url = "github:catppuccin/nix";
     };
@@ -110,7 +104,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Coding agents
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";

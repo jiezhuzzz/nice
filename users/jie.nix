@@ -7,6 +7,6 @@
     email = "jiezzz@duck.com";
   };
   theme = {
-    flavor = "frappe"; # catppuccin flavor
+    flavor = "frappe";
   };
 }

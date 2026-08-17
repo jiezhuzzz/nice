@@ -13,7 +13,7 @@
     # hardware/default.nix: that bundle also carries power/bluetooth/touchpad,
     # which are laptop concerns. Also flips on hardware.enableAllFirmware.
     ../../../modules/nixos/hardware/firmware.nix
-    ../../../modules/nixos/media # media automation stack
+    ../../../modules/nixos/media
     ../../../modules/nixos/litellm.nix # LLM gateway holding the provider keys
     ../../../modules/nixos/stirling-pdf.nix # self-hosted PDF toolkit
     ../../../modules/nixos/karakeep.nix # self-hosted bookmark-everything app
@@ -40,13 +40,11 @@
 
   time.timeZone = "America/Chicago";
 
-  # ----------------------------------------------------------------------
   # Boot — systemd-boot on the primary ESP (/boot). The disko layout also
   # mounts a second ESP at /boot/.fallback on the other NVMe; it's a spare
   # you sync by hand (systemd-boot doesn't mirror ESPs natively).
   # Deliberately NOT pinning linuxPackages_latest: ZFS lags the newest
   # kernel, so we ride NixOS's default (ZFS-compatible) kernel.
-  # ----------------------------------------------------------------------
   boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.configurationLimit = 5;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -75,13 +73,11 @@
     settings.PasswordAuthentication = false;
   };
 
-  # ----------------------------------------------------------------------
   # Audio — local playback out of an attached device (HDMI / analog / USB
   # DAC). PipeWire itself comes from the imported hardware/audio.nix module.
   # rtkit lets PipeWire acquire realtime scheduling priority (avoids xruns).
   # jie is in the `audio` group because this box is driven over SSH, which
   # has no seat session to hand out /dev/snd ACLs the way a local login would.
-  # ----------------------------------------------------------------------
   security.rtkit.enable = true;
 
   # GPU / graphics stack — DRI, Mesa/VAAPI, plus 32-bit userspace for apps
@@ -110,11 +106,9 @@
     ../../../modules/home-manager/linux/dsh.nix
   ];
 
-  # ----------------------------------------------------------------------
   # Podman — rootless-capable container runtime. Keep the Docker CLI shim
   # disabled so callers explicitly select Podman. DNS in the default network
   # lets containers resolve each other by name (needed by most compose stacks).
-  # ----------------------------------------------------------------------
   virtualisation.podman = {
     enable = true;
     dockerCompat = false;

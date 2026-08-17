@@ -101,11 +101,9 @@ in {
         "weekly-limit"
         "current-dir"
       ];
-      # Always use the highest reasoning effort.
       # Valid: minimal | low | medium | high | xhigh.
       model_reasoning_effort = "high";
-      # model = "gpt-5.5";
-      #
+
       # The US-region API profile is intentionally NOT defined here: Codex
       # rejects legacy `[profiles.<name>]` tables in config.toml. It lives in
       # its own CODEX_HOME/api.config.toml (see `apiProfile` and the

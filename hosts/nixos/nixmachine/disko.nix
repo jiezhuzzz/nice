@@ -3,9 +3,7 @@
   user,
   ...
 }: let
-  # ------------------------------------------------------------------
-  # Disk identifiers (by-id, stable across reboots / controller swaps).
-  # ------------------------------------------------------------------
+  # By-id, so the mapping survives reboots and controller swaps.
   nvme0Id = "nvme-Samsung_SSD_9100_PRO_with_Heatsink_4TB_S7ZRNJ0Y700069V";
   nvme1Id = "nvme-Samsung_SSD_9100_PRO_with_Heatsink_4TB_S7ZRNJ0Y407276L";
 
@@ -100,9 +98,7 @@ in {
       // lib.mapAttrs (_: mkHdd) hddIds;
 
     zpool = {
-      # ----------------------------------------------------------------
       # rpool — system + important files, 2-way NVMe mirror, ~1 TiB.
-      # ----------------------------------------------------------------
       rpool = {
         type = "zpool";
         mode = "mirror";
@@ -168,11 +164,9 @@ in {
         };
       };
 
-      # ----------------------------------------------------------------
       # tank — 8-disk HDD raidz2 + NVMe special-vdev mirror.
       # Usable: ~72 TiB. Tolerates 2 HDD failures. The special mirror is
       # CRITICAL: lose both NVMes simultaneously and the whole pool is gone.
-      # ----------------------------------------------------------------
       tank = {
         type = "zpool";
         mode.topology = {
@@ -299,11 +293,9 @@ in {
         };
       };
 
-      # ----------------------------------------------------------------
       # fast — rebuildable high-performance data, 2-way NVMe stripe, ~4.8 TiB.
       # NO REDUNDANCY: losing either NVMe loses the entire pool. Keep canonical
       # copies of anything important on rpool, tank, or remote storage.
-      # ----------------------------------------------------------------
       fast = {
         type = "zpool";
         mode = ""; # empty mode = stripe

@@ -39,7 +39,6 @@ _: {
       NSNavPanelExpandedStateForSaveMode2 = true;
       PMPrintingExpandedStateForPrint = true;
       PMPrintingExpandedStateForPrint2 = true;
-      #_HIHideMenuBar = true;
     };
 
     trackpad.Clicking = true;

@@ -20,7 +20,6 @@ COUNT="${4:?Missing instance count}"
 BATCH_SIZE=2
 POLL_INTERVAL=60
 
-# Get reservation ID and network ID
 echo "Fetching reservation and network IDs..."
 reservation_id=$("$CHI" blazar lease-show "$LEASE_NAME" -f json | "$JQ" -r '.reservations' | "$JQ" -r 'select(.resource_type=="physical:host") | .id')
 net_id=$("$CHI" openstack network show sharednet1 -c id -f value)
@@ -41,7 +40,6 @@ for ((batch_start = 1; batch_start <= COUNT; batch_start += BATCH_SIZE)); do
 
   echo "=== Batch: $LEASE_NAME-$batch_start to $LEASE_NAME-$batch_end ==="
 
-  # Launch batch
   for ((i = batch_start; i <= batch_end; i++)); do
     "$CHI" openstack server create \
       --image "$IMAGE" --flavor baremetal --key-name "$KEYPAIR" \
@@ -49,7 +47,6 @@ for ((batch_start = 1; batch_start <= COUNT; batch_start += BATCH_SIZE)); do
       "$LEASE_NAME-$i" -f json | "$JQ" '{Name: .name, Status: .status}'
   done
 
-  # Poll until all instances in this batch are ACTIVE
   while true; do
     all_active=true
     for ((i = batch_start; i <= batch_end; i++)); do

@@ -1,4 +1,3 @@
-# profiles/home/desktop.nix
 # Home config for personal desktop machines (macOS and NixOS).
 {
   imports = [

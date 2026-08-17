@@ -1,4 +1,3 @@
-# profiles/nixos-desktop.nix
 # Shared NixOS profile for desktop/laptop machines.
 {
   inputs,

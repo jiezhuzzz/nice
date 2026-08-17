@@ -1,6 +1,5 @@
 _: {
   programs.ghostty.settings = {
-    # macOS-like Alt-as-Command keybindings (Linux)
     keybind = [
       "super+c=copy_to_clipboard"
       "super+v=paste_from_clipboard"

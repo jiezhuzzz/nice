@@ -20,7 +20,6 @@ host_ids=$(echo "$hosts" | "$JQ" -r '.[].id')
 echo "Fetching allocations..."
 allocations=$("$CHI" blazar allocation-list host -f json)
 
-# Build set of currently-allocated host IDs
 now=$(date -u +%Y-%m-%dT%H:%M:%S)
 # shellcheck disable=SC2016 # $now is a jq-program variable bound via --arg, not a shell var
 allocated_ids=$(echo "$allocations" | "$JQ" -r --arg now "$now" '
@@ -29,7 +28,6 @@ allocated_ids=$(echo "$allocations" | "$JQ" -r --arg now "$now" '
   )) | .resource_id
 ')
 
-# Query node_type for each host, track free vs reserved
 declare -A total reserved free
 for id in $host_ids; do
   node_type=$("$CHI" blazar host-show "$id" -f json | "$JQ" -r '.node_type')

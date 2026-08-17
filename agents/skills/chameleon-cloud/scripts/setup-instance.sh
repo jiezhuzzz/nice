@@ -21,7 +21,6 @@ fi
 for ip in "$@"; do
   echo "=== Setting up $ip ==="
 
-  # Remove stale host key
   ssh-keygen -R "$ip" 2>/dev/null || true
 
   # Copy rclone OAuth tokens (decrypted by agenix on the operator host).
@@ -42,20 +41,17 @@ for ip in "$@"; do
     fi
   done
 
-  # Copy Ghostty terminfo
   infocmp -x xterm-ghostty | ssh "${SSH_OPTS[@]}" cc@"$ip" -- tic -x -
 
-  # System update and install podman dependencies
   ssh "${SSH_OPTS[@]}" cc@"$ip" 'sudo apt update && sudo apt upgrade -y && sudo apt install -y uidmap podman slirp4netns'
 
-  # Allow unprivileged user namespaces (required for podman rootless)
+  # Rootless podman needs unprivileged user namespaces.
   ssh "${SSH_OPTS[@]}" cc@"$ip" 'sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 && echo "kernel.apparmor_restrict_unprivileged_userns=0" | sudo tee /etc/sysctl.d/99-userns.conf'
 
   # Enable systemd user lingering so the rclone mount and other user services
   # start at boot rather than at next interactive login.
   ssh "${SSH_OPTS[@]}" cc@"$ip" 'sudo loginctl enable-linger cc'
 
-  # Install Nix
   ssh "${SSH_OPTS[@]}" cc@"$ip" 'curl --proto "=https" --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm'
 
   echo "=== $ip setup complete ==="

@@ -1,4 +1,3 @@
-# profiles/home/server.nix
 # Home config for headless machines: standalone HM on foreign servers
 # (chameleon/goku/vegeta) and, via profiles/homelab.nix, NixOS homelab boxes.
 {

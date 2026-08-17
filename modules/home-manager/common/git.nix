@@ -9,11 +9,9 @@ in {
     enable = true;
     lfs.enable = true;
     attributes = [
-      # Default: normalize line endings on commit, check out as-is.
       "* text=auto"
       # Encrypted secrets — never diff or merge.
       "*.age binary"
-      # Images
       "*.png binary"
       "*.jpg binary"
       "*.jpeg binary"
@@ -23,16 +21,13 @@ in {
       "*.avif binary"
       "*.heic binary"
       "*.psd binary"
-      # Diagrams
       "*.drawio binary"
-      # Audio / video
       "*.mp3 binary"
       "*.mp4 binary"
       "*.mov binary"
       "*.webm binary"
       "*.wav binary"
       "*.flac binary"
-      # Archives
       "*.zip binary"
       "*.tar binary"
       "*.tar.gz binary"
@@ -43,7 +38,6 @@ in {
       "*.zst binary"
       "*.7z binary"
       "*.rar binary"
-      # Binaries / packages
       "*.exe binary"
       "*.dll binary"
       "*.so binary"
@@ -54,13 +48,11 @@ in {
       "*.dmg binary"
       "*.iso binary"
       "*.pdf binary"
-      # Fonts
       "*.woff binary"
       "*.woff2 binary"
       "*.ttf binary"
       "*.otf binary"
       "*.eot binary"
-      # Diff hints — better hunk headers / word diffs.
       "*.md diff=markdown"
       "*.tex diff=tex"
       "*.py diff=python"
@@ -71,13 +63,10 @@ in {
       "*.html diff=html"
     ];
     ignores = [
-      # macOS metadata
       ".DS_Store"
-      # AI assistant per-repo state
       ".codex/"
       ".claude/"
       ".agents/"
-      # direnv local cache
       ".direnv/"
       ".envrc.local"
     ];

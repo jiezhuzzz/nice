@@ -29,7 +29,6 @@ INSTANCE="$LEASE_NAME-1"
 echo "Floating IP: $FLOATING_IP (CHI@${CHI_SITE^^})"
 echo "Target instance: $INSTANCE"
 
-# Detach from any existing server
 echo "Checking if floating IP is currently attached..."
 current_server=$("$CHI" openstack floating ip show "$FLOATING_IP" -f json | "$JQ" -r '.port_id // empty')
 if [ -n "$current_server" ]; then
@@ -37,7 +36,6 @@ if [ -n "$current_server" ]; then
   ("$CHI" openstack floating ip unset --port "$FLOATING_IP")
 fi
 
-# Attach to the first instance
 echo "Attaching $FLOATING_IP to $INSTANCE..."
 ("$CHI" openstack server add floating ip "$INSTANCE" "$FLOATING_IP")
 

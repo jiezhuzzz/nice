@@ -1,4 +1,3 @@
-# profiles/homelab.nix
 # Lean, headless NixOS profile for homelab boxes (e.g. nixmachine): user
 # `jie` gets the standalone-server home-manager toolkit (profiles/home/server.nix),
 # wired through the NixOS home-manager module so the two never drift. On top of

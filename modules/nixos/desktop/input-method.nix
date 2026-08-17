@@ -1,5 +1,4 @@
 {pkgs, ...}: {
-  # Chinese input method (Rime via fcitx5)
   i18n.inputMethod = {
     enable = true;
     type = "fcitx5";

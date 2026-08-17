@@ -1,4 +1,3 @@
-# modules/nixos/secureboot.nix
 # UEFI Secure Boot for nixps via lanzaboote, plus TPM2-backed LUKS unlock.
 # Imported by hosts/nixos/nixps/default.nix only — nixmachine has no LUKS
 # root and stays on plain systemd-boot.

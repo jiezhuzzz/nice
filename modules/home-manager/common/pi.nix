@@ -11,9 +11,8 @@
   # Directory of catppuccin-{latte,frappe,macchiato,mocha}.json.
   piThemes = "${inputs.pi-catppuccin.packages.${pkgs.stdenv.hostPlatform.system}.default}/share/pi/themes";
 in {
-  # pi: a terminal coding agent with multi-model support
-  # (https://github.com/earendil-works/pi). Enabled on every host via
-  # profiles/home/core.nix.
+  # pi is a terminal coding agent with multi-model support
+  # (https://github.com/earendil-works/pi).
   programs.pi-coding-agent = {
     enable = true;
     # The upstream module's default is pkgs.pi-coding-agent; llm-agents names
@@ -25,11 +24,9 @@ in {
     # upstream default, so the CLI reads the same location.
     configDir = "${config.xdg.configHome}/pi/agent";
     settings = {
-      # Use the highest reasoning effort by default.
       defaultThinkingLevel = "high";
       quietStartup = true;
-      # Don't override per-level token budgets (thinkingBudgets omitted).
-      # Keep thinking blocks visible in the transcript.
+      # Per-level token budgets are left at upstream's values (thinkingBudgets omitted).
       hideThinkingBlock = false;
 
       # Extensions/skills, declared rather than installed. `pi install` cannot
@@ -54,7 +51,6 @@ in {
       # NOTE: these run with full system access (pi's own warning) — extensions
       # execute arbitrary code and skills can direct the model to run anything.
       packages = [
-        # Core utilities
         "npm:context-mode" # sandboxed code execution to shrink context use
         "npm:pi-lens" # real-time LSP feedback on edits
         "npm:pi-mcp-adapter" # load MCP servers as pi tools

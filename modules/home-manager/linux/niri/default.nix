@@ -38,7 +38,6 @@ in {
     inherit handleLidClose noctalia;
   };
 
-  # niri tools & niri's ecosystem companions.
   home.packages = with pkgs; [
     brightnessctl # CLI backlight control; the keys go through noctalia now
     wl-clipboard # wl-copy/wl-paste; no CLI equivalent in noctalia's clipboard panel

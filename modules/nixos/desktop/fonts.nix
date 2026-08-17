@@ -4,17 +4,14 @@
     nerd-fonts.inconsolata
     maple-mono.NF
 
-    # Latin
     noto-fonts
 
-    # CJK
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif
     lxgw-wenkai # handwriting-style Chinese (kept for reading/decorative)
     source-han-sans # PingFang-alike default (思源黑体)
     source-han-serif # serif companion (思源宋体)
 
-    # Emoji
     noto-fonts-color-emoji
   ];
 

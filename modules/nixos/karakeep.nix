@@ -61,7 +61,7 @@
       # http://nixmachine.local:8084 may redirect logins to this URL.
       NEXTAUTH_URL = "https://karakeep.jiezhu.me";
 
-      # ---- AI features via the local LiteLLM gateway (llm/litellm.nix, :4000) ----
+      # AI features via the local LiteLLM gateway (litellm.nix, :4000).
       # Karakeep speaks the OpenAI API; point it at LiteLLM, which fronts Claude
       # and OpenAI. LiteLLM has no master key (localhost-only), so any non-empty
       # key satisfies the OpenAI client — this is a placeholder, not a secret. If

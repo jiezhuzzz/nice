@@ -17,10 +17,6 @@ in {
     configDir = "${config.xdg.configHome}/claude";
     settings = {
       model = "opus[1m]";
-      # Default thinking/reasoning effort. Persisted here, but see the
-      # CLAUDE_CODE_EFFORT_LEVEL note under `env` — on its own this key loses to
-      # the per-model launch-effort pin, so both are set.
-      # effortLevel = "xhigh";
       # Compact against a 400k window rather than the model's real 1M — frequent
       # cheap compactions instead of one enormous one. Only live while
       # auto-compact is on; disabling that reverts to the full model window.
@@ -58,11 +54,12 @@ in {
       };
       skipDangerousModePermissionPrompt = true;
       env = {
-        # Force effort via env, not just effortLevel: Claude Code "pins" each new
-        # Opus version to its built-in launch effort (opus-4-8 defaults to "high")
-        # and ignores the persisted effortLevel until effort is changed interactively
-        # once — which never happens here because settings.json is a read-only Nix
-        # symlink (/effort writes fail with EACCES). The env var bypasses the pin.
+        # Effort comes from the env var rather than the `effortLevel` setting
+        # key: Claude Code "pins" each new Opus version to its built-in launch
+        # effort (opus-4-8 defaults to "high") and ignores the persisted
+        # effortLevel until effort is changed interactively once — which never
+        # happens here because settings.json is a read-only Nix symlink (/effort
+        # writes fail with EACCES). The env var bypasses the pin.
         CLAUDE_CODE_EFFORT_LEVEL = "xhigh";
         CLAUDE_CODE_PLUGIN_CACHE_DIR = "${config.xdg.cacheHome}/claude/plugins";
         CLAUDE_CODE_DEBUG_LOGS_DIR = "${config.xdg.stateHome}/claude/logs";
