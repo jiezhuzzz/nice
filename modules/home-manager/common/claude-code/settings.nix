@@ -30,6 +30,9 @@ in {
       # `context` in context.nix still apply (those are user-authored, not auto
       # memory).
       autoMemoryEnabled = false;
+      skillOverrides = {
+        claude-api = "user-invocable-only";
+      };
       # Backstops for the guards in hooks/: the hooks run first and refuse
       # with the corrected command; these deny rules only surface if a hook
       # fails open (a hook that errors is non-blocking). One entry set per
