@@ -38,6 +38,19 @@
     - The one exception is text no formatter reflows: comments and docstrings. Match the file being edited — where its comments wrap at ~80 columns, keep wrapping to match, since nothing will do it afterwards.
   '';
 
+  commentPolicy = ''
+    # Comment policy
+
+    1. Prefer no comment.
+    2. Never explain what the code does.
+    3. Never restate names, types, control flow, or function behavior in prose.
+    4. If a comment is necessary to understand the implementation, refactor first.
+    5. Comments may only document information that cannot be represented in code: external constraints, non-obvious invariants, deliberate deviations from the obvious implementation, safety arguments, temporary technical debt.
+    6. A prose comment must explain a constraint or decision originating outside the local code.
+    7. Action comments must use one of: `TODO:`, `FIXME:`, `HACK:`, `SAFETY:`.
+    8. Remove comments that become redundant after refactoring.
+  '';
+
   nixDevEnvironments = ''
     # Nix dev environments
 
