@@ -24,6 +24,11 @@ in {
     # upstream default, so the CLI reads the same location.
     configDir = "${config.xdg.configHome}/pi/agent";
     settings = {
+      # defaultModel only takes effect alongside defaultProvider — pi requires
+      # both before it will look the model up, and otherwise falls back to its
+      # built-in per-provider table.
+      defaultProvider = "deepseek";
+      defaultModel = "deepseek-v4-flash";
       defaultThinkingLevel = "xhigh";
       quietStartup = true;
       # Per-level token budgets are left at upstream's values (thinkingBudgets omitted).
