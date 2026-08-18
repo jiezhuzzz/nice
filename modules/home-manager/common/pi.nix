@@ -24,7 +24,7 @@ in {
     # upstream default, so the CLI reads the same location.
     configDir = "${config.xdg.configHome}/pi/agent";
     settings = {
-      defaultThinkingLevel = "high";
+      defaultThinkingLevel = "xhigh";
       quietStartup = true;
       # Per-level token budgets are left at upstream's values (thinkingBudgets omitted).
       hideThinkingBlock = false;
