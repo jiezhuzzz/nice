@@ -89,7 +89,10 @@
 
   users.users.${user.me.username} = {
     isNormalUser = true;
-    extraGroups = ["wheel" "audio" "media"];
+    # `podman` is the SocketGroup on /run/podman/podman.sock, so it is what
+    # lets podman-tui reach the rootful containers below without sudo. Socket
+    # access is root-equivalent, which `wheel` already grants on this box.
+    extraGroups = ["wheel" "audio" "media" "podman"];
     # Runs jie's systemd user manager at boot, not just during an SSH session —
     # what keeps the dsh-web user unit below up.
     linger = true;
@@ -104,6 +107,7 @@
   # On top of the server bundle profiles/homelab.nix hands jie.
   home-manager.users.${user.me.username}.imports = [
     ../../../modules/home-manager/linux/dsh.nix
+    ../../../modules/home-manager/linux/podman-tui.nix
   ];
 
   # Podman — rootless-capable container runtime. Keep the Docker CLI shim
@@ -123,6 +127,7 @@
     jq
     wget
     skopeo # inspect/copy container images (e.g. resolve pinned digests for podman)
+    podman-tui # TUI over the podman socket (connection in linux/podman-tui.nix)
     alsa-utils # aplay -l / speaker-test to enumerate and test outputs
   ];
 
