@@ -1,7 +1,7 @@
 # Xuewen — self-hosted paper manager (github:jiezhuzzz/xuewen). No nixpkgs
 # package: the flake input carries both the build and this service module.
 # Tailnet-only — binds 127.0.0.1, opens no firewall port, caddy is the only way
-# in. 8087 because metatube holds 8080 and stirling/glance/karakeep/searx/
+# in. 8087 because metatube holds 8080 and stirling/glance/shiori/searx/
 # miniflux take 8082-8086.
 #
 # The web UI has NO authentication and its mutating endpoints answer anyone who
@@ -21,9 +21,9 @@
 # meaningful — `summary = {}` renders `[ai.summary]`, which switches summaries
 # on and inherits the endpoint and model from `[ai]`.
 #
-# LLM traffic goes through the local LiteLLM gateway exactly like karakeep,
-# with two exceptions that reach their provider directly and so need real keys
-# from environmentFile: Agent Ask (the Claude Code / Codex SDKs) and DeepL.
+# LLM traffic goes through the local LiteLLM gateway, with two exceptions
+# that reach their provider directly and so need real keys from
+# environmentFile: Agent Ask (the Claude Code / Codex SDKs) and DeepL.
 #
 # Semantic search needs a Qdrant server; it runs as an OCI container at the
 # bottom of this file rather than services.qdrant, for the toolchain reason
@@ -109,10 +109,10 @@
         translate = {}; # LLM provider for translate-on-selection
 
         # Vectors behind semantic search and the daily feed's interest profile.
-        # text-embedding-3-small is already in litellm.nix's model_list (karakeep
-        # uses it too), so this inherits base_url/api_key above and only names
-        # the model. dims must match what the API returns or the embedder aborts
-        # — 1536 is text-embedding-3-small's native width. Changing either means
+        # text-embedding-3-small is already in litellm.nix's model_list, so
+        # this inherits base_url/api_key above and only names the model. dims
+        # must match what the API returns or the embedder aborts — 1536 is
+        # text-embedding-3-small's native width. Changing either means
         # dropping the Qdrant collection and re-embedding the library.
         embedding = {
           model = "text-embedding-3-small";

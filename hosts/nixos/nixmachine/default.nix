@@ -16,7 +16,7 @@
     ../../../modules/nixos/media
     ../../../modules/nixos/litellm.nix # LLM gateway holding the provider keys
     ../../../modules/nixos/stirling-pdf.nix # self-hosted PDF toolkit
-    ../../../modules/nixos/karakeep.nix # self-hosted bookmark-everything app
+    ../../../modules/nixos/shiori.nix # self-hosted bookmarks — tailnet-only, no LAN port
     ../../../modules/nixos/vaultwarden.nix # password vault — tailnet-only, no LAN port
     ../../../modules/nixos/memos.nix # note-taking — tailnet-only, no LAN port
     ../../../modules/nixos/miniflux.nix # RSS reader — tailnet-only, no LAN port

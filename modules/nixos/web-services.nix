@@ -28,12 +28,6 @@
     icon = "di:stirling-pdf";
   }
   {
-    name = "karakeep";
-    port = 8084;
-    title = "Karakeep";
-    icon = "di:karakeep";
-  }
-  {
     name = "searx";
     port = 8085;
     title = "SearXNG";
@@ -52,6 +46,15 @@
     port = 5230;
     title = "Memos";
     icon = "di:memos";
+  }
+  {
+    name = "shiori";
+    port = 8084;
+    title = "Shiori";
+    icon = "di:shiori";
+    # Passwordless login (SSO proxy auth in shiori.nix). No +/- prefix means
+    # *set*, so a client's own Remote-User is replaced, not appended.
+    proxyDirectives = "header_up Remote-User jie";
   }
   {
     name = "miniflux";
