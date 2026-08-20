@@ -50,6 +50,20 @@ in {
           # hooks/flake-lock.nix. Edit() alone — file rules match every editing
           # tool, so a Write() entry is redundant and warns at startup.
           "Edit(**/flake.lock)"
+          # hooks/github-via-gh.nix. Exact hosts, mirroring the guard's list —
+          # docs.github.com, github.blog and *.github.io stay fetchable.
+          "WebFetch(domain:github.com)"
+          "WebFetch(domain:www.github.com)"
+          "WebFetch(domain:api.github.com)"
+          "WebFetch(domain:gist.github.com)"
+          "WebFetch(domain:codeload.github.com)"
+          "WebFetch(domain:raw.githubusercontent.com)"
+          "WebFetch(domain:gist.githubusercontent.com)"
+          "WebFetch(domain:objects.githubusercontent.com)"
+          "Bash(curl *github.com*)"
+          "Bash(curl *githubusercontent.com*)"
+          "Bash(wget *github.com*)"
+          "Bash(wget *githubusercontent.com*)"
         ];
       };
       skipDangerousModePermissionPrompt = true;
