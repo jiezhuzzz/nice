@@ -4,14 +4,14 @@
 # that base, this profile adds agent-free git signing: agenix decrypts jie's
 # github + signing keys (modules/nixos/agenix-git.nix) and git/ssh point at the
 # files instead of a forwarded agent (git-agentless-signing.nix), so signing and
-# push survive a detached tmux/shpool. It also decrypts the rclone tokens
-# (agenix-rclone.nix) that server.nix's gdrive/box mounts need — without them
-# rclone-config.service cannot render a config and both mounts stay dead.
-# Boot, storage, networking and the user account stay with the host.
+# push survive a detached tmux/shpool. It also carries what server.nix's
+# gdrive/box mounts need from the system side (modules/nixos/rclone.nix): the
+# decrypted tokens, and the setuid fusermount3 that a non-root FUSE mount goes
+# through. Boot, storage, networking and the user account stay with the host.
 {user, ...}: {
   imports = [
     ../modules/nixos/agenix-git.nix
-    ../modules/nixos/agenix-rclone.nix
+    ../modules/nixos/rclone.nix
   ];
   home-manager.users.${user.me.username}.imports = [
     ./home/server.nix
