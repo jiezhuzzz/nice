@@ -1,20 +1,26 @@
 # rclone remotes + auto-mounts. Cross-platform: home-manager emits systemd
 # user services on Linux and launchd agents on macOS.
-#
-# Token paths differ per platform:
-#   - macOS: agenix (nix-darwin) decrypts to /run/agenix/<name>
-#   - Linux: chameleon is standalone home-manager (no system agenix);
-#     tokens are placed under XDG data dir.
 # macOS additionally needs a FUSE provider for mounts (fuse-t cask).
+#
+# Where a token lives depends on whether this host's *system* layer decrypts
+# it, which is not the same question as which platform it is: the macOS hosts
+# and nixmachine both get it from agenix, while chameleon and the other
+# standalone home-manager servers have no system agenix at all and take a
+# hand-placed file under the XDG data dir. Keying off the secret's own
+# declaration keeps those two cases apart and makes the path track whatever
+# agenix actually chose.
 {
   config,
+  osConfig ? {},
   pkgs,
   ...
 }: let
-  inherit (pkgs.stdenv.hostPlatform) isDarwin;
-  tokenPath = name:
-    if isDarwin
-    then "/run/agenix/rclone-${name}-token"
+  systemSecrets = osConfig.age.secrets or {};
+  tokenPath = name: let
+    secret = "rclone-${name}-token";
+  in
+    if builtins.hasAttr secret systemSecrets
+    then systemSecrets.${secret}.path
     else "${config.xdg.dataHome}/rclone/${name}-token";
   gdriveTokenPath = tokenPath "gdrive";
   boxTokenPath = tokenPath "box";

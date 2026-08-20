@@ -26,8 +26,11 @@ in {
   "ssh/chameleon.age".publicKeys = allRecipients;
   "ssh/lab.age".publicKeys = allRecipients;
   "ssh/home.age".publicKeys = allRecipients;
-  "rclone/gdrive.age".publicKeys = allRecipients;
-  "rclone/box.age".publicKeys = allRecipients;
+  # rclone OAuth tokens for the gdrive/box mounts. nixmachine runs the same
+  # mounts through the server home profile, so it decrypts these too — see
+  # modules/nixos/agenix-rclone.nix.
+  "rclone/gdrive.age".publicKeys = allRecipients ++ [nixmachine];
+  "rclone/box.age".publicKeys = allRecipients ++ [nixmachine];
   # Glance's air-quality widget (WAQI API token). Only nixmachine runs glance;
   # password-manager is kept as the editing/recovery recipient.
   "glance/waqi-token.age".publicKeys = [nixmachine password-manager];
