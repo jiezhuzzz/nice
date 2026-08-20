@@ -30,6 +30,13 @@ in {
     # every `git@github.com` operation hang instead of using the key.
     IdentityAgent = "none";
   };
+  # The homelab forge, on the same personal key as github.com — one identity
+  # registered in both places. Agent bypassed for the reason given above.
+  programs.ssh.settings."git.jiezhu.me" = {
+    IdentityFile = "/run/agenix/github-ssh-key";
+    IdentitiesOnly = true;
+    IdentityAgent = "none";
+  };
   programs.ssh.settings."tacc" = {
     IdentityFile = "/run/agenix/chameleon-ssh-key";
     IdentitiesOnly = true;
