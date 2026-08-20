@@ -48,6 +48,19 @@ in {
           resolvers 1.1.1.1
         }
 
+        # Forgejo CI job containers sit on podman's bridge, and :443 is open to
+        # them there (modules/nixos/forgejo/runner.nix) because a job clones
+        # from ROOT_URL. Only the git vhost is theirs to reach: several of the
+        # blocks below *set* an SSO header, so a workflow that could reach them
+        # would arrive already logged in as jie.
+        @off-limits-to-ci {
+          remote_ip 10.88.0.0/16
+          not host git.jiezhu.me
+        }
+        handle @off-limits-to-ci {
+          abort
+        }
+
       ''
       + lib.concatMapStrings (svc: ''
         @${svc.name} host ${svc.name}.jiezhu.me

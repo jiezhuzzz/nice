@@ -81,6 +81,12 @@
     icon = "https://raw.githubusercontent.com/jiezhuzzz/xuewen/main/assets/logo.svg";
   }
   {
+    name = "git";
+    port = 8081;
+    title = "Forgejo";
+    icon = "di:forgejo";
+  }
+  {
     # Served by a systemd user unit (modules/home-manager/linux/dsh.nix), which
     # also passes this name to dsh as --trusted-host — rename both together.
     name = "dsh";
