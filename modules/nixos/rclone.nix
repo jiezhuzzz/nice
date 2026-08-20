@@ -17,11 +17,10 @@
 # Secret names have to stay in step with secrets/definitions.nix, which is what
 # the darwin hosts decrypt these under: the home-manager module picks its token
 # path by looking the secret up by name, so a rename here silently drops this
-# host back to the hand-placed fallback path.
+# host back to the hand-placed fallback path. age.identityPaths is deliberately
+# NOT set here — see profiles/homelab.nix.
 {user, ...}: {
   programs.fuse.enable = true;
-
-  age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
 
   age.secrets.rclone-gdrive-token = {
     file = ../../secrets/rclone/gdrive.age;

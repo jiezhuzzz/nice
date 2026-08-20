@@ -13,6 +13,12 @@
     ../modules/nixos/agenix-git.nix
     ../modules/nixos/rclone.nix
   ];
+  # The host key every agenix secret on this box decrypts with. Declared once
+  # here rather than in each module above: identityPaths is a list option, so
+  # two modules naming the same key concatenate rather than override, and age
+  # then warns "duplicate identity file" for every secret on every activation.
+  age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+
   home-manager.users.${user.me.username}.imports = [
     ./home/server.nix
     ../modules/home-manager/common/git-agentless-signing.nix

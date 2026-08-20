@@ -3,10 +3,9 @@
 # with a detached tmux/shpool). Scoped to just these two secrets — nixmachine is
 # a recipient for only ssh/github.age + ssh/git-signing.age (see secrets/secrets.nix),
 # not the full desktop secret set. Consumed by the agenix NixOS module that
-# lib/mk-hosts.nix already injects.
+# lib/mk-hosts.nix already injects. age.identityPaths lives in
+# profiles/homelab.nix, which imports this — see the note there.
 {user, ...}: {
-  age.identityPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-
   age.secrets.github-ssh-key = {
     file = ../../secrets/ssh/github.age;
     owner = user.me.username;
