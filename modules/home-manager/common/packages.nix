@@ -4,6 +4,7 @@
     comma
     lazyrsync
     rsync
+    tea
     yubikey-manager
   ];
 }

@@ -110,7 +110,7 @@ in {
       # `home.file` entry below). Run it with `codex --profile api`.
     };
     # Soft guidance: Codex's equivalent of AGENTS.md, shared with claude-code.
-    context = contextSections.python + "\n" + contextSections.lineWrapping + "\n" + contextSections.nixDevEnvironments;
+    context = contextSections.python + "\n" + contextSections.lineWrapping + "\n" + contextSections.commentPolicy + "\n" + contextSections.nixDevEnvironments;
     # Hard enforcement: execpolicy rules that block these commands outright.
     # decision values are allow | prompt | forbidden (strictest wins);
     # written to CODEX_HOME/rules/deny-python.rules.

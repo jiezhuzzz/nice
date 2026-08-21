@@ -49,6 +49,7 @@
     6. A prose comment must explain a constraint or decision originating outside the local code.
     7. Action comments must use one of: `TODO:`, `FIXME:`, `HACK:`, `SAFETY:`.
     8. Remove comments that become redundant after refactoring.
+    9. After writing or editing code, reread the comments in that edit against rules 1-8 and silently delete the ones that fail.
   '';
 
   nixDevEnvironments = ''

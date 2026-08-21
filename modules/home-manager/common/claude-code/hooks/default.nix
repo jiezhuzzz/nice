@@ -1,12 +1,11 @@
-# Wires the hook snippets beside this file into Claude Code's settings:
-# guards into PreToolUse, reminders into PostToolUse. Machinery and
-# rationale live in lib.nix.
+# Wires the guard snippets beside this file into Claude Code's PreToolUse
+# settings. Machinery and rationale live in lib.nix.
 {
   lib,
   pkgs,
   ...
 }: let
-  inherit (import ./lib.nix {inherit pkgs;}) mkGuardHook mkReminderHook commandGuardPreamble;
+  inherit (import ./lib.nix {inherit pkgs;}) mkGuardHook commandGuardPreamble;
 
   githubViaGh = import ./github-via-gh.nix;
 
@@ -24,22 +23,7 @@
   flakeLockGuard = mkGuardHook "claude-flake-lock-hook" ["flake.lock"] (import ./flake-lock.nix);
 
   webFetchGuard = mkGuardHook "claude-webfetch-guard" ["github"] githubViaGh.fromUrl;
-
-  commentReminder = mkReminderHook "claude-comment-reminder" (import ./comment-policy.nix);
 in {
-  programs.claude-code.settings.hooks.PostToolUse = [
-    {
-      matcher = "Edit|Write";
-      hooks = [
-        {
-          type = "command";
-          command = lib.getExe commentReminder;
-          timeout = 5;
-        }
-      ];
-    }
-  ];
-
   programs.claude-code.settings.hooks.PreToolUse = [
     {
       matcher = "Bash";

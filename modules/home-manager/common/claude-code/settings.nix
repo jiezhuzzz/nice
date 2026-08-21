@@ -86,7 +86,7 @@ in {
         commit = "";
         pr = "";
       };
-      disableAgentView = true;
+      # disableAgentView = true;
     };
   };
 }
