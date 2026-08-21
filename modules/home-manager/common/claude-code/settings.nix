@@ -79,6 +79,7 @@ in {
         CLAUDE_CODE_DEBUG_LOGS_DIR = "${config.xdg.stateHome}/claude/logs";
         CLAUDE_CODE_TMPDIR = "/tmp/claude-code-${config.home.username}";
       };
+      outputStyle = "Explanatory";
       theme = "auto";
       tui = "fullscreen";
       attribution = {
