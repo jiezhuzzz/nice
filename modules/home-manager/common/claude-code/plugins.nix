@@ -5,8 +5,6 @@
   officialPlugins = "${inputs.claude-plugins-official}/plugins";
 
   communityPlugins = inputs.claude-plugins-community;
-
-  mattpocockSkills = "${inputs.mattpocock-skills}/skills";
 in {
   # Each entry is linked whole as ~/.config/claude/skills/<name> and loaded as
   # a personal plugin, so its skills, agents, commands and hooks all register
@@ -29,10 +27,6 @@ in {
   # mentions (`superpowers:test-driven-development`) are not installed.
   programs.claude-code.skills = {
     systematic-debugging = "${inputs.superpowers}/skills/systematic-debugging";
-    improve-codebase-architecture = "${mattpocockSkills}/engineering/improve-codebase-architecture";
-    codebase-design = "${mattpocockSkills}/engineering/codebase-design";
-    domain-modeling = "${mattpocockSkills}/engineering/domain-modeling";
-    grilling = "${mattpocockSkills}/productivity/grilling";
     # Authored in this repo, under ./skills/<name> beside this file.
     concretize = ./skills/concretize;
   };

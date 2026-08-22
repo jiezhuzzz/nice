@@ -72,6 +72,10 @@
     };
   };
 
+  # An explicit opt-out: catppuccin.autoEnable in lib/mk-hosts.nix would
+  # otherwise theme the forge as soon as services.forgejo is on.
+  catppuccin.forgejo.enable = false;
+
   # The admin CLI above, pinned to the exact build the unit runs: `forgejo
   # admin` and `forgejo doctor` write to the live database, and a version skew
   # between CLI and service is how migrations get applied twice. Free in disk
