@@ -94,6 +94,38 @@
         "type": "github"
       }
     },
+    "caveman": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787282775,
+        "narHash": "sha256-FagkzOnjW9tqeaAK8NX1X8REsjWRRMqfrvhByEtrAXM=",
+        "owner": "JuliusBrussee",
+        "repo": "caveman",
+        "rev": "2f49f0e1a352aa810e70056b7930aeb0b3d219b4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JuliusBrussee",
+        "repo": "caveman",
+        "type": "github"
+      }
+    },
+    "claude-plugins-community": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787339364,
+        "narHash": "sha256-iKvIn5H0+zoAB9svNl3v2Mss3akRF2WqiokgzcidegU=",
+        "owner": "anthropics",
+        "repo": "claude-plugins-community",
+        "rev": "f4c9452f5ca091f1be7064d9faab1b001ea21645",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-plugins-community",
+        "type": "github"
+      }
+    },
     "claude-plugins-official": {
       "flake": false,
       "locked": {
@@ -351,6 +383,22 @@
         "type": "github"
       }
     },
+    "mattpocock-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787309793,
+        "narHash": "sha256-FPAAotNqA5aHrFDlj/XddoLs4TDKi+4J5H/mvevlOlk=",
+        "owner": "mattpocock",
+        "repo": "skills",
+        "rev": "5b15a47f2d7150f545fbcacbfe381787fc0230dc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mattpocock",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -540,6 +588,8 @@
       "inputs": {
         "agenix": "agenix",
         "catppuccin": "catppuccin",
+        "caveman": "caveman",
+        "claude-plugins-community": "claude-plugins-community",
         "claude-plugins-official": "claude-plugins-official",
         "disko": "disko",
         "flake-parts": "flake-parts",
@@ -549,6 +599,7 @@
         "homebrew-core": "homebrew-core",
         "lanzaboote": "lanzaboote",
         "llm-agents": "llm-agents",
+        "mattpocock-skills": "mattpocock-skills",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_2",

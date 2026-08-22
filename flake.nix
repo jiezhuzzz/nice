@@ -114,6 +114,21 @@
       flake = false;
     };
 
+    claude-plugins-community = {
+      url = "github:anthropics/claude-plugins-community";
+      flake = false;
+    };
+
+    caveman = {
+      url = "github:JuliusBrussee/caveman";
+      flake = false;
+    };
+
+    mattpocock-skills = {
+      url = "github:mattpocock/skills";
+      flake = false;
+    };
+
     # Source for individual skills, not the plugin: only the subdirectories
     # named in modules/home-manager/common/claude-code/plugins.nix are linked.
     superpowers = {
