@@ -45,11 +45,9 @@
     brews = [];
     casks = [
       "1password"
-      "affinity"
       "balenaetcher"
       "betterdisplay"
       "cleanshot"
-      "dropbox"
       "figma"
       "fuse-t"
       "ghostty"
@@ -63,7 +61,6 @@
       "squirrel-app"
       "stats"
       "tailscale-app"
-      "tor-browser"
       "typeless"
       "zoom"
     ];
