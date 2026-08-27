@@ -1,7 +1,10 @@
-# SSH identity pinning + agent auto-load for personal desktop machines.
+# SSH identity pinning for every host jie logs in from, desktop or headless.
 # Keys are decrypted by agenix to /run/agenix/ (see the platform secrets
-# modules); this pins each destination to its key and loads the whole set
-# into the agent at login (launchd on macOS, systemd on Linux).
+# modules); this pins each destination to its key file, which is what makes
+# auth work on headless boxes where a detached tmux/shpool outlives the
+# forwarded agent. Desktops additionally load the set into an agent — see
+# ssh-agent-keys.nix. The base host blocks (HostName, User, ProxyJump) live in
+# ssh.nix.
 #
 # Agent forwarding policy: only the Chameleon hosts (user `cc`: tacc +
 # 10.52.*.*, set in ssh.nix) forward the agent — you hop between reserved
@@ -9,19 +12,7 @@
 # `ForwardAgent no` from the `*` block. Forwarding into other boxes (esp.
 # home-LAN machines like nixmachine) is what leaves a stale $SSH_AUTH_SOCK
 # behind when the session drops, which then hangs github auth.
-{
-  lib,
-  pkgs,
-  ...
-}: let
-  keys = [
-    "/run/agenix/github-ssh-key"
-    "/run/agenix/git-signing-key"
-    "/run/agenix/chameleon-ssh-key"
-    "/run/agenix/lab-ssh-key"
-    "/run/agenix/home-ssh-key"
-  ];
-in {
+_: {
   programs.ssh.settings."github.com" = {
     IdentityFile = "/run/agenix/github-ssh-key";
     IdentitiesOnly = true;
@@ -69,23 +60,5 @@ in {
     User = "jie";
     IdentityFile = "/run/agenix/home-ssh-key";
     IdentitiesOnly = true;
-  };
-
-  launchd.agents.ssh-add-keys = lib.mkIf pkgs.stdenv.isDarwin {
-    enable = true;
-    config = {
-      Label = "com.user.ssh-add-keys";
-      ProgramArguments = ["/usr/bin/ssh-add"] ++ keys;
-      RunAtLoad = true;
-    };
-  };
-
-  systemd.user.services.ssh-add-keys = lib.mkIf pkgs.stdenv.isLinux {
-    Unit.Description = "Load SSH keys into agent";
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.openssh}/bin/ssh-add ${lib.concatStringsSep " " keys}";
-    };
-    Install.WantedBy = ["default.target"];
   };
 }

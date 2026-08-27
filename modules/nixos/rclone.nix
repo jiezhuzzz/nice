@@ -14,24 +14,8 @@
 # userAllowOther stays off — these mounts are single-user and pass no
 # allow_other.
 #
-# Secret names have to stay in step with secrets/definitions.nix, which is what
-# the darwin hosts decrypt these under: the home-manager module picks its token
-# path by looking the secret up by name, so a rename here silently drops this
-# host back to the hand-placed fallback path. age.identityPaths is deliberately
-# NOT set here — see profiles/homelab.nix.
-{user, ...}: {
+# The tokens themselves come from modules/nixos/secrets.nix, which decrypts
+# every entry in secrets/definitions.nix.
+_: {
   programs.fuse.enable = true;
-
-  age.secrets.rclone-gdrive-token = {
-    file = ../../secrets/rclone/gdrive.age;
-    owner = user.me.username;
-    group = "users";
-    mode = "0400";
-  };
-  age.secrets.rclone-box-token = {
-    file = ../../secrets/rclone/box.age;
-    owner = user.me.username;
-    group = "users";
-    mode = "0400";
-  };
 }
