@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Attach the site's floating IP to the first instance of a lease
 # Usage: attach-floating-ips.sh <lease-name>
-# Uses CHI_SITE env var to determine the floating IP (uc=192.5.87.161, tacc=129.114.108.248)
+# Uses CHI_SITE env var to determine the floating IP (uc=192.5.87.43, tacc=129.114.108.248)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -17,7 +17,7 @@ LEASE_NAME="${1:?Usage: $0 <lease-name>}"
 CHI_SITE="${CHI_SITE:-uc}"
 
 case "$CHI_SITE" in
-uc) FLOATING_IP="192.5.87.161" ;;
+uc) FLOATING_IP="192.5.87.43" ;;
 tacc) FLOATING_IP="129.114.108.248" ;;
 *)
   echo "Unknown site: $CHI_SITE" >&2

@@ -42,5 +42,19 @@ _: {
       ProxyJump = "tacc";
       ForwardAgent = true;
     };
+    # The CHI@UC half of the same setup. The alias carries the bare IP too, so
+    # `ssh cc@<floating-ip>` picks up the identity instead of falling through to
+    # `Host *`. Both are the project's floating IP, reattached to whichever node
+    # is the current bastion — change them together if the project gets a new one.
+    settings."uc 192.5.87.43" = {
+      HostName = "192.5.87.43";
+      User = "cc";
+      ForwardAgent = true;
+    };
+    settings."10.140.*.*" = {
+      User = "cc";
+      ProxyJump = "uc";
+      ForwardAgent = true;
+    };
   };
 }

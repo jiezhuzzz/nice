@@ -6,8 +6,8 @@
 # ssh-agent-keys.nix. The base host blocks (HostName, User, ProxyJump) live in
 # ssh.nix.
 #
-# Agent forwarding policy: only the Chameleon hosts (user `cc`: tacc +
-# 10.52.*.*, set in ssh.nix) forward the agent — you hop between reserved
+# Agent forwarding policy: only the Chameleon hosts (user `cc`: the tacc and uc
+# bastions and their private ranges, set in ssh.nix) forward the agent — you hop between reserved
 # bare-metal nodes and clone repos there. Everything else inherits
 # `ForwardAgent no` from the `*` block. Forwarding into other boxes (esp.
 # home-LAN machines like nixmachine) is what leaves a stale $SSH_AUTH_SOCK
@@ -33,6 +33,14 @@ _: {
     IdentitiesOnly = true;
   };
   programs.ssh.settings."10.52.*.*" = {
+    IdentityFile = "/run/agenix/chameleon-ssh-key";
+    IdentitiesOnly = true;
+  };
+  programs.ssh.settings."uc 192.5.87.43" = {
+    IdentityFile = "/run/agenix/chameleon-ssh-key";
+    IdentitiesOnly = true;
+  };
+  programs.ssh.settings."10.140.*.*" = {
     IdentityFile = "/run/agenix/chameleon-ssh-key";
     IdentitiesOnly = true;
   };
