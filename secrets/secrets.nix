@@ -23,7 +23,9 @@ let
 in {
   "ssh/github.age".publicKeys = allRecipients ++ [nixmachine];
   "ssh/git-signing.age".publicKeys = allRecipients ++ [nixmachine];
-  "ssh/chameleon.age".publicKeys = allRecipients;
+  # nixmachine drives Chameleon reservations from a detached shpool session,
+  # where no forwarded agent survives — see modules/nixos/agenix-chameleon.nix.
+  "ssh/chameleon.age".publicKeys = allRecipients ++ [nixmachine];
   "ssh/lab.age".publicKeys = allRecipients;
   "ssh/home.age".publicKeys = allRecipients;
   # rclone OAuth tokens for the gdrive/box mounts. nixmachine runs the same

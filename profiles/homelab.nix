@@ -11,6 +11,7 @@
 {user, ...}: {
   imports = [
     ../modules/nixos/agenix-git.nix
+    ../modules/nixos/agenix-chameleon.nix
     ../modules/nixos/rclone.nix
   ];
   # The host key every agenix secret on this box decrypts with. Declared once
@@ -22,5 +23,6 @@
   home-manager.users.${user.me.username}.imports = [
     ./home/server.nix
     ../modules/home-manager/common/git-agentless-signing.nix
+    ../modules/home-manager/common/chameleon-agentless-identity.nix
   ];
 }
