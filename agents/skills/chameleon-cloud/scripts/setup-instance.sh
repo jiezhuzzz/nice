@@ -2,6 +2,7 @@
 # Post-instance setup for Chameleon Cloud bare metal instances
 # Usage: setup-instance.sh <ip> [<ip2> ...]
 # Set SSH_JUMP=cc@<bastion-ip> to reach nodes via jump host
+# Set SSH_KEY=<path> to use a key other than the agenix-decrypted chameleon one
 set -euo pipefail
 
 if [ $# -eq 0 ]; then
@@ -10,12 +11,16 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-SSH_KEY="${SSH_KEY:-$HOME/.ssh/cc.private}"
+SSH_KEY="${SSH_KEY:-/run/agenix/chameleon-ssh-key}"
 SSH_OPTS=(-o StrictHostKeyChecking=accept-new -i "$SSH_KEY")
 SCP_OPTS=(-o StrictHostKeyChecking=accept-new -i "$SSH_KEY" -p)
 if [ -n "${SSH_JUMP:-}" ]; then
-  SSH_OPTS+=(-J "$SSH_JUMP")
-  SCP_OPTS+=(-J "$SSH_JUMP")
+  # OpenSSH does not pass -i through to a -J hop, so a non-default SSH_KEY
+  # authenticates against the target but not the bastion. Spelling the hop out
+  # as a ProxyCommand carries the same identity to both.
+  JUMP_OPTS=(-o "ProxyCommand=ssh -i $SSH_KEY -o StrictHostKeyChecking=accept-new -W %h:%p $SSH_JUMP")
+  SSH_OPTS+=("${JUMP_OPTS[@]}")
+  SCP_OPTS+=("${JUMP_OPTS[@]}")
 fi
 
 for ip in "$@"; do
