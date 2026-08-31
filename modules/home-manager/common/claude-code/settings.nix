@@ -26,6 +26,11 @@ in {
       # `context` in context.nix still apply (those are user-authored, not auto
       # memory).
       autoMemoryEnabled = false;
+      # Remote Control off unless asked for per session (/remote-control). Left
+      # unset it is not simply off: the resolver falls back to the org policy
+      # default and a server-side rollout gate, so an explicit false is the
+      # only way to keep the bridge from starting on its own.
+      remoteControlAtStartup = false;
       skillOverrides = {
         claude-api = "user-invocable-only";
       };
@@ -86,7 +91,7 @@ in {
         commit = "";
         pr = "";
       };
-      # disableAgentView = true;
+      disableAgentView = true;
     };
   };
 }
