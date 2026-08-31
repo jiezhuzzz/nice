@@ -18,7 +18,10 @@
       on-window-detected = [
         {
           "if".app-id = "com.mitchellh.ghostty";
-          run = "move-node-to-workspace T";
+          run = [
+            "layout tiling"
+            "move-node-to-workspace T"
+          ];
         }
         {
           "if".app-id = "net.imput.helium";
