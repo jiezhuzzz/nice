@@ -64,6 +64,7 @@
       ../modules/home-manager/linux/chromium.nix
       ../modules/home-manager/linux/fcitx5.nix
       ../modules/home-manager/linux/ghostty.nix
+      ../modules/home-manager/linux/rio.nix
       ../modules/home-manager/linux/shpool.nix
       ../modules/home-manager/linux/zathura.nix
     ];
