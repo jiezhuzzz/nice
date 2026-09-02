@@ -12,12 +12,19 @@ in {
       palette = {
         pink = "#F4B8E4";
         lavender = "#BABBF1";
+        teal = "#81C8BE";
       };
       blocks = [
         {
           type = "prompt";
           alignment = "left";
           segments = [
+            {
+              type = "text";
+              style = "plain";
+              foreground = "p:teal";
+              template = "{{ if .Env.ZMX_SESSION }}${icon "\\ueba9"} {{ .Env.ZMX_SESSION }} {{ end }}";
+            }
             {
               type = "path";
               style = "plain";
