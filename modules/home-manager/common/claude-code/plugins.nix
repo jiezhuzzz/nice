@@ -28,6 +28,6 @@ in {
   programs.claude-code.skills = {
     systematic-debugging = "${inputs.superpowers}/skills/systematic-debugging";
     # Authored in this repo, under ./skills/<name> beside this file.
-    concretize = ./skills/concretize;
+    # concretize = ./skills/concretize;
   };
 }

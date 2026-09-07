@@ -92,6 +92,7 @@ in {
         pr = "";
       };
       disableAgentView = true;
+      cleanupPeriodDays = 7;
     };
   };
 }
