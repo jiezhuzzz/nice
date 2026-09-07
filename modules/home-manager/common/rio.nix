@@ -6,6 +6,12 @@
 }: {
   programs.rio = {
     enable = true;
+    # librio's tests spawn a real shell through /usr/bin/login, which the macOS
+    # build sandbox denies, so 15 of them fail on every rebuild here.
+    package =
+      if pkgs.stdenv.hostPlatform.isDarwin
+      then pkgs.rio.overrideAttrs {doCheck = false;}
+      else pkgs.rio;
     settings =
       {
         fonts = {
@@ -32,7 +38,7 @@
         cursor.shape = "block";
         copy-on-select = true;
         window = {
-          opacity = 0.9;
+          opacity = 0.8;
           opacity-cells = true;
           blur =
             if pkgs.stdenv.hostPlatform.isDarwin
@@ -58,6 +64,7 @@
         # Rio has no custom-shader hook, so nixmini's Ghostty cursor_blaze
         # becomes the built-in trail; the matrix background has no counterpart.
         effects.trail-cursor = true;
+        effects.trail-cursor-opacity = 0.5;
       };
   };
 }
