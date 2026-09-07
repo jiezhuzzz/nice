@@ -19,7 +19,7 @@ in {
     code-simplifier = "${officialPlugins}/code-simplifier";
     feature-dev = "${officialPlugins}/feature-dev";
     eli5 = "${communityPlugins}/eli5";
-    inherit (inputs) caveman;
+    inherit (inputs) caveman ponytail;
   };
 
   # Single skills, linked as ~/.config/claude/skills/<name> without their

@@ -124,6 +124,11 @@
       flake = false;
     };
 
+    ponytail = {
+      url = "github:DietrichGebert/ponytail";
+      flake = false;
+    };
+
     # Source for individual skills, not the plugin: only the subdirectories
     # named in modules/home-manager/common/claude-code/plugins.nix are linked.
     superpowers = {
