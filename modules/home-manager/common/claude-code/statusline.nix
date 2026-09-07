@@ -16,109 +16,91 @@
   # status payload, so the 5h/7d numbers cost no API call. One thing is lost
   # against the old script: ccstatusline has no value-driven colour, so nothing
   # turns amber or red as the context fills.
-  seg = id: type: pair: extra:
-    {
-      inherit id type;
-      color = pair.fg;
-      backgroundColor = pair.bg;
-    }
-    // extra;
+  #
+  # Plain text rather than powerline: Rio draws the window translucent with
+  # per-cell opacity, so the powerline caps and arrows never sat on the same
+  # background as the cells beside them. Foreground colours only, from the
+  # Nord palette (https://www.nordtheme.com/docs/colors-and-palettes).
+  nord = {
+    polarNight3 = "hex:4c566a";
+    snowStorm0 = "hex:d8dee9";
+    frost0 = "hex:8fbcbb";
+    frost1 = "hex:88c0d0";
+    frost2 = "hex:81a1c1";
+    frost3 = "hex:5e81ac";
+    red = "hex:bf616a";
+    orange = "hex:d08770";
+    yellow = "hex:ebcb8b";
+    green = "hex:a3be8c";
+    purple = "hex:b48ead";
+  };
 
-  # 月 "moonlight": powerline segments in dim, cold blue-violet with pale text
-  # over them. Every boundary alternates dark against light as well as shifting
-  # hue, which is what keeps neighbouring fills legible when the whole ramp
-  # sits this close together.
+  seg = id: type: color: extra: {inherit id type color;} // extra;
+
+  # ccstatusline drops a separator whose preceding widget rendered nothing, so
+  # the hidden branch and worktree segments leave no doubled bars behind.
+  sep = id: {
+    inherit id;
+    type = "separator";
+    character = "│";
+    color = nord.polarNight3;
+  };
+
   ccstatuslineSettings = {
-    version = 3;
+    # Must equal ccstatusline's CURRENT_VERSION (2.2.29: 4). Anything lower is
+    # migrated and written back — into the read-only store here, so the write
+    # fails and every render falls back to defaults with "⚠ invalid config".
+    version = 4;
     colorLevel = 3; # truecolor
     defaultPadding = " ";
     defaultPaddingSide = "both";
-    flexMode = "full";
     # Longer than statusLine.refreshInterval below, or every timed re-render
     # (which exists for the clock) would re-fork git.
     gitCacheTtlSeconds = 30;
-    powerline = {
-      enabled = true;
-      # Nix strings have no \uXXXX escape, so the Nerd Font glyphs sit here as
-      # literal characters: separator U+E0B0, caps U+E0B6 and U+E0B4.
-      separators = [""];
-      separatorInvertBackground = [false];
-      startCaps = [""];
-      endCaps = [""];
-      theme = "custom"; # colours come from each segment below
-      autoAlign = false;
-      continueThemeAcrossLines = false;
-    };
     lines = [
       [
-        # Model and effort share one fill. `merge` drops the arrow that would
-        # otherwise sit between them; it has to be the no-padding form, because
-        # every widget is padded on both sides and a plain merge would leave a
-        # double space — hence the explicit single space put back after it.
-        (seg "model" "model" {
-            fg = "hex:eef1ff";
-            bg = "hex:4c5b8a";
-          } {
-            bold = true;
-            rawValue = true;
-            merge = "no-padding";
-          })
+        # Model and effort read as one pair, no bar between. `merge` has to be
+        # the no-padding form: every widget is padded on both sides, so a plain
+        # merge would leave a double space — hence the explicit single space put
+        # back after it.
+        (seg "model" "model" nord.frost1 {
+          bold = true;
+          rawValue = true;
+          merge = "no-padding";
+        })
         {
           id = "model-gap";
           type = "custom-text";
           customText = " ";
-          backgroundColor = "hex:4c5b8a";
           merge = "no-padding";
         }
-        (seg "effort" "thinking-effort" {
-          fg = "hex:a3aed0";
-          bg = "hex:4c5b8a";
-        } {rawValue = true;})
-        (seg "cwd" "current-working-dir" {
-            fg = "hex:d6e2ff";
-            bg = "hex:35507a";
-          } {
-            rawValue = true;
-            metadata.segments = "1";
-          })
-        (seg "branch" "git-branch" {
-            fg = "hex:e6f2ff";
-            bg = "hex:4a7fa6";
-          } {
-            rawValue = true;
-            metadata.hideNoGit = "true";
-          })
+        (seg "effort" "thinking-effort" nord.frost2 {rawValue = true;})
+        (sep "sep-cwd")
+        (seg "cwd" "current-working-dir" nord.snowStorm0 {
+          rawValue = true;
+          metadata.fishStyle = "true";
+        })
+        (sep "sep-branch")
+        (seg "branch" "git-branch" nord.purple {
+          rawValue = true;
+          metadata.hide = "no-git";
+        })
+        (sep "sep-worktree")
         # Renders nothing outside a linked worktree, so it costs no width there.
-        (seg "worktree" "worktree-name" {
-          fg = "hex:d8f0f0";
-          bg = "hex:2f6b74";
-        } {rawValue = true;})
-        (seg "ctx" "context-percentage" {
-          fg = "hex:e4f6f5";
-          bg = "hex:4f8a8b";
-        } {metadata.inverse = "true";}) # percent remaining, not consumed
-        (seg "session" "session-usage" {
-          fg = "hex:d5e3f5";
-          bg = "hex:2e4a6b";
-        } {})
-        (seg "weekly" "weekly-usage" {
-          fg = "hex:eef2ff";
-          bg = "hex:6b7fa8";
-        } {})
-        # The one inverted segment: dark text on a light fill.
-        (seg "cost" "session-cost" {
-            fg = "hex:131a28";
-            bg = "hex:c3cfe8";
-          } {
-            bold = true;
-            rawValue = true;
-          })
-        # A step down from the cost, but neutral grey — a second periwinkle
-        # here would echo the weekly two segments back.
-        (seg "clock" "session-clock" {
-          fg = "hex:1a2130";
-          bg = "hex:a2a9b5";
-        } {rawValue = true;})
+        (seg "worktree" "worktree-name" nord.frost0 {rawValue = true;})
+        (sep "sep-ctx")
+        (seg "ctx" "context-percentage" nord.green {metadata.inverse = "true";}) # percent remaining, not consumed
+        (sep "sep-session")
+        (seg "session" "session-usage" nord.yellow {})
+        (sep "sep-weekly")
+        (seg "weekly" "weekly-usage" nord.orange {})
+        (sep "sep-cost")
+        (seg "cost" "session-cost" nord.red {
+          bold = true;
+          rawValue = true;
+        })
+        (sep "sep-clock")
+        (seg "clock" "session-clock" nord.frost3 {rawValue = true;})
       ]
     ];
   };
@@ -130,9 +112,10 @@ in {
 
   # ccstatusline reads ~/.config/ccstatusline/settings.json. Generating it keeps
   # the status line declarative like everything else. A read-only store path is
-  # safe on the render path: ccstatusline only writes back when an
-  # `updatemessage` key is present, which a generated config never has, and its
-  # git/timer caches go to ~/.cache/ccstatusline regardless.
+  # safe on the render path as long as `version` above is current: ccstatusline
+  # only writes back when migrating an older schema or when an `updatemessage`
+  # key is present, and its git/timer caches go to ~/.cache/ccstatusline
+  # regardless.
   xdg.configFile."ccstatusline/settings.json".source =
     (pkgs.formats.json {}).generate "ccstatusline-settings.json" ccstatuslineSettings;
 
