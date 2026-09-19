@@ -7,16 +7,9 @@
   llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
   piThemes = "${inputs.pi-catppuccin.packages.${pkgs.stdenv.hostPlatform.system}.default}/share/pi/themes";
 
-  # Same segments, order and Nord colors as the ccstatusline line in
-  # claude-code/statusline.nix. Two differences pi cannot close: `time` is the
-  # wall clock rather than elapsed session time, and `context` reports the
-  # window consumed where ccstatusline inverts it to what is left.
-  #
-  # The 5h and weekly gauges have no pi-starship module. pi publishes no rate
-  # limits of its own, so pi-usage-bars queries the provider (Claude Pro/Max
-  # OAuth, ChatGPT Codex OAuth) and pushes one string into pi's extension
-  # status map, which `extension_status` renders. It carries its own severity
-  # colors, so `style` here only applies where it leaves text unstyled.
+  # Nord colors and segment order follow claude-code/statusline.nix.
+  # `time` is the wall clock rather than elapsed session time, and `context`
+  # reports the window consumed where ccstatusline inverts it to what is left.
   sep = "[ │ ](polar_night_3)";
   piStarshipSettings = {
     palette = "nord";
@@ -34,7 +27,7 @@
     };
     # Branch and worktree sit in conditional groups so their separator leaves
     # with them outside a repo or a linked worktree.
-    format = "$model $thinking${sep}$directory(${sep}$git_branch)(${sep}$git_worktree)${sep}$context(${sep}$extension_status)${sep}$cost${sep}$time";
+    format = "$model $thinking${sep}$directory(${sep}$git_branch)(${sep}$git_worktree)${sep}$context${sep}$cost${sep}$time";
     model = {
       format = "[$model]($style)";
       style = "bold frost_1";
@@ -66,11 +59,6 @@
         }
       ];
     };
-    extension_status = {
-      style = "yellow";
-      # Plain text, like every other segment here.
-      icons."@hk_net/pi-usage-bars" = "";
-    };
     cost = {
       symbol = "$";
       format = "[$symbol$cost]($style)";
@@ -82,10 +70,6 @@
         }
       ];
     };
-    time = {
-      format = "[$time]($style)";
-      style = "frost_3";
-    };
   };
 in {
   programs.pi-coding-agent = {
@@ -93,7 +77,7 @@ in {
     package = llmAgents.pi;
     configDir = "${config.xdg.configHome}/pi/agent";
     settings = {
-      defaultProvider = "openai";
+      defaultProvider = "openai-codex";
       defaultModel = "gpt-6-astra";
       defaultThinkingLevel = "xhigh";
       quietStartup = true;
@@ -104,7 +88,6 @@ in {
         "npm:pi-subagents"
         "npm:pi-web-access"
         "npm:@narumitw/pi-starship"
-        "npm:@hk_net/pi-usage-bars"
         "npm:pi-btw"
 
         "${inputs.ponytail}"
