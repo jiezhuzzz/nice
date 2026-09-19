@@ -50,6 +50,7 @@
           {
             nixpkgs.config.allowUnfree = true;
             nix.settings.experimental-features = ["nix-command" "flakes"];
+            nix.settings.trusted-users = [user.me.username];
             catppuccin.enable = true;
             catppuccin.autoEnable = true;
             catppuccin.flavor = user.theme.flavor;

@@ -23,10 +23,9 @@
   # Quickshell/Qt closure is expensive to build from source.
   #
   # Deliberately set here rather than as `nixConfig` in flake.nix: that
-  # attribute is honoured only for a trusted user, and `trusted-users` is just
-  # `root`, so it would apply under `sudo nixos-rebuild switch` but be silently
-  # ignored for an unprivileged `nix build` — falling back to a source build.
-  # Baking it into the system's nix.conf applies it regardless of invoker.
+  # attribute is honoured only for a trusted user, and even then nix prompts to
+  # accept it on every run unless `accept-flake-config` is set. Baking it into
+  # the system's nix.conf applies it silently regardless of invoker.
   nix.settings = {
     extra-substituters = ["https://noctalia.cachix.org"];
     extra-trusted-public-keys = [
