@@ -6,7 +6,23 @@
   ...
 }: let
   # ccstatusline from llm-agents.nix (like claude-code itself in settings.nix).
-  llmAgents = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+  #
+  # HACK: llm-agents.nix installs only dist/ccstatusline.js, but 2.2.32 split
+  # dist/ into chunks the entry point imports relatively, so it dies with
+  # ERR_MODULE_NOT_FOUND and Claude Code draws no status line. Ship all of
+  # dist/ until upstream does; node resolves the chunks next to the symlink's
+  # target.
+  ccstatusline = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccstatusline.overrideAttrs {
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/lib $out/bin
+      cp -r --no-preserve=mode $src/dist $out/lib/ccstatusline
+      chmod +x $out/lib/ccstatusline/ccstatusline.js
+      patchShebangs $out/lib/ccstatusline/ccstatusline.js
+      ln -s $out/lib/ccstatusline/ccstatusline.js $out/bin/ccstatusline
+      runHook postInstall
+    '';
+  };
 
   # ccstatusline renders the status line from this JSON, replacing the
   # hand-rolled shell script that used to live here — which forked jq nine
@@ -108,7 +124,7 @@ in {
   # On PATH so `ccstatusline` opens its TUI. Editing there is read-only: the
   # settings file below is a store symlink, so saves fail — it is a preview of
   # what this module declares, not a way to change it.
-  home.packages = [llmAgents.ccstatusline];
+  home.packages = [ccstatusline];
 
   # ccstatusline reads ~/.config/ccstatusline/settings.json. Generating it keeps
   # the status line declarative like everything else. A read-only store path is
@@ -121,7 +137,7 @@ in {
 
   programs.claude-code.settings.statusLine = {
     type = "command";
-    command = "${llmAgents.ccstatusline}/bin/ccstatusline";
+    command = "${ccstatusline}/bin/ccstatusline";
     padding = 0;
     # Re-render between turns so the session clock stays live. Claude Code
     # honours this from 2.1.97 on.
