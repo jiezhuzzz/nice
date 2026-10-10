@@ -15,7 +15,7 @@
     "/run/agenix/home-ssh-key"
   ];
 in {
-  launchd.agents.ssh-add-keys = lib.mkIf pkgs.stdenv.isDarwin {
+  launchd.agents.ssh-add-keys = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     config = {
       Label = "com.user.ssh-add-keys";
@@ -24,7 +24,7 @@ in {
     };
   };
 
-  systemd.user.services.ssh-add-keys = lib.mkIf pkgs.stdenv.isLinux {
+  systemd.user.services.ssh-add-keys = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     Unit.Description = "Load SSH keys into agent";
     Service = {
       Type = "oneshot";

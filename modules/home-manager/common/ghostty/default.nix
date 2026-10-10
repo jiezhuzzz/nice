@@ -7,7 +7,7 @@
   programs.ghostty = {
     enable = true;
     package =
-      if pkgs.stdenv.isDarwin
+      if pkgs.stdenv.hostPlatform.isDarwin
       then null
       else pkgs.ghostty;
     settings =
