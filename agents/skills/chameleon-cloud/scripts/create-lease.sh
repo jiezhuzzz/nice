@@ -1,18 +1,10 @@
 #!/usr/bin/env bash
-# Create a Chameleon Cloud lease with host + floating IP reservations
+# Create a physical:host lease starting now and wait until it is ACTIVE
 # Usage: create-lease.sh <name> <node-type> <count> <end-date>
 # Example: create-lease.sh my-lease compute_skylake 2 "2026-03-15 00:00"
-# Requires: OS_PASSWORD env var set, chi.sh in same directory
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CHI="$SCRIPT_DIR/chi.sh"
-# Prefer jaq (faster) but fall back to jq; one of them must exist.
-JQ="${JQ:-$(command -v jaq || command -v jq || true)}"
-[[ -n $JQ ]] || {
-  echo "Error: need 'jaq' or 'jq' on PATH" >&2
-  exit 1
-}
+CHI="$(cd "$(dirname "$0")" && pwd)/chi.sh"
 
 LEASE_NAME="${1:?Usage: $0 <name> <node-type> <count> <end-date>}"
 NODE_TYPE="${2:?Missing node_type (e.g. compute_skylake, compute_cascadelake_r)}"
@@ -26,18 +18,15 @@ echo "  Node type: $NODE_TYPE"
 echo "  Count: $COUNT"
 echo "  End date: $END_DATE"
 
-# NOTE: chi.sh uses exec, so lease-create must run in a subshell to avoid
-# replacing the parent process. The subshell lets output print to stdout
-# while the parent script continues to the polling loop.
-("$CHI" blazar lease-create \
+"$CHI" blazar lease-create \
   --reservation "min=$COUNT,max=$COUNT,resource_type=physical:host,resource_properties=[\"=\",\"\$node_type\",\"$NODE_TYPE\"]" \
   --end-date "$END_DATE" \
-  "$LEASE_NAME")
+  "$LEASE_NAME"
 
 echo "Polling lease status (timeout ${TIMEOUT}s)..."
 elapsed=0
 while [ $elapsed -lt $TIMEOUT ]; do
-  status=$("$CHI" blazar lease-show "$LEASE_NAME" -f json | "$JQ" -r '.status')
+  status=$("$CHI" blazar lease-show "$LEASE_NAME" -f json | jq -r '.status')
   echo "  Status: $status (${elapsed}s)"
   if [ "$status" = "ACTIVE" ]; then
     echo "Lease '$LEASE_NAME' is ACTIVE."

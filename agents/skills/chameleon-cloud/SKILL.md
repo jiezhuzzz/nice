@@ -1,23 +1,24 @@
 ---
 name: chameleon-cloud
-description: Use when managing Chameleon Cloud resources - creating leases, reservations, launching bare metal instances, managing networks, floating IPs, or any openstack/blazar CLI operations on CHI@UC or CHI@TACC
+description: Use when managing Chameleon Cloud resources - creating leases, reservations, launching bare metal instances, managing networks, floating IPs, ccauth/cc-login authentication, or any openstack/blazar CLI operations on CHI@UC or CHI@TACC
 ---
 
 # Chameleon Cloud Management
 
 Manage bare metal reservations and instances on Chameleon Cloud (CHI@UC or CHI@TACC) via CLI.
 
-**JSON parsing:** use `-f json` on blazar/openstack output and pipe through **`jq`** to extract fields. Do **not** assume `jaq` is installed — the operator hosts here only ship `jq`, and a bare `jaq` pipe fails with `command not found` (exit 127). The bundled scripts auto-detect `jaq` (a faster drop-in) and fall back to `jq` via `JQ="${JQ:-$(command -v jaq || command -v jq || true)}"`; for ad-hoc commands prefer `jq`.
+**JSON parsing:** use `-f json` on blazar/openstack output and pipe it through `jq`. The operator hosts ship `jq` only; `jaq` is not installed.
 
 ## CLI Wrapper
 
 All commands use the `chi` wrapper script at `scripts/chi.sh` relative to this skill's base directory.
 
+Authentication goes through Chameleon's [`ccauth`](https://chameleoncloud.readthedocs.io/en/latest/technical/cli/ccauth.html) OIDC device flow (browser approval, no password). The wrapper runs `blazar` (`chameleon-blazarclient`) and `openstack` (`python-openstackclient`) with ccauth's keystoneauth plugin.
+
 **Before running any commands:**
 1. Ask the user which site: **UC** (`CHI@UC`) or **TACC** (`CHI@TACC`).
-2. Ask the user for `OS_PASSWORD` interactively. Never store or hardcode it.
-3. Export both: `export OS_PASSWORD="<password>" CHI_SITE="uc"` (or `"tacc"`)
-4. Set the wrapper path: `CHI="<skill-base-dir>/scripts/chi.sh"` (use the absolute path from the skill's base directory)
+2. Set the site and wrapper path: `export CHI_SITE="uc"` (or `"tacc"`) and `CHI="<skill-base-dir>/scripts/chi.sh"` (use the absolute path from the skill's base directory).
+3. Log in: run `$CHI login` **as a background task** (`run_in_background`). It reuses the cached refresh token and exits at once when that is still valid. Otherwise it prints `To authenticate please go to: <url>` and polls until the user approves. Read that URL from the task output, give it to the user, and wait for the task to finish before running anything else.
 
 Then run commands as:
 ```bash
@@ -25,7 +26,21 @@ $CHI blazar <args...>
 $CHI openstack <args...>
 ```
 
-**IMPORTANT:** Prefix all `blazar` and `openstack` commands below with `$CHI`. Combine `export OS_PASSWORD`, `CHI_SITE`, and `CHI=` with each command using inline env vars or a single export block at the start of the session. The `CHI_SITE` env var selects the site (`uc` or `tacc`, defaults to `uc`).
+**IMPORTANT:** Prefix every `blazar` and `openstack` command below with `$CHI`. All scripts go through `chi.sh`, so `CHI_SITE` (default `uc`) selects the site for them too.
+
+### Auth details
+
+- The refresh token is cached at `~/.cache/ccauth/refresh_token.json` (override the directory with `CC_LOGIN_STATE`). It comes from Chameleon's single Keycloak realm, so **one login covers both sites** — switching `CHI_SITE` needs no new login.
+- `$CHI blazar` / `$CHI openstack` refuse to run when no token is cached. A cached but *expired* token still makes them block on a device flow whose URL you cannot see, which is why step 3 runs `$CHI login` first.
+- `$CHI logout` clears the cached token.
+- **`cc-login`** (same package) trades the device login for a portable, **unrestricted** OpenStack application credential (default lifetime 24h), for contexts without `ccauth` installed. It can create further non-expiring credentials as the user if leaked, so only generate one when asked and never commit the output:
+  ```bash
+  $CHI cc-login --output-openrc <file>          # export OS_AUTH_TYPE=v3applicationcredential ...
+  $CHI cc-login --output-clouds-yaml <file>     # entry named `chameleon` (--cloud-name to change)
+  $CHI cc-login --force-refresh --output-openrc <file>   # bypass the cached credential
+  ```
+  The wrapper adds the site flags and a per-site credential cache; don't pass them.
+- **On a Chameleon instance**, CC-* images ship `ccauth` and `cc-login` on `cc`'s `PATH`, and they discover site and project from the metadata service. Instance vendordata no longer carries credentials: `~/openrc` is not populated at boot and `cc-generate-openrc` is gone. If the user needs OpenStack credentials *on a node* (e.g. `sudo -E cc-snapshot <image>` or `setup-cc-mount-object-store`), run there: `ccauth openrc --output ~/openrc && source ~/openrc`.
 
 ## Supported Node Types
 
@@ -50,13 +65,13 @@ When the user asks to reserve hosts, follow **all steps** in order.
 
 ### Steps 1-2: Check Availability
 
-Run the availability script to query all hosts, allocations, and node types, then display a summary:
+Run the availability script (two API calls, ~10 s):
 
 ```bash
 <skill-base-dir>/scripts/check-availability.sh
 ```
 
-Requires `OS_PASSWORD` env var. Outputs a node availability summary automatically (free/reserved counts per type, next availability dates).
+It prints, per node type: total, free, reserved and unreservable counts, plus the first release time among the reserved hosts.
 
 ### Step 3: Prompt the User
 
@@ -72,13 +87,13 @@ If requested count exceeds free nodes, show earliest time when enough become fre
 
 ### Step 4: Create the Lease
 
-Run the lease creation script. It gets the public network ID, creates the lease with host + floating IP reservations, and polls until ACTIVE (timeout 120s).
+Run the lease creation script. It creates a `physical:host` lease starting now and polls until ACTIVE (timeout 120s).
 
 ```bash
 <skill-base-dir>/scripts/create-lease.sh <name> <node-type> <count> "<end-date>"
 ```
 
-Requires `OS_PASSWORD` env var. Omits `--start-date` to start immediately. No floating IP reservation — a pre-existing IP is reused.
+`<end-date>` is UTC (`YYYY-MM-DD HH:MM`). No floating IP is reserved; Step 6 reuses the site's pre-existing IP.
 
 ### Step 5: Launch Instances
 
@@ -88,9 +103,9 @@ Use the batch launch script. It launches in batches of 2 (system concurrency lim
 <skill-base-dir>/scripts/launch-instances.sh <lease-name> <image> <keypair> <count>
 ```
 
-Requires `OS_PASSWORD` env var. Instances are named `<lease-name>-1`, `<lease-name>-2`, etc. Bare metal takes ~10-15 min per batch.
+Instances are named `<lease-name>-1`, `<lease-name>-2`, etc. These names do not identify a lease; see [Instances belonging to a lease](#instances-belonging-to-a-lease). Bare metal takes ~10-15 min per batch.
 
-> **Names do not identify a lease.** The `<lease-name>-N` name is just a label chosen at launch; the counter can continue past a lease's node count and names can even look swapped between leases. To find which instances actually belong to a lease, map by reservation, never by name — see [Instances belonging to a lease](#instances-belonging-to-a-lease).
+Run it with `run_in_background` and wait for its exit notification; it polls and exits on its own. Do not watch its output with `tail -F`, which never exits.
 
 ### Step 6: Attach Floating IP
 
@@ -99,13 +114,13 @@ After instances are ACTIVE, run the attach script. It attaches the site's pre-ex
 | Site | Floating IP |
 |------|-------------|
 | CHI@UC | `192.5.87.43` |
-| CHI@TACC | `129.114.108.248` |
+| CHI@TACC | `129.114.108.129` |
 
 ```bash
 <skill-base-dir>/scripts/attach-floating-ips.sh <lease-name>
 ```
 
-Requires `OS_PASSWORD` and `CHI_SITE` env vars. The script detaches the IP from any previous server before attaching.
+The script detaches the IP from any previous server before attaching. If it fails with `No FloatingIP found`, the IP was reclaimed from the project; Neutron policy forbids requesting a specific address. Ask the user, then allocate a new one with `$CHI openstack floating ip create public` and update this table, `attach-floating-ips.sh`, and the `uc`/`tacc` host in `modules/home-manager/common/ssh.nix`.
 
 SSH access:
 - **Bastion (first node):** `ssh cc@<floating-ip>`
@@ -119,11 +134,19 @@ After the floating IP is attached and SSH is working, use the setup script. For 
 # Bastion (first node)
 <skill-base-dir>/scripts/setup-instance.sh <floating-ip>
 
-# Other nodes (via SSH jump)
-SSH_JUMP=cc@<floating-ip> <skill-base-dir>/scripts/setup-instance.sh <private-ip1> <private-ip2> ...
+# Other nodes (via SSH jump), one background task per IP
+SSH_JUMP=cc@<floating-ip> <skill-base-dir>/scripts/setup-instance.sh <private-ip>
 ```
 
-This script handles per-instance: stale host key removal, rclone OAuth token copy for GDrive and Box (best-effort; requires `/run/agenix/rclone-{gdrive,box}-token` on the operator host), Ghostty terminfo, apt update/upgrade, uidmap install, AppArmor unprivileged userns fix (required for rootless podman), `loginctl enable-linger cc` for persistent user services, and Nix install. Run instances in parallel as background tasks.
+After stale host key removal, it runs these steps per instance, in order:
+- `rclone`: copy the GDrive and Box OAuth tokens (best-effort; requires `/run/agenix/rclone-{gdrive,box}-token` on the operator host).
+- `terminfo`: install the Ghostty terminfo.
+- `apt`: apt update/upgrade, then install uidmap/podman.
+- `userns`: apply the AppArmor unprivileged-userns fix (required for rootless podman).
+- `linger`: `loginctl enable-linger cc`, for persistent user services.
+- `nix`: install Nix.
+
+Set `STEPS` to run a subset, e.g. `STEPS=nix` when the user wants Nix but not their config. Run instances in parallel as background tasks.
 
 ### Ordering note
 
@@ -138,7 +161,7 @@ systemctl --user start 'rclone-mount:@gdrive.service' 'rclone-mount:@box.service
 
 | Task | Command |
 |------|---------|
-| List hosts | `$CHI blazar host-list` |
+| List hosts (with node_type) | `$CHI blazar host-list --long` |
 | Show host details | `$CHI blazar host-show <id>` |
 | List allocations | `$CHI blazar allocation-list host` |
 | Create lease | `$CHI blazar lease-create --reservation "..." --end-date "..." <name>` |
@@ -163,7 +186,7 @@ Use the helper script, which resolves it reliably:
 <skill-base-dir>/scripts/lease-instances.sh <lease-name>
 ```
 
-Requires `OS_PASSWORD` (and `CHI_SITE`) env vars. It prints the reserved-host count and every instance scheduled on those hosts, mapping `lease → host reservation id(s) → Blazar host id(s) → hypervisor_hostname(s) → server`.
+It prints the reserved-host count and every instance scheduled on those hosts, mapping `lease → host reservation id(s) → Blazar host id(s) → hypervisor_hostname(s) → server`.
 
 The mapping chain, if you need to do it by hand:
 
@@ -172,7 +195,7 @@ The mapping chain, if you need to do it by hand:
 3. `blazar host-list -f json` → map each Blazar host id to its `hypervisor_hostname`.
 4. `openstack server list --long -f json` → the server whose `.Host` equals that `hypervisor_hostname` is the instance on that reserved node.
 
-> **Blazar `.reservations` shape differs by command.** In `lease-show` it is a JSON-encoded *string* holding one or more objects *concatenated* (not a JSON array) — pipe the raw string into a second `jq -s` (stream-slurp), not `fromjson`. In `allocation-list` it is already a real array — use it directly (no `fromjson`).
+> `.reservations` is a JSON array in both `lease-show` and `allocation-list` under the pinned `chameleon-blazarclient`; index it directly (`.reservations[]`).
 
 ## Extend a Lease
 
@@ -184,11 +207,10 @@ $CHI blazar lease-update --prolong-for "2d" my-lease
 
 ## Common Mistakes
 
-- **Counting/identifying a lease's instances by name prefix** -- instance names (`<lease>-N`) do NOT encode the lease; the launch counter can continue across leases and names can even look swapped. Map via reservation → host → hypervisor (use `lease-instances.sh`). See [Instances belonging to a lease](#instances-belonging-to-a-lease).
-- **Assuming `jaq` is installed** -- operator hosts only have `jq`, so a bare `jaq` pipe fails with `command not found`. Use `jq`; the scripts fall back automatically.
-- **Calling `fromjson` on `allocation-list` reservations** -- there `.reservations` is already an array; `fromjson` only applies to the *string* form returned by `lease-show`. `jaq` tolerated the mismatch, `jq` errors.
+- **Counting/identifying a lease's instances by name prefix** -- see [Instances belonging to a lease](#instances-belonging-to-a-lease); use `lease-instances.sh`.
 - Confusing **lease ID** with **reservation ID** -- extract with `jq` from `lease-show`
 - Forgetting `--hint reservation=<id>` for `server create`
-- Using wrong floating IPs -- always filter by `reservation:<id>` tag
 - Using `--flavor` other than `baremetal` for physical hosts
-- Using `openstack reservation` commands -- they don't exist; use `blazar` CLI
+- Using `$CHI openstack reservation ...` -- the wrapper's `openstack` env has no blazarclient plugin, and the scripts depend on the `blazar` CLI's output shapes; use `$CHI blazar`
+- Asking the user for a password or exporting `OS_PASSWORD` -- auth is `ccauth`'s device flow; run `$CHI login`
+- Running the `blazar` shell against a hand-made or `ccauth openrc`-generated env without `OS_ACCESS_TOKEN_TYPE=access_token` -- its argparse auth loading hands the plugin `None`, the refresh silently fails, and the command blocks on a device flow despite a valid cached login. `chi.sh` sets it.
