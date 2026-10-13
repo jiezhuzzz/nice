@@ -33,7 +33,7 @@ _: {
     # from the tacc gateway onto reserved bare-metal nodes (10.52.*.*) and use
     # your keys there. No other host forwards — see ssh-identities.nix for why.
     settings."tacc" = {
-      HostName = "129.114.108.248";
+      HostName = "129.114.108.129";
       User = "cc";
       ForwardAgent = true;
     };
