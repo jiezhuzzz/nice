@@ -47,7 +47,7 @@
       "1password"
       "balenaetcher"
       "betterdisplay"
-      "cleanshot"
+      # "cleanshot"
       "figma"
       "fuse-t"
       "ghostty"
