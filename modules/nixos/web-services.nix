@@ -78,7 +78,7 @@
     name = "xuewen";
     port = 8087;
     title = "Xuewen";
-    icon = "https://raw.githubusercontent.com/jiezhuzzz/xuewen/main/assets/logo.svg";
+    icon = "https://raw.githubusercontent.com/r3clab/Xuewen/main/assets/logo.svg";
   }
   {
     name = "git";

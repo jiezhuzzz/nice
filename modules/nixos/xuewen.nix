@@ -1,4 +1,4 @@
-# Xuewen — self-hosted paper manager (github:jiezhuzzz/xuewen). No nixpkgs
+# Xuewen — self-hosted paper manager (github:r3clab/Xuewen). No nixpkgs
 # package: the flake input carries both the build and this service module.
 # Tailnet-only — binds 127.0.0.1, opens no firewall port, caddy is the only way
 # in. 8087 because metatube holds 8080 and stirling/glance/shiori/searx/

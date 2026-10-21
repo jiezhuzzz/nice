@@ -869,16 +869,16 @@
         "treefmt-nix": "treefmt-nix_3"
       },
       "locked": {
-        "lastModified": 1792333008,
-        "narHash": "sha256-W7Lk2iH3HNSGfZ5iz51aOrZtBY8dxceqGwRs9u160YA=",
-        "owner": "jiezhuzzz",
-        "repo": "xuewen",
-        "rev": "ab42eef7ef2ee5fe038948a92a614f89f3c897d4",
+        "lastModified": 1792514448,
+        "narHash": "sha256-ciCwHtdsxR6d2L0EySha1y+86axR7Xn/09y3MKEHfT4=",
+        "owner": "r3clab",
+        "repo": "Xuewen",
+        "rev": "c9b26c801d4dff8adc7a0a2ac44e8f7482552d8e",
         "type": "github"
       },
       "original": {
-        "owner": "jiezhuzzz",
-        "repo": "xuewen",
+        "owner": "r3clab",
+        "repo": "Xuewen",
         "type": "github"
       }
     }

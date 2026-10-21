@@ -135,7 +135,7 @@
     # Homelab services with no nixpkgs package — the flake carries the build
     # and the NixOS module (see modules/nixos/xuewen.nix).
     xuewen = {
-      url = "github:jiezhuzzz/xuewen";
+      url = "github:r3clab/Xuewen";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
