@@ -1,19 +1,19 @@
 # Forgejo Actions runner — the CI executor for the forge in ./server.nix. One
 # globally-scoped runner, jobs executed as podman containers.
 #
-# `package` is deliberately forgejo-runner rather than the module's
-# gitea-actions-runner default: the two forks' runner protocols drift, and this
-# talks to Forgejo.
-#
 # ── Registration ───────────────────────────────────────────────────────────
-# A runner registers with a token the *server* mints, so there is nothing to
-# author by hand and nothing worth encrypting: the token is machine-local and
-# meaningless off this box, which is why it is not an agenix secret like the
-# Cloudflare or provider keys. forgejo-runner-token.service below mints one and
-# keeps it. Keeping it matters — the runner module re-registers whenever the
-# token's hash changes, so a fresh token per boot would leave a trail of dead
-# runners in the admin UI. It has to run after forgejo.service because the CLI
-# drives Forgejo's internal HTTP API rather than the database.
+# services.forgejo-runner takes a pre-registered UUID + token pair rather than a
+# registration token, so forgejo-runner-token.service registers one itself via
+# `forgejo-cli actions register` with a 40-hex shared secret. That secret *is*
+# the token, and both Forgejo and the runner derive the UUID from its first 16
+# characters (gouuid.FromBytes over their ASCII bytes) — so pinning that prefix
+# here makes the UUID static at eval time, which the module needs because it
+# has no uuid_url, while the remaining 96 random bits are minted on the box.
+# The secret is machine-local and meaningless off this box, which is why it is
+# not an agenix secret like the Cloudflare or provider keys. It is minted once
+# and kept, so the runner keeps one identity in the admin UI; registration is
+# idempotent and re-runs every start. It has to run after forgejo.service
+# because the CLI drives Forgejo's internal HTTP API rather than the database.
 #
 # ── Reaching the forge from inside a job container ─────────────────────────
 # Jobs clone from GITHUB_SERVER_URL, which Forgejo fills in from ROOT_URL, so a
@@ -38,7 +38,7 @@
 # runs squat.
 {
   config,
-  pkgs,
+  lib,
   ...
 }: let
   # podman's default bridge and the gateway address containers see the host as.
@@ -47,44 +47,49 @@
   cacheProxyPort = 8100;
 
   domain = config.services.forgejo.settings.server.DOMAIN;
-  # The unit services.gitea-actions-runner derives from the instance name.
-  runnerUnit = "gitea-runner-nixmachine.service";
-  tokenFile = "/var/lib/forgejo-runner-token/env";
-in {
-  services.gitea-actions-runner = {
-    package = pkgs.forgejo-runner;
+  # The unit services.forgejo-runner derives from the instance name.
+  runnerUnit = "forgejo-runner-nixmachine.service";
+  secretFile = "/var/lib/forgejo-runner-token/secret";
 
-    instances.nixmachine = {
-      enable = true;
-      name = "nixmachine";
-      # No trailing slash: the runner appends its own paths to this.
-      url = "https://${domain}";
-      inherit tokenFile;
+  secretPrefix = "1c933ccc66353a1a";
+  uuid = let
+    hex = lib.concatMapStrings (c: lib.toLower (lib.toHexString (lib.strings.charToInt c))) (lib.stringToCharacters secretPrefix);
+    part = start: len: builtins.substring start len hex;
+  in "${part 0 8}-${part 8 4}-${part 12 4}-${part 16 4}-${part 20 12}";
+in {
+  services.forgejo-runner.instances.nixmachine = {
+    enable = true;
+    secrets.server.connections.default.token_url = secretFile;
+
+    settings = {
+      server.connections.default = {
+        # No trailing slash: the runner appends its own paths to this.
+        url = "https://${domain}";
+        inherit uuid;
+      };
 
       # `ubuntu-latest` so workflows lifted from GitHub match without an edit.
       # A plain tag rather than a digest like the oci-containers pins
       # elsewhere: this is the image a *job* runs in, and pinning it would
       # freeze CI's toolchain to whatever was current the day this was written.
-      labels = [
+      runner.labels = [
         "ubuntu-latest:docker://node:24-bookworm"
         "docker:docker://node:24-bookworm"
       ];
 
-      settings = {
-        container = {
-          network = "bridge";
-          options = "--add-host=${domain}:${gateway}";
-        };
-        cache = {
-          host = gateway;
-          proxy_port = cacheProxyPort;
-        };
+      container = {
+        network = "bridge";
+        options = "--add-host=${domain}:${gateway}";
+      };
+      cache = {
+        host = gateway;
+        proxy_port = cacheProxyPort;
       };
     };
   };
 
   systemd.services.forgejo-runner-token = {
-    description = "Mint and persist the Forgejo Actions runner registration token";
+    description = "Mint, persist and register the Forgejo Actions runner secret";
     after = ["forgejo.service"];
     requires = ["forgejo.service"];
     before = [runnerUnit];
@@ -96,16 +101,17 @@ in {
       FORGEJO_CUSTOM = config.services.forgejo.customDir;
     };
 
-    # Assign before writing, and assert non-empty: `set -e` does not trip on a
+    # Assign before writing, and assert the length: `set -e` does not trip on a
     # command substitution that fails inside an argument list, so writing the
-    # token inline would persist a bare `TOKEN=` on a failed mint — and the
+    # random half inline would persist a bare prefix on a failed read — and the
     # file test below would then read as done and never retry.
     script = ''
-      if [ ! -s '${tokenFile}' ]; then
-        token=$(forgejo forgejo-cli actions generate-runner-token)
-        [ -n "$token" ]
-        printf 'TOKEN=%s\n' "$token" > '${tokenFile}'
+      if [ ! -s '${secretFile}' ]; then
+        random=$(od -An -N12 -tx1 /dev/urandom | tr -d ' \n')
+        [ "''${#random}" -eq 24 ]
+        printf '%s%s' '${secretPrefix}' "$random" > '${secretFile}'
       fi
+      forgejo forgejo-cli actions register --secret-file '${secretFile}' --name nixmachine
     '';
 
     serviceConfig = {
