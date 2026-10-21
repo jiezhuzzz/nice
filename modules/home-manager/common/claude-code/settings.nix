@@ -72,14 +72,14 @@ in {
         ];
       };
       skipDangerousModePermissionPrompt = true;
+      # A setting rather than CLAUDE_CODE_EFFORT_LEVEL: the env var outranks
+      # /effort, so it would block session-only changes (`s` in the slider).
+      # Per-model because Claude Code (2.1.303) honours a top-level
+      # effortLevel in user settings only for a legacy model list ending at
+      # opus-5/fable-5-1; newer models read modelSettings.<model> alone. Keys
+      # are alias-resolved before matching, so `opus` follows each new Opus.
+      modelSettings.opus.effortLevel = "high";
       env = {
-        # Effort comes from the env var rather than the `effortLevel` setting
-        # key: Claude Code "pins" each new Opus version to its built-in launch
-        # effort (opus-4-8 defaults to "high") and ignores the persisted
-        # effortLevel until effort is changed interactively once — which never
-        # happens here because settings.json is a read-only Nix symlink (/effort
-        # writes fail with EACCES). The env var bypasses the pin.
-        CLAUDE_CODE_EFFORT_LEVEL = "xhigh";
         CLAUDE_CODE_PLUGIN_CACHE_DIR = "${config.xdg.cacheHome}/claude/plugins";
         CLAUDE_CODE_DEBUG_LOGS_DIR = "${config.xdg.stateHome}/claude/logs";
         CLAUDE_CODE_TMPDIR = "/tmp/claude-code-${config.home.username}";
