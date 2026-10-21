@@ -46,8 +46,8 @@ _: {
     # `ssh cc@<floating-ip>` picks up the identity instead of falling through to
     # `Host *`. Both are the project's floating IP, reattached to whichever node
     # is the current bastion — change them together if the project gets a new one.
-    settings."uc 192.5.87.43" = {
-      HostName = "192.5.87.43";
+    settings."uc 192.5.87.20" = {
+      HostName = "192.5.87.20";
       User = "cc";
       ForwardAgent = true;
     };

@@ -36,7 +36,7 @@ _: {
     IdentityFile = "/run/agenix/chameleon-ssh-key";
     IdentitiesOnly = true;
   };
-  programs.ssh.settings."uc 192.5.87.43" = {
+  programs.ssh.settings."uc 192.5.87.20" = {
     IdentityFile = "/run/agenix/chameleon-ssh-key";
     IdentitiesOnly = true;
   };

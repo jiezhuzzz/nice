@@ -9,7 +9,7 @@ LEASE_NAME="${1:?Usage: $0 <lease-name>}"
 CHI_SITE="${CHI_SITE:-uc}"
 
 case "$CHI_SITE" in
-uc) FLOATING_IP="192.5.87.43" ;;
+uc) FLOATING_IP="192.5.87.20" ;;
 tacc) FLOATING_IP="129.114.108.129" ;;
 *)
   echo "Unknown site: $CHI_SITE" >&2

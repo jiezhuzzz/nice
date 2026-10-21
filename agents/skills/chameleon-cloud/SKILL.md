@@ -113,7 +113,7 @@ After instances are ACTIVE, run the attach script. It attaches the site's pre-ex
 
 | Site | Floating IP |
 |------|-------------|
-| CHI@UC | `192.5.87.43` |
+| CHI@UC | `192.5.87.20` |
 | CHI@TACC | `129.114.108.129` |
 
 ```bash
