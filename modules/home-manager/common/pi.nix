@@ -1,6 +1,7 @@
 {
   config,
   inputs,
+  lib,
   pkgs,
   ...
 }: let
@@ -77,14 +78,13 @@ in {
     package = llmAgents.pi;
     configDir = "${config.xdg.configHome}/pi/agent";
     settings = {
-      defaultProvider = "openai-codex";
+      defaultProvider = "openai";
       defaultModel = "gpt-6-astra";
       defaultThinkingLevel = "xhigh";
       quietStartup = true;
       hideThinkingBlock = false;
       packages = [
         # "npm:context-mode" # sandboxed code execution to shrink context use
-        "npm:pi-mcp-adapter"
         "npm:pi-subagents"
         "npm:pi-web-access"
         "npm:@narumitw/pi-starship"
@@ -100,11 +100,13 @@ in {
     };
   };
 
-  # pi-starship reads exactly one file, <configDir>/pi-starship.toml, so this
-  # has to track configDir above. `/starship settings` edits that same path and
-  # will fail against a store symlink — treat the TUI as a preview.
-  xdg.configFile."pi/agent/pi-starship.toml".source =
-    (pkgs.formats.toml {}).generate "pi-starship.toml" piStarshipSettings;
+  # pi-starship rejects symlinks; reset a regular copy from Nix on activation.
+  # Changes made through `/starship` last only until the next activation.
+  home.activation.piStarshipSettings = lib.hm.dag.entryAfter ["linkGeneration"] ''
+    run ${pkgs.coreutils}/bin/install -Dm600 \
+      ${(pkgs.formats.toml {}).generate "pi-starship.toml" piStarshipSettings} \
+      ${lib.escapeShellArg "${config.programs.pi-coding-agent.configDir}/pi-starship.toml"}
+  '';
 
   home.sessionVariables.PI_CODING_AGENT_SESSION_DIR = "${config.xdg.stateHome}/pi/sessions";
 }
