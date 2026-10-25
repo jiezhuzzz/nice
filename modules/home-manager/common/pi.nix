@@ -89,6 +89,7 @@ in {
         "npm:pi-web-access"
         "npm:@narumitw/pi-starship"
         "npm:pi-btw"
+        "npm:pi-ask-user"
 
         "${inputs.ponytail}"
         "${inputs.caveman}"
