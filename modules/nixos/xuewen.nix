@@ -29,13 +29,33 @@
 {
   config,
   inputs,
+  pkgs,
   ...
-}: {
+}: let
+  inherit (pkgs.stdenv.hostPlatform) system;
+  toolchain = inputs.xuewen.inputs.fenix.packages.${system}.stable.minimalToolchain;
+in {
   imports = [inputs.xuewen.nixosModules.default];
 
   services.xuewen = {
     enable = true;
     port = 8087;
+
+    # HACK: nixpkgs builds rustc 1.99 against LLVM 21, but 1.99's stdarch
+    # declares the LLVM 22+ AVX-512 VNNI intrinsic signatures, so qdrant-edge
+    # fails with "intrinsic signature mismatch for llvm.x86.avx512.vpdpbusd.512".
+    # Rebuild the upstream package with fenix's rustup toolchain, which bundles
+    # a matching LLVM. Drop once nixpkgs' rustc moves to LLVM 22+.
+    package = import "${inputs.xuewen}/nix/packages/xuewen.nix" {
+      flake = inputs.xuewen;
+      perSystem.self = inputs.xuewen.packages.${system};
+      pkgs = pkgs.extend (_: prev: {
+        rustPlatform = prev.makeRustPlatform {
+          cargo = toolchain;
+          rustc = toolchain;
+        };
+      });
+    };
 
     settings = {
       # Sent as the User-Agent on Crossref/arXiv metadata lookups, which puts
