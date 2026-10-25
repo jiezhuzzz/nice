@@ -8,9 +8,9 @@ _: {
   services.avahi = {
     enable = true;
     nssmdns4 = true; # resolve other hosts' <name>.local from this machine
-    publish = {
-      enable = true;
-      addresses = true; # advertise this host's A records as <hostname>.local
+    settings.publish = {
+      disable-publishing = false;
+      publish-addresses = true; # advertise this host's A records as <hostname>.local
     };
     openFirewall = true; # UDP 5353
   };

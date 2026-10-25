@@ -17,4 +17,20 @@
     capSysAdmin = true;
     autoStart = true;
   };
+
+  # HACK: upstream sunshine.nix still sets the obsolete avahi.publish.* options
+  # (mkDefault), which trips evaluation warnings. Null them out and set the
+  # settings-based equivalents Moonlight discovery needs. Drop once nixpkgs
+  # migrates the sunshine module.
+  services.avahi = {
+    publish = {
+      enable = null;
+      userServices = null;
+    };
+    settings.publish = {
+      disable-publishing = false;
+      disable-user-service-publishing = false;
+      publish-addresses = true;
+    };
+  };
 }
