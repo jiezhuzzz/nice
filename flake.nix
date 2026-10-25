@@ -36,12 +36,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Pinned to a master rev, not a tag: only master has
-    # autoEnrollKeys.includeFirmwareBuiltinKeys, which nixps needs to keep its
-    # OEM certificates (and thus fwupd) working through key enrollment. Move
-    # back to a tag once one ships with that option.
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/6183ac79eadb079a1e72fa2c60915601be669100";
+      url = "github:nix-community/lanzaboote/v1.2.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -66,9 +62,6 @@
 
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
-      # Track brew HEAD instead of nix-homebrew's brew-src pin: the taps below
-      # follow HEAD, so a lagging brew fails to parse casks using newer DSL.
-      inputs.brew-src.url = "github:Homebrew/brew";
     };
 
     # Taps pinned via flake.lock (mutableTaps = false).

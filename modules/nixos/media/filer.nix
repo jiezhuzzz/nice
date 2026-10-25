@@ -14,7 +14,7 @@
     src = ./filer;
     build-system = [pkgs.python3.pkgs.hatchling];
     dependencies = [pkgs.python3.pkgs.guessit];
-    doCheck = false; # tests are the dev loop (uv), not the build
+    nativeCheckInputs = [pkgs.python3.pkgs.pytestCheckHook];
   };
 
   queue = "/tank/media/downloads/.filer-queue";

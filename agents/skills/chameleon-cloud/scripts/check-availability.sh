@@ -8,7 +8,6 @@ CHI="$(cd "$(dirname "$0")" && pwd)/chi.sh"
 hosts=$("$CHI" blazar host-list --long -f json)
 allocations=$("$CHI" blazar allocation-list host -f json)
 
-# shellcheck disable=SC2016 # $now/$hosts/$alloc are jq-program variables bound via --arg, not shell vars
 jq -nr --argjson hosts "$hosts" --argjson alloc "$allocations" --arg now "$(date -u +%Y-%m-%dT%H:%M:%S)" '
   ($alloc
     | map({(.resource_id | tostring): ([.reservations[] | select(.start_date <= $now and .end_date >= $now) | .end_date] | max)})

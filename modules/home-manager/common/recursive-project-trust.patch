@@ -1,28 +1,8 @@
-diff --git a/config/src/config_toml.rs b/config/src/config_toml.rs
-index 7270c3f329..e2029b8ad3 100644
---- a/config/src/config_toml.rs
-+++ b/config/src/config_toml.rs
-@@ -862,6 +862,15 @@ fn normalize_project_lookup_key(key: String) -> String {
- fn project_config_for_lookup_key(
-     projects: &HashMap<String, ProjectConfig>,
-     lookup_key: &str,
-+) -> Option<ProjectConfig> {
-+    Path::new(lookup_key)
-+        .ancestors()
-+        .find_map(|path| project_config_for_exact_lookup_key(projects, &path.to_string_lossy()))
-+}
-+
-+fn project_config_for_exact_lookup_key(
-+    projects: &HashMap<String, ProjectConfig>,
-+    lookup_key: &str,
- ) -> Option<ProjectConfig> {
-     if let Some(project_config) = projects.get(lookup_key) {
-         return Some(project_config.clone());
 diff --git a/config/src/loader/mod.rs b/config/src/loader/mod.rs
-index d154f87e1d..14bfde2a4e 100644
+index b78dee7..17d29fa 100644
 --- a/config/src/loader/mod.rs
 +++ b/config/src/loader/mod.rs
-@@ -1052,6 +1052,15 @@ fn normalize_project_trust_lookup_key(key: String) -> String {
+@@ -1599,6 +1599,15 @@ fn normalize_project_trust_lookup_key(key: String) -> String {
  fn project_trust_for_lookup_key(
      projects_trust: &std::collections::HashMap<String, TrustLevel>,
      lookup_key: &str,
@@ -38,3 +18,104 @@ index d154f87e1d..14bfde2a4e 100644
  ) -> Option<(String, TrustLevel)> {
      if let Some(trust_level) = projects_trust.get(lookup_key).copied() {
          return Some((lookup_key.to_string(), trust_level));
+@@ -1613,6 +1622,33 @@ fn project_trust_for_lookup_key(
+         .first()
+         .map(|(key, trust_level)| ((**key).clone(), **trust_level))
+ }
++
++#[cfg(test)]
++mod recursive_project_trust_tests {
++    use super::*;
++
++    #[test]
++    fn recursive_project_trust_preserves_nearest_entry_and_path_boundaries() {
++        let projects = std::collections::HashMap::from([
++            ("/home/jie".to_string(), TrustLevel::Trusted),
++            ("/home/jie/blocked".to_string(), TrustLevel::Untrusted),
++        ]);
++        for (path, expected) in [
++            ("/home/jie/repo/src", Some(("/home/jie", TrustLevel::Trusted))),
++            (
++                "/home/jie/blocked/src",
++                Some(("/home/jie/blocked", TrustLevel::Untrusted)),
++            ),
++            ("/home/jie-other/repo", None),
++        ] {
++            assert_eq!(
++                project_trust_for_lookup_key(&projects, path),
++                expected.map(|(key, trust)| (key.to_string(), trust)),
++            );
++        }
++    }
++}
++
+ /// Takes a `toml::Value` parsed from a config.toml file and walks through it,
+ /// resolving any `AbsolutePathBuf` fields against `base_dir`, returning a new
+ /// `toml::Value` with the same shape but with paths resolved.
+diff --git a/config/src/project_trust.rs b/config/src/project_trust.rs
+index 82678af..20e49f8 100644
+--- a/config/src/project_trust.rs
++++ b/config/src/project_trust.rs
+@@ -78,15 +78,21 @@ pub fn get_active_project_for_lookup(
+         lookup: &ProjectTrustLookup,
+     ) -> Option<ProjectConfig> {
+         let projects = self.projects.as_ref()?;
+-        for key in &lookup.keys {
+-            if let Some(project) = projects.get(key) {
++        let parent_keys = lookup.keys.iter().flat_map(|key| {
++            Path::new(key)
++                .ancestors()
++                .skip(1)
++                .map(|path| path.to_string_lossy().into_owned())
++        });
++        for key in lookup.keys.iter().cloned().chain(parent_keys) {
++            if let Some(project) = projects.get(&key) {
+                 return Some(project.clone());
+             }
+             // Preserve native exact-key preference and deterministic selection
+             // when multiple Windows keys differ only in ASCII case.
+             if let Some((_, project)) = projects
+                 .iter()
+-                .filter(|(candidate, _)| normalize_lookup_key(candidate, lookup.convention) == *key)
++                .filter(|(candidate, _)| normalize_lookup_key(candidate, lookup.convention) == key)
+                 .min_by_key(|(candidate, _)| *candidate)
+             {
+                 return Some(project.clone());
+diff --git a/config/src/project_trust_tests.rs b/config/src/project_trust_tests.rs
+index f935b0e..33dd37a 100644
+--- a/config/src/project_trust_tests.rs
++++ b/config/src/project_trust_tests.rs
+@@ -89,3 +89,33 @@ fn windows_prefers_exact_normalized_key_then_sorted_aliases() {
+         ],
+     );
+ }
++
++#[test]
++fn recursive_project_trust_preserves_nearest_entry_and_path_boundaries() {
++    let config = config_with_projects(&[
++        ("/home/jie", Some(TrustLevel::Trusted)),
++        ("/home/jie/blocked", Some(TrustLevel::Untrusted)),
++        ("/home/jie/unset", None),
++    ]);
++    for (path, expected) in [
++        ("/home/jie/repo/src", Some(Some(TrustLevel::Trusted))),
++        ("/home/jie/blocked/src", Some(Some(TrustLevel::Untrusted))),
++        ("/home/jie/unset/src", Some(None)),
++        ("/home/jie-other/repo", None),
++    ] {
++        let lookup = ProjectTrustLookup::from_paths(
++            PathConvention::Posix,
++            ProjectTrustPath {
++                original: path.into(),
++                canonical: None,
++            },
++            None,
++        );
++        assert_eq!(
++            config
++                .get_active_project_for_lookup(&lookup)
++                .map(|project| project.trust_level),
++            expected,
++        );
++    }
++}

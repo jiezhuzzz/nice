@@ -23,7 +23,6 @@ servers=$("$CHI" openstack server list --long -n -f json)
 
 # `any(. == x)` (not `index`) avoids jq treating list index 0 as falsy.
 # In `openstack server list --long`, .Host is the hypervisor_hostname.
-# shellcheck disable=SC2016 # $resids/$alloc/etc. are jq-program variables bound via --argjson, not shell vars
 result=$(jq -n \
   --argjson alloc "$alloc" \
   --argjson hosts "$hosts" \

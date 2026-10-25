@@ -12,14 +12,6 @@
     ../modules/nix-darwin/system.nix
   ];
 
-  # direnv 2.37.1 checkPhase hangs on macOS due to sandbox restrictions
-  nixpkgs.overlays = [
-    (final: prev: {
-      direnv = prev.direnv.overrideAttrs (old: {
-        doCheck = false;
-      });
-    })
-  ];
   nix.enable = false;
 
   programs.fish.enable = true;

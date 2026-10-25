@@ -25,9 +25,7 @@
 # that reach their provider directly and so need real keys from
 # environmentFile: Agent Ask (the Claude Code / Codex SDKs) and DeepL.
 #
-# Semantic search needs a Qdrant server; it runs as an OCI container at the
-# bottom of this file rather than services.qdrant, for the toolchain reason
-# documented there.
+# Semantic search stores vectors in-process under /var/lib/xuewen/search-vectors.
 {
   config,
   inputs,
@@ -51,13 +49,6 @@
       # web UI's "Institutional access" panel, or with
       # `xuewen proxy-cookie --set '<cookie>'`.
       proxy.login_url = "https://proxy.uchicago.edu/login?url=";
-
-      # Semantic search rides on the Qdrant instance enabled below. Upstream's
-      # default is http://localhost:6333, which also resolves to ::1 — Qdrant
-      # only binds 127.0.0.1, so name the literal and skip the dead attempt.
-      # (index_dir is set by the module under dataDir; recursiveUpdate is deep,
-      # so naming one key here leaves the other default intact.)
-      search.qdrant_url = "http://127.0.0.1:6333";
 
       # Daily arXiv recommendations, surfaced at /api/daily for the Glance
       # dashboard. New announcements are scored against the embeddings of the
@@ -113,7 +104,7 @@
         # this inherits base_url/api_key above and only names the model. dims
         # must match what the API returns or the embedder aborts — 1536 is
         # text-embedding-3-small's native width. Changing either means
-        # dropping the Qdrant collection and re-embedding the library.
+        # rebuilding the vector store with `xuewen index rebuild --vectors-only`.
         embedding = {
           model = "text-embedding-3-small";
           dims = 1536;
@@ -143,57 +134,6 @@
     # so a file still missing DEEPL_API_KEY costs only the DeepL translations —
     # everything else, translate-via-LLM included, keeps working.
     environmentFile = config.age.secrets.xuewen-provider-keys.path;
-  };
-
-  # Vector store for [ai.embedding] above — xuewen is its only consumer, so it
-  # lives here rather than in a module of its own.
-  #
-  # Deliberately NOT services.qdrant. nixpkgs' rustc 1.97.1 is linked against
-  # LLVM 21.1.8, whose llvm.x86.avx512.vpdpbusd.512 takes three <16 x i32>
-  # operands, while the stdarch bundled in that same rustc still declares the
-  # pre-LLVM-21 (<16 x i32>, <64 x i8>, <64 x i8>) form. Any crate calling
-  # _mm512_dpbusd_epi32 therefore fails to codegen, and qdrant's
-  # lib/quantization calls it — so the native build dies, and hydra fails
-  # identically, which is why qdrant never substitutes and lands in "will be
-  # built". There is no escape hatch: the intrinsic sits behind
-  # #[target_feature(enable = "avx512vnni")], so -C target-feature=-avx512vnni
-  # does not suppress it, the derivation exposes no cargo feature for the SIMD
-  # path, and nixpkgs carries no second rust toolchain to override with (only
-  # rust_1_97). Reverting the flake.lock bump does not help either — the
-  # committed nixpkgs pins the same rustc, LLVM and qdrant.
-  #
-  # The upstream image is the same 1.18.2, prebuilt, so nothing is lost but the
-  # native unit. Revisit services.qdrant once rustc and LLVM agree again.
-  #
-  # Pinned by digest like metatube; bump deliberately (pull the tag, then
-  # `podman inspect --format '{{index .RepoDigests 0}}'`). Setting `backend`
-  # here too is safe — the option merges equal definitions, and this module
-  # must not depend on metatube.nix being imported.
-  virtualisation.oci-containers = {
-    backend = "podman";
-    containers.qdrant = {
-      image = "docker.io/qdrant/qdrant@sha256:75eab8c4ba42096724fdcfde8b4de0b5713d529dde32f285a1f86fdcb2c9e50c";
-      # Only the HTTP REST port: xuewen drives Qdrant over reqwest against
-      # /collections/xuewen/points, never the :6334 gRPC one. Published to
-      # loopback, so the container's own 0.0.0.0 bind stays inside its netns.
-      ports = ["127.0.0.1:6333:6333"];
-      volumes = ["/var/lib/qdrant:/qdrant/storage"];
-      environment = {
-        # Matches what the nixpkgs module set for us.
-        QDRANT__TELEMETRY_DISABLED = "true";
-        # Default is /qdrant/snapshots, outside the volume above — keep
-        # snapshots on persistent storage rather than in the container layer.
-        QDRANT__STORAGE__SNAPSHOTS_PATH = "/qdrant/storage/snapshots";
-      };
-    };
-  };
-
-  # The generated container unit runs as root, so StateDirectory creates
-  # /var/lib/qdrant as persistent root-owned storage before Podman resolves the
-  # bind mount above.
-  systemd.services.podman-qdrant.serviceConfig = {
-    StateDirectory = "qdrant";
-    StateDirectoryMode = "0750";
   };
 
   age.secrets.xuewen-provider-keys = {

@@ -6,23 +6,7 @@
   ...
 }: let
   # ccstatusline from llm-agents.nix (like claude-code itself in settings.nix).
-  #
-  # HACK: llm-agents.nix installs only dist/ccstatusline.js, but 2.2.32 split
-  # dist/ into chunks the entry point imports relatively, so it dies with
-  # ERR_MODULE_NOT_FOUND and Claude Code draws no status line. Ship all of
-  # dist/ until upstream does; node resolves the chunks next to the symlink's
-  # target.
-  ccstatusline = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccstatusline.overrideAttrs {
-    installPhase = ''
-      runHook preInstall
-      mkdir -p $out/lib $out/bin
-      cp -r --no-preserve=mode $src/dist $out/lib/ccstatusline
-      chmod +x $out/lib/ccstatusline/ccstatusline.js
-      patchShebangs $out/lib/ccstatusline/ccstatusline.js
-      ln -s $out/lib/ccstatusline/ccstatusline.js $out/bin/ccstatusline
-      runHook postInstall
-    '';
-  };
+  ccstatusline = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccstatusline;
 
   # ccstatusline renders the status line from this JSON, replacing the
   # hand-rolled shell script that used to live here — which forked jq nine

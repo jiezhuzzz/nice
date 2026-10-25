@@ -6,12 +6,6 @@
 }: {
   programs.rio = {
     enable = true;
-    # librio's tests spawn a real shell through /usr/bin/login, which the macOS
-    # build sandbox denies, so 15 of them fail on every rebuild here.
-    package =
-      if pkgs.stdenv.hostPlatform.isDarwin
-      then pkgs.rio.overrideAttrs {doCheck = false;}
-      else pkgs.rio;
     settings =
       {
         fonts = {

@@ -37,11 +37,6 @@
   # Generic user-bin dir (npm --prefix, pipx, ad-hoc scripts) ahead of the profile.
   home.sessionPath = ["${config.home.homeDirectory}/.local/bin"];
   programs.man.generateCaches = false;
-  # HACK: Building the home-configuration.nix(5) man page makes Determinate Nix
-  # warn that options.json references nixpkgs without a proper context
-  # (https://github.com/nix-community/home-manager/issues/7935). Re-enable
-  # once that is fixed.
-  manual.manpages.enable = false;
   programs.home-manager.enable = true;
   home.stateVersion = "26.05";
 }
