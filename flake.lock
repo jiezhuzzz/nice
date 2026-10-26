@@ -114,11 +114,11 @@
     "caveman": {
       "flake": false,
       "locked": {
-        "lastModified": 1792828912,
-        "narHash": "sha256-CqPyPn6q88TU7XBYeRnQJumOymPdgNVHuaW9UPOAc+Q=",
+        "lastModified": 1792915057,
+        "narHash": "sha256-fuSsPP7GMuAZ5Ab2paS41RAo5k/objd503ElcMeMgsk=",
         "owner": "JuliusBrussee",
         "repo": "caveman",
-        "rev": "1f951fb4ad40ba63302c6e7f987147e034d599d9",
+        "rev": "9b68f7ed12b05e7efaff18e65c5a3fc2849fd0a4",
         "type": "github"
       },
       "original": {
@@ -334,11 +334,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792818371,
-        "narHash": "sha256-yhEZAzZRNvzYpoAlyFY3wM75V9BmkIXJIueof8S5gOg=",
+        "lastModified": 1792896866,
+        "narHash": "sha256-/0tELNnhdSnP+bHSdWiEe6KpfSwi6WrTnT9cm/jNkjA=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2cd3234928f60bbff695a7ee56115ef7799c47cd",
+        "rev": "c216bf5a1f173b0481bd5c8c489ebe5595ecc68c",
         "type": "github"
       },
       "original": {
@@ -366,11 +366,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1792886726,
-        "narHash": "sha256-rXmMbY2f00MtFHJETn2TKoMHjXjoNMamyejsd9xxM1M=",
+        "lastModified": 1792981861,
+        "narHash": "sha256-GiDcZJBRk7HAQduhxaWemjZOIYfpXzUBEqhAmCVjjZQ=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "f1a4cbde06607cc3a3d8329bf92248e24aa98d66",
+        "rev": "261e054a0ec5937208ba6190c6077d1f7cff675e",
         "type": "github"
       },
       "original": {
@@ -382,11 +382,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1792886928,
-        "narHash": "sha256-jQh9f8pmpICU9ZL+Kv/zfOiUr5ZVerBu5w2PNEoSXl0=",
+        "lastModified": 1792983462,
+        "narHash": "sha256-ncMrTSs4rXGzHTjlun2Usv21a6kjXhEVtJH+4P4/k58=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "140d741251c7721615a7b67893d6d2ea9cd58aa2",
+        "rev": "aedf4d3a92cb00c123a1d85c1e8a2e7779b2baef",
         "type": "github"
       },
       "original": {
@@ -430,11 +430,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1792883840,
-        "narHash": "sha256-fOCJxUUwPleEubikxI0jiscUTz+GJdb1aJRoteXCRk0=",
+        "lastModified": 1792971270,
+        "narHash": "sha256-pvkekz4R2bbObsKIKQlTkhSw7iEdDXtrfhILxBKLQaQ=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "e1e35b247842f7366c4e51904a24673139380dd1",
+        "rev": "0784674971b3ee4681aea5b5e9641c75faf7e846",
         "type": "github"
       },
       "original": {
@@ -532,11 +532,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1792782095,
-        "narHash": "sha256-KtL+p7f7jY34cO5Mt0/hUZNE3spnINk7hwpYxM2XLC4=",
+        "lastModified": 1792812153,
+        "narHash": "sha256-T2+XBfNbf9pecLUWS4+RtuVNZ3W8K5taG5QdV71mWlk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "901c54c08bdc20e00c2b3c73716b97497b1b3c74",
+        "rev": "674a2028661e550a97400c1cc992b9cca9a668a1",
         "type": "github"
       },
       "original": {
@@ -553,11 +553,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792885641,
-        "narHash": "sha256-lfb7OhsnGd/lmL7TFZ61DMZ/bOT9DeYUsmZpcMk4ptU=",
+        "lastModified": 1792983731,
+        "narHash": "sha256-hRSb/0yZBhubFQrT3npu+ygQk+3f52o19YFyrbVID+E=",
         "owner": "noctalia-dev",
         "repo": "noctalia",
-        "rev": "f0ffa94befc98e0a846c80a129cb5953d53908dd",
+        "rev": "5f22715258565a08cd3b7780bbe2bd3c04eff60f",
         "type": "github"
       },
       "original": {
@@ -573,11 +573,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792782888,
-        "narHash": "sha256-aURVafwEQ2TobqPLV4YbgCivbHRVENb/hFnuK/WGqMQ=",
+        "lastModified": 1792894449,
+        "narHash": "sha256-23ynML6xH86MdfydW4bGPuReToZhqFspAO8Q220i/hM=",
         "owner": "noctalia-dev",
         "repo": "noctalia-greeter",
-        "rev": "8cc00abfdce3d8c1e68709a44eb0efc055932ada",
+        "rev": "dbace1c834a9e0f2e1b5d4ef186db8ec3b422a49",
         "type": "github"
       },
       "original": {
