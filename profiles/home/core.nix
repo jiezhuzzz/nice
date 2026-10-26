@@ -33,7 +33,11 @@
 
   home.preferXdgDirectories = true;
   xdg.enable = true;
-  home.sessionVariables.CARGO_HOME = "${config.xdg.dataHome}/cargo";
+  home.sessionVariables = {
+    CARGO_HOME = "${config.xdg.dataHome}/cargo";
+    GOPATH = "${config.xdg.dataHome}/go";
+    GOMODCACHE = "${config.xdg.cacheHome}/go/mod";
+  };
   # Generic user-bin dir (npm --prefix, pipx, ad-hoc scripts) ahead of the profile.
   home.sessionPath = ["${config.home.homeDirectory}/.local/bin"];
   programs.man.generateCaches = false;

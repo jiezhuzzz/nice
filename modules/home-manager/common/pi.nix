@@ -9,8 +9,8 @@
   piThemes = "${inputs.pi-catppuccin.packages.${pkgs.stdenv.hostPlatform.system}.default}/share/pi/themes";
 
   # Nord colors and segment order follow claude-code/statusline.nix.
-  # `time` is the wall clock rather than elapsed session time, and `context`
-  # reports the window consumed where ccstatusline inverts it to what is left.
+  # `context` reports the window consumed where ccstatusline inverts it to what
+  # is left.
   sep = "[ │ ](polar_night_3)";
   piStarshipSettings = {
     palette = "nord";
@@ -28,7 +28,7 @@
     };
     # Branch and worktree sit in conditional groups so their separator leaves
     # with them outside a repo or a linked worktree.
-    format = "$model $thinking${sep}$directory(${sep}$git_branch)(${sep}$git_worktree)${sep}$context${sep}$cost${sep}$time";
+    format = "$model $thinking${sep}$directory(${sep}$git_branch)(${sep}$git_worktree)${sep}$context${sep}$cost";
     model = {
       format = "[$model]($style)";
       style = "bold frost_1";
