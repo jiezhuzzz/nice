@@ -25,6 +25,7 @@
     ../../modules/home-manager/common/claude-code
     # ../../modules/home-manager/common/codex.nix
     ../../modules/home-manager/common/pi.nix
+    ../../modules/home-manager/common/go.nix
     ../../modules/home-manager/common/uv.nix
     ../../modules/home-manager/common/npm.nix
     ../../modules/home-manager/common/delta.nix
@@ -35,8 +36,6 @@
   xdg.enable = true;
   home.sessionVariables = {
     CARGO_HOME = "${config.xdg.dataHome}/cargo";
-    GOPATH = "${config.xdg.dataHome}/go";
-    GOMODCACHE = "${config.xdg.cacheHome}/go/mod";
   };
   # Generic user-bin dir (npm --prefix, pipx, ad-hoc scripts) ahead of the profile.
   home.sessionPath = ["${config.home.homeDirectory}/.local/bin"];
