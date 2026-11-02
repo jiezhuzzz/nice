@@ -12,8 +12,8 @@
   # hand-rolled shell script that used to live here — which forked jq nine
   # times and git twice on every single render.
   #
-  # Widgets read `rate_limits.five_hour` / `.seven_day` straight out of the
-  # status payload, so the 5h/7d numbers cost no API call. One thing is lost
+  # The weekly widget reads `rate_limits.seven_day` straight out of the status
+  # payload, so the 7d number costs no API call. One thing is lost
   # against the old script: ccstatusline has no value-driven colour, so nothing
   # turns amber or red as the context fills.
   #
@@ -90,10 +90,8 @@
         (seg "worktree" "worktree-name" nord.frost0 {rawValue = true;})
         (sep "sep-ctx")
         (seg "ctx" "context-percentage" nord.green {metadata.inverse = "true";}) # percent remaining, not consumed
-        (sep "sep-session")
-        (seg "session" "session-usage" nord.yellow {})
         (sep "sep-weekly")
-        (seg "weekly" "weekly-usage" nord.orange {})
+        (seg "weekly" "weekly-usage" nord.orange {metadata.label = "Usage: ";})
         (sep "sep-cost")
         (seg "cost" "session-cost" nord.red {
           bold = true;
