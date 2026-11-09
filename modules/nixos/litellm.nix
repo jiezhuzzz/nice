@@ -16,6 +16,9 @@
     host = "127.0.0.1";
     port = 4000;
     environmentFile = config.age.secrets.litellm-provider-keys.path;
+    # LiteLLM >= 1.108 refuses to start without a master key; this gateway is
+    # deliberately keyless since it only listens on localhost.
+    settings.general_settings.dangerously_permit_weak_or_unset_master_key = true;
     settings.model_list = [
       {
         model_name = "Claude Opus 4.8 (high)";
